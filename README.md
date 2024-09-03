@@ -61,6 +61,7 @@ yarn install
 ```bash
 docker compose up -d
 ```
+##Scrip para CI/CD 🌐
 
 6. Levantar el proyecto (en dev mode)
 
