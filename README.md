@@ -67,3 +67,4 @@ docker compose up -d
 ```bash
 yarn start:dev
 ```
+## Scrip para CI/CD 🌐
