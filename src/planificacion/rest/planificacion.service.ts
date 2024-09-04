@@ -1,0 +1,114 @@
+import { BadRequestException, forwardRef, Inject, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { PlanificacionSocketService } from '../socket/planificacion.socket.service';
+import { Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Planificacion } from '../entities/planificacion.entity';
+import { normalizeDates } from 'src/utils';
+import { CreatePlanificacionDto, GetPlanificacionDto } from '../dto/rest';
+import { PlanificacionDetalle } from '../entities/planificacion-detalle.entity';
+import { CategoriasService } from 'src/inventario/rest/servicios-especificos';
+import { EnviosService } from 'src/logistica/envios/envios.service';
+
+@Injectable()
+export class PlanificacionService {
+  constructor(
+    private readonly categoriaService: CategoriasService,
+    @Inject(forwardRef(() => EnviosService))
+    private readonly enviosService: EnviosService,
+    @InjectRepository(Planificacion)
+    private readonly planificacionRepository: Repository<Planificacion>,
+    @InjectRepository(PlanificacionDetalle)
+    private readonly planificacionDetalleRepository: Repository<PlanificacionDetalle>,
+
+    @Inject(forwardRef(() => PlanificacionSocketService))
+    private readonly planificacionSocketService: PlanificacionSocketService,
+  ) { }
+
+  async create(createPlanificacionDto: CreatePlanificacionDto) {
+    try {
+      const { fecha, detalles } = createPlanificacionDto;
+
+      //Crear la planificacion
+      const planificacionCreated = this.planificacionRepository.create({
+        fecha,
+      });
+      const planificacion = await this.planificacionRepository.save(planificacionCreated);
+
+      //Crear el detalle de la planificacion
+      const detallesCreated = detalles.map((d) => {
+        const categoria = this.categoriaService.generateClass(d.categoria);
+        return this.planificacionDetalleRepository.create({
+          categoria,
+          planificacionDiaria: planificacion,
+          cantidadPlanificada: d.cantidadPlanificada,
+        })
+      });
+
+      await this.planificacionDetalleRepository.save(detallesCreated);
+      return planificacion;
+    } catch (error) {
+      throw new BadRequestException(error);
+    }
+  }
+
+  async findByFecha(getPlanificacionDto: GetPlanificacionDto) {
+    const { fecha } = getPlanificacionDto;
+    try {
+      const planificacion = await this.planificacionRepository.findOne({
+        where: {
+          isDeleted: false,
+          fecha: normalizeDates.normalize(fecha),
+        }
+      })
+      if (!planificacion) {
+        throw new NotFoundException(`No hay planificacion para la fecha ${fecha}`)
+      }
+      delete planificacion.isDeleted;
+
+      //Verificamos si hay un envio en proceso
+      const detallesEnEnvio = await this.enviosService.findAllEnvioCategoriasByFecha(fecha);
+      const envioEnProceso = detallesEnEnvio.length != 0;
+
+
+      if (envioEnProceso) {
+        return {
+          envioIniciado: envioEnProceso,
+          ...planificacion,
+          detalles: detallesEnEnvio,
+        }
+      }
+
+      const detalles = planificacion.detalles.map(d => {
+        delete d.isDeleted;
+        delete d.categoria.isDeleted;
+        const newDetalle = {
+          ...d,
+          isComplete: false,
+          categoria: d.categoria.nombre,
+          categoriaId: d.categoria.id,
+          urlImagen: d.categoria.urlImagen,
+        };
+        return newDetalle;
+      });
+      return {
+        envioIniciado: envioEnProceso,
+        ...planificacion,
+        detalles,
+      }
+    } catch (error) {
+      throw new InternalServerErrorException(error)
+    }
+  }
+  async deleteAll() {
+    const query1 = this.planificacionRepository.createQueryBuilder('planificacion');
+    const query2 = this.planificacionDetalleRepository.createQueryBuilder('planificacionDetalle');
+    try {
+      await query2.delete().where({}).execute();
+      await query1.delete().where({}).execute();
+      return;
+    } catch (error) {
+      console.log({ error })
+    }
+  }
+
+}

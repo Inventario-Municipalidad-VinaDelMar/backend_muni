@@ -11,7 +11,7 @@ export class Movimiento {
     cantidadRetirada: number;
 
     @Column({ type: 'date', default: () => 'CURRENT_DATE' })
-    fecha: string;
+    fecha: Date;
 
     @Column({ type: 'time', default: () => 'CURRENT_TIME' })
     hora: string;

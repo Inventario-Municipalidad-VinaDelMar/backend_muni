@@ -35,7 +35,6 @@ export class TandasService extends BaseService<Tanda> {
             }
 
             delete tandaWithRelations.isDeleted;
-
             return {
                 ...tandaWithRelations,
                 bodega: tandaWithRelations.bodega.nombre,

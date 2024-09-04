@@ -9,10 +9,13 @@ import { InventarioSocketGateway } from "./socket/inventario.socket.gateway";
 import { MovimientosModule } from "src/movimientos/movimientos.module";
 import { Bodega, Categoria, Producto, Tanda, Ubicacion } from "./entities";
 import { BodegasService, CategoriasService, ProductosService, TandasService, UbicacionesService } from "./rest/servicios-especificos";
+import { LogisticaModule } from "src/logistica/logistica.module";
 
 
 @Module({
     imports: [
+        LogisticaModule,
+
         TypeOrmModule.forFeature([Bodega, Categoria, Ubicacion, Producto, Tanda,]),
 
         //to allow circular import between "InventarioModule" and "MovimientoModule"

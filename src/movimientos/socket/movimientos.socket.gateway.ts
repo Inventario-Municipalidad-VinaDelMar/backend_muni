@@ -2,7 +2,7 @@ import { WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { MovimientosSocketService } from './movimientos.socket.service';
 import { Server } from 'socket.io';
 
-@WebSocketGateway()
+@WebSocketGateway({ cors: true, namespace: 'movimientos' })
 export class MovimientosSocketGateway {
   constructor(private readonly movimientosSocketService: MovimientosSocketService) { }
 

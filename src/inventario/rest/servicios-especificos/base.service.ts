@@ -21,7 +21,7 @@ export class BaseService<T> {
         }
     }
 
-    async generateClass(idEntity: string): Promise<T> {
+    generateClass(idEntity: string): T {
         const entity = this.repository.create() as T;
         (entity as any).id = idEntity;  // Asigna el id de forma explícita
         return entity;

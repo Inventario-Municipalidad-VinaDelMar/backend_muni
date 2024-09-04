@@ -32,7 +32,18 @@ interface SeedTanda {
     // idUbicacion: string;
 }
 
+interface SeedPlanificacionDetalle {
+    cantidadPlanificada: number;
+    categoria: string;
+}
+interface SeedPlanificacion {
+    fecha: string;
+    detalles: SeedPlanificacionDetalle[];
+}
+
 interface SeedData {
+    planificaciones: SeedPlanificacion[];
+    //inventario
     ubicaciones: SeedUbicacion[];
     categorias: SeedCategoria[];
     bodegas: SeedBodega[];
@@ -41,6 +52,54 @@ interface SeedData {
 }
 
 export const initialData: SeedData = {
+    planificaciones: [
+        {
+            fecha: '2024-09-02',
+            detalles: [
+                { cantidadPlanificada: 10, categoria: 'Fideos' },
+                { cantidadPlanificada: 100, categoria: 'Panadería' },
+                { cantidadPlanificada: 25, categoria: 'Bebidas' },
+                { cantidadPlanificada: 150, categoria: 'Cubiertos' },
+            ]
+        },
+        {
+            fecha: '2024-09-03',
+            detalles: [
+                { cantidadPlanificada: 30, categoria: 'Fideos' },
+                { cantidadPlanificada: 100, categoria: 'Panadería' },
+                { cantidadPlanificada: 25, categoria: 'Bebidas' },
+                { cantidadPlanificada: 150, categoria: 'Cubiertos' },
+            ]
+        },
+        {
+            fecha: '2024-09-04',
+            detalles: [
+                { cantidadPlanificada: 15, categoria: 'Arroz' },
+                { cantidadPlanificada: 88, categoria: 'Panadería' },
+                { cantidadPlanificada: 25, categoria: 'Bebidas' },
+                { cantidadPlanificada: 150, categoria: 'Cubiertos' },
+            ]
+        },
+        {
+            fecha: '2024-09-05',
+            detalles: [
+                { cantidadPlanificada: 10, categoria: 'Legumbres' },
+                { cantidadPlanificada: 90, categoria: 'Panadería' },
+                { cantidadPlanificada: 20, categoria: 'Bebidas' },
+                { cantidadPlanificada: 100, categoria: 'Cubiertos' },
+            ]
+        },
+        {
+            fecha: '2024-09-06',
+            detalles: [
+                { cantidadPlanificada: 10, categoria: 'Fideos' },
+                { cantidadPlanificada: 100, categoria: 'Panadería' },
+                { cantidadPlanificada: 33, categoria: 'Bebidas' },
+                { cantidadPlanificada: 109, categoria: 'Cubiertos' },
+                { cantidadPlanificada: 30, categoria: 'Lacteos' },
+            ]
+        },
+    ],
     bodegas: [
         { nombre: 'Bodega A', direccion: 'Miraflores Centro', nombreEncargado: 'Franco Mangini' }
     ],
