@@ -1,7 +1,6 @@
 import { forwardRef, Module } from '@nestjs/common';
 import { EnviosModule } from './envios/envios.module';
 import { EntregasModule } from './entregas/entregas.module';
-import { PlanificacionModule } from 'src/planificacion/planificacion.module';
 
 @Module({
     imports: [
@@ -12,6 +11,8 @@ import { PlanificacionModule } from 'src/planificacion/planificacion.module';
     ],
     controllers: [],
     providers: [],
-    exports: [EnviosModule,],
+    exports: [
+        EnviosModule,
+    ],
 })
 export class LogisticaModule { }

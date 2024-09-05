@@ -1,14 +1,16 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { Envio } from "./envio.entity";
 import { Categoria } from "src/inventario/entities";
+import { Movimiento } from "src/movimientos/entities/movimiento.entity";
 
 @Entity()
 export class EnvioCategoria {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
-    @Column({ default: false })
-    isComplete: boolean;
+    //? se reemplaza por verificar si se tiene un movimiento o no
+    // @Column({ default: false })
+    // isComplete: boolean; 
 
     @Column()
     cantidadPlanificada: number;
@@ -21,4 +23,9 @@ export class EnvioCategoria {
 
     @ManyToOne(() => Categoria, (categoria) => categoria.envios, { eager: true })
     categoria: Categoria;
+
+    // Relación opcional con Movimiento
+    @OneToOne(() => Movimiento, (movimiento) => movimiento.envioCategoria, { nullable: true, eager: true })
+    @JoinColumn()
+    movimiento?: Movimiento;
 }

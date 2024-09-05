@@ -53,6 +53,7 @@ export class TandasService extends BaseService<Tanda> {
             const tandasData = await this.tandaRepository.find({
                 where: { isDeleted: false, categoria: { id: idCategoria } },
                 relations: ['producto', 'bodega', 'ubicacion'],
+                order: { fechaVencimiento: 'ASC' }
             });
             const tandas = tandasData.map(t => {
                 delete t.isDeleted;

@@ -9,6 +9,8 @@ import { PlanificacionDetalle } from '../entities/planificacion-detalle.entity';
 import { CategoriasService } from 'src/inventario/rest/servicios-especificos';
 import { EnviosService } from 'src/logistica/envios/envios.service';
 
+
+
 @Injectable()
 export class PlanificacionService {
   constructor(
@@ -51,8 +53,7 @@ export class PlanificacionService {
     }
   }
 
-  async findByFecha(getPlanificacionDto: GetPlanificacionDto) {
-    const { fecha } = getPlanificacionDto;
+  async findPlanificacionByFecha(fecha: string) {
     try {
       const planificacion = await this.planificacionRepository.findOne({
         where: {
@@ -60,21 +61,37 @@ export class PlanificacionService {
           fecha: normalizeDates.normalize(fecha),
         }
       })
+
       if (!planificacion) {
         throw new NotFoundException(`No hay planificacion para la fecha ${fecha}`)
       }
       delete planificacion.isDeleted;
+      return planificacion;
+    } catch (error) {
+      throw new InternalServerErrorException(error)
+    }
+  }
+
+  async findByFecha(getPlanificacionDto: GetPlanificacionDto) {
+    const { fecha } = getPlanificacionDto;
+    try {
+
+      const planificacion = await this.findPlanificacionByFecha(fecha);
 
       //Verificamos si hay un envio en proceso
-      const detallesEnEnvio = await this.enviosService.findAllEnvioCategoriasByFecha(fecha);
-      const envioEnProceso = detallesEnEnvio.length != 0;
+      const envio = await this.enviosService.findAllEnvioCategoriasByFecha(fecha);
+      const envioEnProceso = envio != null;
 
 
       if (envioEnProceso) {
+        const detalles = envio.categoriasPlanificadas;
+        //Todo: utilizar el type correspondiente para "envio"
+        delete envio.isDeleted;
+        delete envio.categoriasPlanificadas;
         return {
-          envioIniciado: envioEnProceso,
+          envioIniciado: envio,
           ...planificacion,
-          detalles: detallesEnEnvio,
+          detalles,
         }
       }
 
@@ -91,7 +108,7 @@ export class PlanificacionService {
         return newDetalle;
       });
       return {
-        envioIniciado: envioEnProceso,
+        envioIniciado: null,
         ...planificacion,
         detalles,
       }

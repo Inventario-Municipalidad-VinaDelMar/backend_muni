@@ -2,6 +2,7 @@ import { BadRequestException, forwardRef, Inject, Injectable } from '@nestjs/com
 import { Server } from 'socket.io';
 import { PlanificacionService } from '../rest/planificacion.service';
 import { GetPlanificacionDto } from '../dto/rest/planificacion/get-planificacion.dto';
+import { normalizeDates } from 'src/utils';
 
 @Injectable()
 export class PlanificacionSocketService {
@@ -25,9 +26,10 @@ export class PlanificacionSocketService {
         }
     }
 
-    async notifyStartedNewEnvio(fecha: string) {
+    async notifyEnvioUpdate() {
         if (this.wss) {
-            const planificacion = await this.planificacionService.findByFecha({ fecha })
+            const fechaActual = normalizeDates.currentFecha();
+            const planificacion = await this.planificacionService.findByFecha({ fecha: fechaActual })
             this.wss.emit('loadPlanificacion', planificacion);
         } else {
             console.error('WebSocket server not initialized - To notify a envio has been started ');

@@ -5,12 +5,16 @@ import { DataSource, QueryRunner, Repository } from 'typeorm';
 import { CreateMovimientoDto } from '../dto/create_movimiento.dto';
 import { TandasService } from 'src/inventario/rest/servicios-especificos';
 import { MovimientosSocketService } from '../socket/movimientos.socket.service';
+import { EnviosService } from 'src/logistica/envios/envios.service';
+import { PlanificacionSocketService } from 'src/planificacion/socket/planificacion.socket.service';
 
 @Injectable()
 export class MovimientosService {
 
     constructor(
+        private readonly enviosService: EnviosService,
         private readonly tandasService: TandasService,
+        private readonly planificacionSocketService: PlanificacionSocketService,
         @InjectRepository(Movimiento)
         private readonly movimientoRepository: Repository<Movimiento>,
 
@@ -22,7 +26,7 @@ export class MovimientosService {
     }
 
     async createMovimiento(createMovimientoDto: CreateMovimientoDto) {
-        const { idTanda, cantidadRetirada } = createMovimientoDto;
+        const { idEnvioCategoria, idTanda, cantidadRetirada } = createMovimientoDto;
 
         // Iniciar la transacción
         const queryRunner: QueryRunner = this.dataSource.createQueryRunner();
@@ -32,10 +36,11 @@ export class MovimientosService {
 
         try {
             // Crear el movimiento
-            const tandaInstance = await this.tandasService.generateClass(idTanda);
+            const tandaInstance = this.tandasService.generateClass(idTanda);
             const movimientoCreated = this.movimientoRepository.create({
                 cantidadRetirada,
                 tanda: tandaInstance,
+                envioCategoria: this.enviosService.instanceEnvioCategoria(idEnvioCategoria)
             });
 
             // Guardar el movimiento dentro de la transacción
@@ -44,18 +49,23 @@ export class MovimientosService {
             // Descontar la cantidad del movimiento a la tanda
             const tanda = await this.tandasService.substractAmountToTanda(queryRunner, idTanda, cantidadRetirada);
 
+            // Asignar el nuevo movimiento al EnvioCategoria;
+            await this.enviosService.updateEnvioCategoria(queryRunner, movimiento)
             // throw new InternalServerErrorException();
             // Confirmar la transacción
             await queryRunner.commitTransaction();
 
             //* Notificar por socket movimiento nuevo
             await this.movimientosSocketService.notifyMovimientoCreated(movimiento)
-            //* Notificar actualización de la tanda
+            //* Notificar por socket actualización de la tanda
             await this.movimientosSocketService.notifyTandaDiscount(tanda)
+            //* Notificar por socket movimiento asignado a EnvioCategoria
+            await this.planificacionSocketService.notifyEnvioUpdate()
 
             //Error de prueba
             return movimiento;
         } catch (error) {
+            console.log({ error })
             // Revertir todos los cambios si ocurre un error
             await queryRunner.rollbackTransaction();
             throw error;

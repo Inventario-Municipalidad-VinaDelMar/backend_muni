@@ -1,15 +1,14 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Post, } from '@nestjs/common';
 import { EnviosService } from './envios.service';
-import { CreateEnvioDto } from './dto/create-envio.dto';
-import { UpdateEnvioDto } from './dto/update-envio.dto';
 
 @Controller('envios')
 export class EnviosController {
   constructor(private readonly enviosService: EnviosService) { }
 
-  @Post()
-  create(@Body() createEnvioDto: CreateEnvioDto) {
-    return this.enviosService.create(createEnvioDto);
+  @Post('newEnvio')
+  create() {
+    return this.enviosService.create();
+    // return this.enviosService.create(createEnvioDto);
   }
 
   // @Get()

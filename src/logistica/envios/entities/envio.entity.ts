@@ -1,5 +1,6 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { EnvioCategoria } from "./envio-categoria.entity";
+import { normalizeDates } from "src/utils";
 
 export enum EnvioStatus {
     SIN_CARGAR = 'Sin Cargar',
@@ -17,7 +18,8 @@ export class Envio {
     @Column({ type: 'date', default: () => 'CURRENT_DATE' })
     fecha: Date;
 
-    @Column({ type: 'time', default: () => 'CURRENT_TIME' })
+    @Column({ type: 'time', default: normalizeDates.getHoraInicioChile() })
+    // @Column({ type: 'time', default: () => 'CURRENT_TIME' })
     horaInicio: string;
 
     @Column({ type: 'time', nullable: true })

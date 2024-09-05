@@ -77,18 +77,8 @@ export class InventarioService {
   }
 
   async findManyProductosByName(nameSuggested: string) {
-    const productosData = await this.productoService.findManyByName(nameSuggested);
-    const productos = productosData.map(p => {
-      delete p.barcode;
-      delete p.descripcion;
-      delete p.isDeleted;
-      delete p.urlImagen;
+    const productos = await this.productoService.findManyByName(nameSuggested);
 
-      return {
-        ...p,
-        categoria: p.categoria.id,
-      };
-    })
     return productos;
   }
 
