@@ -1,4 +1,4 @@
-import { forwardRef, Inject, Injectable, InternalServerErrorException } from '@nestjs/common';
+import { BadRequestException, forwardRef, Inject, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Movimiento } from '../entities/movimiento.entity';
 import { DataSource, QueryRunner, Repository } from 'typeorm';
@@ -27,6 +27,9 @@ export class MovimientosService {
 
     async createMovimiento(createMovimientoDto: CreateMovimientoDto) {
         const { idEnvioCategoria, idTanda, cantidadRetirada } = createMovimientoDto;
+
+        //Verificar si el movimiento tiene vinculo con un envio actual
+        await this.enviosService.verifyEnvioByEnvioCategoria(idEnvioCategoria);
 
         // Iniciar la transacción
         const queryRunner: QueryRunner = this.dataSource.createQueryRunner();

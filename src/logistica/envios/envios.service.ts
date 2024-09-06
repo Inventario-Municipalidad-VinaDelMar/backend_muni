@@ -25,6 +25,19 @@ export class EnviosService {
   async create() {
     try {
       const fechaActual = normalizeDates.currentFecha();
+      const envios = await this.envioRepository.find({
+        where: {
+          fecha: normalizeDates.normalize(fechaActual),
+          isDeleted: false,
+        },
+      })
+
+      envios.map(e => {
+        if ([EnvioStatus.SIN_CARGAR, EnvioStatus.CARGANDO].includes(e.status)) {
+          throw new BadRequestException('Ya hay un envio en proceso')
+        }
+      })
+
       const envioCreated = this.envioRepository.create({
         fecha: fechaActual,
       })
@@ -46,7 +59,29 @@ export class EnviosService {
 
       return envio;
     } catch (error) {
-      throw new BadRequestException(error);
+      throw error;
+    }
+  }
+
+  async verifyEnvioByEnvioCategoria(idEnvioCategoria: string): Promise<void> {
+    try {
+      const envioCategoria = await this.envioCategoriaRepository.findOne({
+        where: {
+          isDeleted: false,
+          id: idEnvioCategoria,
+        },
+        relations: ['envio']
+      })
+
+      if (!envioCategoria) {
+        throw new NotFoundException(`No hay envio categoria with id ${idEnvioCategoria}`);
+      }
+      const fechaActual = normalizeDates.normalize(normalizeDates.currentFecha());
+      if (envioCategoria.envio.fecha !== fechaActual) {
+        throw new BadRequestException('Este envio no es uno actual')
+      }
+    } catch (error) {
+      throw error;
     }
   }
 
@@ -99,7 +134,7 @@ export class EnviosService {
   }
   async findOneEnvioCategoria(id: string) {
     try {
-      const envioCategoria = await this.envioCategoriaRepository.findOne({ where: { id } })
+      const envioCategoria = await this.envioCategoriaRepository.findOne({ where: { id, isDeleted: false, } })
       if (!envioCategoria) {
         throw new NotFoundException(`Envio categoria with id ${id} not exists.`)
       }

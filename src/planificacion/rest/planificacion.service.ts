@@ -1,4 +1,4 @@
-import { BadRequestException, forwardRef, Inject, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { BadRequestException, forwardRef, Inject, Injectable, InternalServerErrorException, Logger, NotFoundException } from '@nestjs/common';
 import { PlanificacionSocketService } from '../socket/planificacion.socket.service';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -13,6 +13,7 @@ import { EnviosService } from 'src/logistica/envios/envios.service';
 
 @Injectable()
 export class PlanificacionService {
+  protected readonly logger = new Logger('PlanificacionService');;
   constructor(
     private readonly categoriaService: CategoriasService,
     @Inject(forwardRef(() => EnviosService))
@@ -49,7 +50,7 @@ export class PlanificacionService {
       await this.planificacionDetalleRepository.save(detallesCreated);
       return planificacion;
     } catch (error) {
-      throw new BadRequestException(error);
+      this.handleDbExceptions(error);
     }
   }
 
@@ -68,7 +69,7 @@ export class PlanificacionService {
       delete planificacion.isDeleted;
       return planificacion;
     } catch (error) {
-      throw new InternalServerErrorException(error)
+      throw error;
     }
   }
 
@@ -113,7 +114,8 @@ export class PlanificacionService {
         detalles,
       }
     } catch (error) {
-      throw new InternalServerErrorException(error)
+      // console.log('Ocurrio un error')
+      this.handleDbExceptions(error);
     }
   }
   async deleteAll() {
@@ -124,8 +126,18 @@ export class PlanificacionService {
       await query1.delete().where({}).execute();
       return;
     } catch (error) {
-      console.log({ error })
+      throw error;
     }
+  }
+
+  protected handleDbExceptions(error: any): void {
+    if (error.code === '23505') {
+      throw new BadRequestException(error.detail);
+    }
+    this.logger.error(error);
+    throw new InternalServerErrorException(
+      'Error inesperado, check logs del server.',
+    );
   }
 
 }
