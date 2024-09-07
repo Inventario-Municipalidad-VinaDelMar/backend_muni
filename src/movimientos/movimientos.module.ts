@@ -27,6 +27,6 @@ import { PlanificacionModule } from 'src/planificacion/planificacion.module';
     MovimientosSocketGateway,
     MovimientosSocketService,
   ],
-  exports: [TypeOrmModule],
+  exports: [TypeOrmModule, MovimientosService],
 })
 export class MovimientosModule { }

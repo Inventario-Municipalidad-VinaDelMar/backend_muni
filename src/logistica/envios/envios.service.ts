@@ -155,6 +155,18 @@ export class EnviosService {
     }
   }
 
+  async deleteAll() {
+    const query1 = this.envioCategoriaRepository.createQueryBuilder('enviosCategorias');
+    const query2 = this.envioRepository.createQueryBuilder('envios');
+    try {
+      await query1.delete().where({}).execute();
+      await query2.delete().where({}).execute();
+      return;
+    } catch (error) {
+      throw error;
+    }
+  }
+
   // findAll() {
   //   return `This action returns all envios`;
   // }

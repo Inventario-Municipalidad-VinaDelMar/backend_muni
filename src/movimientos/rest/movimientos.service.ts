@@ -77,4 +77,14 @@ export class MovimientosService {
             await queryRunner.release();
         }
     }
+
+    async deleteAll() {
+        const query = this.movimientoRepository.createQueryBuilder('movimientos');
+        try {
+            await query.delete().where({}).execute();
+            return;
+        } catch (error) {
+            throw error;
+        }
+    }
 }
