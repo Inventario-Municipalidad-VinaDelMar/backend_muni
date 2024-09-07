@@ -71,13 +71,23 @@ export class InventarioService {
     }
   }
 
+  async findAllBodegas() {
+    const bodegas = await this.bodegasService.findAll();
+    return bodegas;
+  }
+
+  async findUbicacionesByCategoria(idBodega: string) {
+    const ubicaciones = await this.ubicacionesService.findAllByBodega(idBodega);
+    return ubicaciones;
+  }
+
   async findAllTandasByCategoria(idCategoria: string) {
     const tandas = await this.tandasService.findAllBy(idCategoria);
     return tandas;
   }
 
-  async findManyProductosByName(nameSuggested: string) {
-    const productos = await this.productoService.findManyByName(nameSuggested);
+  async findManyProductos() {
+    const productos = await this.productoService.findMany();
 
     return productos;
   }

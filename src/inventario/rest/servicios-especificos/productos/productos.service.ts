@@ -42,25 +42,19 @@ export class ProductosService extends BaseService<Producto> {
         }
     }
 
-    async findManyByName(nameSuggest: string) {
+    async findMany() {
         try {
-            const productosData = await this.productoRepository
-                .createQueryBuilder('producto')
-                .leftJoinAndSelect('producto.categoria', 'categoria')
-                .where('producto.nombre ILIKE :nameSuggest', { nameSuggest: `%${nameSuggest}%` })
-                .andWhere('producto.isDeleted = :isDeleted', { isDeleted: false })
-                .orderBy(`CASE 
-                            WHEN producto.nombre ILIKE :exactMatch THEN 1
-                            ELSE 2
-                          END`, 'ASC')
-                .addOrderBy('LENGTH(producto.nombre)', 'ASC')
-                .setParameter('exactMatch', `${nameSuggest}%`)
-                .getMany();
+            const productosData = await this.productoRepository.find({
+                where: {
+                    isDeleted: false,
+                },
+                relations: ['categoria']
+            })
 
-            if (productosData.length === 0) {
-                return [];
-                // throw new NotFoundException(`No products found matching "${nameSuggest}"`);
-            }
+            // if (productosData.length === 0) {
+            // return [];
+            // //throw new NotFoundException(`No products found matching "${nameSuggest}"`);
+            // }
             const productos = productosData.map(p => {
                 delete p.barcode;
                 delete p.descripcion;
@@ -69,7 +63,11 @@ export class ProductosService extends BaseService<Producto> {
 
                 return {
                     ...p,
-                    categoria: p.categoria.id,
+                    categoria: {
+                        id: p.categoria.id,
+                        nombre: p.categoria.nombre,
+                        urlImagen: p.categoria.urlImagen,
+                    }
                 };
             })
             return productos;

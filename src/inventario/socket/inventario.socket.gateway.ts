@@ -2,7 +2,7 @@ import { SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/web
 import { InventarioSocketService } from './inventario.socket.service';
 import { Server, Socket } from 'socket.io';
 import { GetTandaDto } from '../dto/socket-dto';
-import { GetProductosDto } from '../dto/socket-dto/productos/get-productos.dto';
+import { GetUbicacionByBodegaDto, } from '../dto/rest-dto';
 
 @WebSocketGateway({ cors: true, namespace: 'inventario' })
 export class InventarioSocketGateway {
@@ -23,6 +23,22 @@ export class InventarioSocketGateway {
     client.emit('loadAllCategorias', data);
   }
 
+  @SubscribeMessage('getUbicacionesByBodega',)
+  async findUbicacionesByBodega(client: Socket, payload: GetUbicacionByBodegaDto) {
+    const data =
+      await this.inventarioSocketService.getInventarioUbicacionByBodega(payload);
+
+    client.emit('loadUbicacionesByBodega', data);
+  }
+
+  @SubscribeMessage('getAllBodegas',)
+  async findAllBodegas(client: Socket,) {
+    const data =
+      await this.inventarioSocketService.getInventarioBodegas();
+
+    client.emit('loadAllBodegas', data);
+  }
+
   @SubscribeMessage('getTandasByIdCategoria')
   async findAllTandasOfCategoria(client: Socket, payload: GetTandaDto) {
     const { idCategoria } = payload;
@@ -37,12 +53,13 @@ export class InventarioSocketGateway {
     client.emit(`${idCategoria}-tanda`, tandasPorCategoria);
   }
 
-  @SubscribeMessage('getManyProductsByName')
-  async findManyProductsByName(client: Socket, payload: GetProductosDto) {
+  @SubscribeMessage('getAllProducts')
+  async findManyProductsByName(client: Socket) {
+    // async findManyProductsByName(client: Socket, payload: GetProductosDto) {
     const data =
-      await this.inventarioSocketService.getProductosByName(payload);
+      await this.inventarioSocketService.getAllProductos();
 
-    client.emit('loadProductsByName', data);
+    client.emit('loadProducts', data);
   }
 }
 

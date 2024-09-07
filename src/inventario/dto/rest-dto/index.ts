@@ -1,3 +1,5 @@
+export { GetUbicacionByBodegaDto } from "./ubicacion-dto/get-ubicacion-by-bodega.dto";
+
 export { UpdateBodegaDto } from "./bodega-dto/update-bodega.dto";
 export { UpdateCategoriaDto } from "./categoria-dto/update-categoria.dto";
 export { UpdateProductoDto } from "./producto-dto/update-producto.dto";
