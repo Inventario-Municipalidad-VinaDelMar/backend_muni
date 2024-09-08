@@ -16,8 +16,8 @@ export class Tanda {
     @Column()
     cantidadActual: number;
 
-    @Column({ type: 'date', default: () => 'CURRENT_DATE' })
-    // @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+    // @Column({ type: 'date', default: () => 'CURRENT_DATE' })
+    @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
     fechaLlegada: Date;
 
     @Column({ type: 'date' })
