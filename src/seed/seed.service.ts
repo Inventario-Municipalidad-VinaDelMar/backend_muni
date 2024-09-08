@@ -29,7 +29,7 @@ export class SeedService {
         await this.insertNewProductos();
         await this.insertNewUbicaciones(bodega.id);
         await this.insertNewTandas();
-        await this.insetNewPlanificaciones();
+        await this.insertNewPlanificaciones();
         return 'Seed Executed';
     }
 
@@ -44,24 +44,28 @@ export class SeedService {
         await this.bodegasService.deleteAll();
 
     }
-    private async insetNewPlanificaciones() {
-        const seedPlanificacion = initialData.planificaciones;
-        // Obtener todas las categorías creadas
-        const categorias = await this.categoriaService.findAll();
+    private async insertNewPlanificaciones() {
+        try {
+            const seedPlanificacion = JSON.parse(JSON.stringify(initialData.planificaciones));
 
-        // Mapeo de nombre de categoría a ID de categoría
-        const categoriaMap = new Map(categorias.map(cat => [cat.nombre.toLowerCase(), cat.id]));
-        const planificacionPromises = seedPlanificacion.map(async (p) => {
-            p.detalles = p.detalles.map(d => {
-                return {
-                    ...d,
-                    categoria: categoriaMap.get(d.categoria.toLowerCase()),
-                }
+            // Obtener todas las categorías creadas
+            const categorias = await this.categoriaService.findAll();
+            // Mapeo de nombre de categoría a ID de categoría
+            const categoriaMap = new Map(categorias.map(cat => [cat.nombre.toLowerCase(), cat.id]));
+            const planificacionPromises = seedPlanificacion.map(async (p) => {
+                p.detalles = p.detalles.map(d => {
+                    return {
+                        ...d,
+                        categoria: categoriaMap.get(d.categoria.toLowerCase()),
+                    }
+                });
+                return await this.planificacionService.create(p);
             });
-            return await this.planificacionService.create(p);
-        });
 
-        await Promise.all(planificacionPromises);
+            await Promise.all(planificacionPromises);
+        } catch (error) {
+            console.log({ error })
+        }
     }
 
     private async insertNewBodegas() {
