@@ -76,9 +76,16 @@ export class EnviosService {
       if (!envioCategoria) {
         throw new NotFoundException(`No hay envio categoria with id ${idEnvioCategoria}`);
       }
+      if (envioCategoria.movimiento) {
+        throw new BadRequestException('Ya se ha realizo un movimiento en esta categoria.')
+      }
       const fechaActual = normalizeDates.normalize(normalizeDates.currentFecha());
-      if (envioCategoria.envio.fecha !== fechaActual) {
-        throw new BadRequestException('Este envio no es uno actual')
+      const fechaEnvio = envioCategoria.envio.fecha;
+      // console.log({ fechaActual })
+      // console.log(fechaEnvio);
+      // console.log(fechaEnvio !== fechaActual)
+      if (fechaEnvio < fechaActual || fechaEnvio > fechaActual) {
+        throw new BadRequestException('Este envio no es de hoy')
       }
     } catch (error) {
       throw error;

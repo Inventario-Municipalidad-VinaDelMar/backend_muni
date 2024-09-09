@@ -54,7 +54,7 @@ interface SeedData {
 export const initialData: SeedData = {
     planificaciones: [
         {
-            fecha: '2024-09-02',
+            fecha: '2024-09-09',
             detalles: [
                 { cantidadPlanificada: 10, categoria: 'Fideos' },
                 { cantidadPlanificada: 100, categoria: 'Panadería' },
@@ -63,7 +63,7 @@ export const initialData: SeedData = {
             ]
         },
         {
-            fecha: '2024-09-03',
+            fecha: '2024-09-10',
             detalles: [
                 { cantidadPlanificada: 30, categoria: 'Fideos' },
                 { cantidadPlanificada: 100, categoria: 'Panadería' },
@@ -72,7 +72,7 @@ export const initialData: SeedData = {
             ]
         },
         {
-            fecha: '2024-09-04',
+            fecha: '2024-09-11',
             detalles: [
                 { cantidadPlanificada: 15, categoria: 'Arroz' },
                 { cantidadPlanificada: 88, categoria: 'Panadería' },
@@ -81,7 +81,7 @@ export const initialData: SeedData = {
             ]
         },
         {
-            fecha: '2024-09-05',
+            fecha: '2024-09-12',
             detalles: [
                 { cantidadPlanificada: 10, categoria: 'Legumbres' },
                 { cantidadPlanificada: 90, categoria: 'Panadería' },
@@ -90,7 +90,7 @@ export const initialData: SeedData = {
             ]
         },
         {
-            fecha: '2024-09-06',
+            fecha: '2024-09-13',
             detalles: [
                 { cantidadPlanificada: 10, categoria: 'Fideos' },
                 { cantidadPlanificada: 100, categoria: 'Panadería' },

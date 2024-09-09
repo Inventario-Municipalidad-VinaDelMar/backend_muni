@@ -18,9 +18,12 @@ export class InventarioSocketService {
 
     async notifyTandaCreated(tanda: TandaResponse) {
         if (this.wss) {
-            // const room = `${idCategoria}-categoria`;
+            const categoria = await this.inventarioService.findOneCategoria(tanda.categoria);
             //?Emision de cambios
             this.wss.emit('newTandaCreated', tanda);
+            //?Re-emitir categoria de la tanda.
+            this.wss.emit('stockCategoriaChange', categoria);
+
         } else {
             console.error('WebSocket server not initialized - To notify tanda has been created');
             throw new BadRequestException();
@@ -28,10 +31,11 @@ export class InventarioSocketService {
     }
     async notifyTandaUpdate(tanda: TandaResponse) {
         if (this.wss) {
-            // const room = `${idCategoria}-categoria`;
+            const categoria = await this.inventarioService.findOneCategoria(tanda.categoria);
             //?Emision de cambios
-            //TODO:Re-emitir categoria de la tanda.
             this.wss.emit('newTandaUpdate', tanda);
+            //?Re-emitir categoria de la tanda.
+            this.wss.emit('stockCategoriaChange', categoria);
         } else {
             console.error('WebSocket server not initialized - To notify tanda has been updated');
             throw new BadRequestException();

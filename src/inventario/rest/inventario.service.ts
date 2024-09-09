@@ -45,10 +45,10 @@ export class InventarioService {
   async createTanda(createTandaDto: CreateTandaDto) {
     try {
       const { idBodega, idCategoria, idProducto, idUbicacion } = createTandaDto;
-      const bodega = await this.bodegasService.generateClass(idBodega);
-      const categoria = await this.categoriaService.generateClass(idCategoria);
-      const producto = await this.productoService.generateClass(idProducto);
-      const ubicacion = await this.ubicacionesService.generateClass(idUbicacion);
+      const bodega = this.bodegasService.generateClass(idBodega);
+      const categoria = this.categoriaService.generateClass(idCategoria);
+      const producto = this.productoService.generateClass(idProducto);
+      const ubicacion = this.ubicacionesService.generateClass(idUbicacion);
 
       const { cantidadIngresada, fechaVencimiento } = createTandaDto;
 
@@ -92,35 +92,58 @@ export class InventarioService {
     return productos;
   }
 
+  async findOneCategoria(idCategoria: string) {
+    try {
+      const categoria = await this.categoriaService.findOneById(idCategoria);
+      const tandas = await this.tandasService.findAll();
+      const stock = tandas.reduce((accum, tanda) => {
+        if (tanda.categoria.id === categoria.id) {
+          return accum + tanda.cantidadActual;
+        }
+        return accum;
+      }, 0);
+
+      delete categoria.isDeleted;
+
+      return {
+        ...categoria,
+        stock,
+      }
+
+    } catch (error) {
+      throw error;
+    }
+  }
+
   async findAllCategorias() {
     try {
       // Categorias sin su cantidad total de stock
       const categoriasData = await this.categoriaService.findAll();
-      // const tandas = await this.tandasService.findAll();
+      const tandas = await this.tandasService.findAll();
       // console.log({ tandas })
 
       //Mapear cada categoría para calcular su stock total
       const categorias = categoriasData.map(c => {
-        // const stock = tandas.reduce((accum, tanda) => {
-        //   if (tanda.categoria.id === c.id) {
-        //     return accum + tanda.cantidadActual;
-        //   }
-        //   return accum;
-        // }, 0);
+        const stock = tandas.reduce((accum, tanda) => {
+          if (tanda.categoria.id === c.id) {
+            return accum + tanda.cantidadActual;
+          }
+          return accum;
+        }, 0);
 
         delete c.isDeleted;
 
         // Retornar la categoría con su stock total
-        // return {
-        //   ...c,
-        //   stock
-        // };
-        return c;
+        return {
+          ...c,
+          stock
+        };
+        // return c;
       });
 
       return categorias;
     } catch (error) {
-      console.log({ error })
+      throw error;
     }
   }
 
