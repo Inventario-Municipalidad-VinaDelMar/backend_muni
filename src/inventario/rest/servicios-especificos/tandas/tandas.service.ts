@@ -40,18 +40,17 @@ export class TandasService extends BaseService<Tanda> {
                 bodega: tandaWithRelations.bodega.nombre,
                 producto: tandaWithRelations.producto.nombre,
                 ubicacion: tandaWithRelations.ubicacion.descripcion,
-                categoria: tandaWithRelations.categoria.id,
-                //Categoria ya es conocida, para el socket que esta escuchando
+                productoId: tandaWithRelations.producto.id,
             };
         } catch (error) {
             this.handleDbExceptions(error);
         }
     }
 
-    async findAllBy(idCategoria: string): Promise<TandaResponse[]> {
+    async findAllBy(idProducto: string): Promise<TandaResponse[]> {
         try {
             const tandasData = await this.tandaRepository.find({
-                where: { isDeleted: false, categoria: { id: idCategoria } },
+                where: { isDeleted: false, producto: { id: idProducto } },
                 relations: ['producto', 'bodega', 'ubicacion'],
                 order: { fechaVencimiento: 'ASC' }
             });
@@ -62,7 +61,7 @@ export class TandasService extends BaseService<Tanda> {
                     bodega: t.bodega.nombre,
                     producto: t.producto.nombre,
                     ubicacion: t.ubicacion.descripcion,
-                    categoria: t.categoria.id,
+                    productoId: t.producto.id,
                     //Categoria ya es conocida
                 };
             })
@@ -89,7 +88,7 @@ export class TandasService extends BaseService<Tanda> {
                 bodega: tanda.bodega.nombre,
                 producto: tanda.producto.nombre,
                 ubicacion: tanda.ubicacion.descripcion,
-                categoria: tanda.categoria.id,
+                productoId: tanda.producto.id,
             };
 
         } catch (error) {

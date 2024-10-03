@@ -9,6 +9,6 @@ export class CreateMovimientoDto {
     idTanda: string;
 
     @IsUUID()
-    idEnvioCategoria: string;
+    idEnvioProducto: string;
 
 }

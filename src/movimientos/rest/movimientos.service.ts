@@ -1,4 +1,4 @@
-import { BadRequestException, forwardRef, Inject, Injectable, InternalServerErrorException } from '@nestjs/common';
+import { forwardRef, Inject, Injectable, } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Movimiento } from '../entities/movimiento.entity';
 import { DataSource, QueryRunner, Repository } from 'typeorm';
@@ -26,10 +26,10 @@ export class MovimientosService {
     }
 
     async createMovimiento(createMovimientoDto: CreateMovimientoDto) {
-        const { idEnvioCategoria, idTanda, cantidadRetirada } = createMovimientoDto;
+        const { idEnvioProducto, idTanda, cantidadRetirada } = createMovimientoDto;
 
         //Verificar si el movimiento tiene vinculo con un envio actual
-        await this.enviosService.verifyEnvioByEnvioCategoria(idEnvioCategoria);
+        await this.enviosService.verifyEnvioByEnvioCategoria(idEnvioProducto);
 
         // Iniciar la transacción
         const queryRunner: QueryRunner = this.dataSource.createQueryRunner();
@@ -43,7 +43,7 @@ export class MovimientosService {
             const movimientoCreated = this.movimientoRepository.create({
                 cantidadRetirada,
                 tanda: tandaInstance,
-                envioCategoria: this.enviosService.instanceEnvioCategoria(idEnvioCategoria)
+                envioProducto: this.enviosService.instanceEnvioProducto(idEnvioProducto)
             });
 
             // Guardar el movimiento dentro de la transacción
@@ -53,7 +53,7 @@ export class MovimientosService {
             const tanda = await this.tandasService.substractAmountToTanda(queryRunner, idTanda, cantidadRetirada);
 
             // Asignar el nuevo movimiento al EnvioCategoria;
-            await this.enviosService.updateEnvioCategoria(queryRunner, movimiento)
+            await this.enviosService.updateEnvioProducto(queryRunner, movimiento)
             // throw new InternalServerErrorException();
             // Confirmar la transacción
             await queryRunner.commitTransaction();

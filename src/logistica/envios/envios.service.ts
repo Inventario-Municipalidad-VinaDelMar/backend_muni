@@ -3,24 +3,25 @@ import { Envio, EnvioStatus } from './entities/envio.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, QueryRunner } from 'typeorm';
 import { normalizeDates } from 'src/utils';
-import { CategoriasService } from 'src/inventario/rest/servicios-especificos';
-import { EnvioCategoria } from './entities/envio-categoria.entity';
+// import { CategoriasService } from 'src/inventario/rest/servicios-especificos';
+import { EnvioProducto } from './entities/envio-producto.entity';
 import { PlanificacionSocketService } from 'src/planificacion/socket/planificacion.socket.service';
 import { PlanificacionService } from 'src/planificacion/rest/planificacion.service';
 import { Movimiento } from 'src/movimientos/entities/movimiento.entity';
+import { ProductosService } from 'src/inventario/rest/servicios-especificos';
 
 @Injectable()
 export class EnviosService {
   constructor(
-    private readonly categoriaService: CategoriasService,
+    private readonly productosService: ProductosService,
     private readonly planificacionSocketService: PlanificacionSocketService,
     @Inject(forwardRef(() => PlanificacionService))
     private readonly planificacionService: PlanificacionService,
     @InjectRepository(Envio)
     private readonly envioRepository: Repository<Envio>,
 
-    @InjectRepository(EnvioCategoria)
-    private readonly envioCategoriaRepository: Repository<EnvioCategoria>,
+    @InjectRepository(EnvioProducto)
+    private readonly envioProductoRepository: Repository<EnvioProducto>,
   ) { }
   async create() {
     try {
@@ -47,13 +48,13 @@ export class EnviosService {
       const { detalles } = await this.planificacionService.findPlanificacionByFecha(fechaActual)
 
       const detallesData = detalles.map(d => {
-        return this.envioCategoriaRepository.create({
+        return this.envioProductoRepository.create({
           cantidadPlanificada: d.cantidadPlanificada,
-          categoria: this.categoriaService.generateClass(d.categoria.id),
+          producto: this.productosService.generateClass(d.producto.id),
           envio,
         })
       })
-      await this.envioCategoriaRepository.save(detallesData);
+      await this.envioProductoRepository.save(detallesData);
       //*Notificar por sockets a planificacion que un envio se inicio
       await this.planificacionSocketService.notifyEnvioUpdate();
 
@@ -65,7 +66,7 @@ export class EnviosService {
 
   async verifyEnvioByEnvioCategoria(idEnvioCategoria: string): Promise<void> {
     try {
-      const envioCategoria = await this.envioCategoriaRepository.findOne({
+      const envioCategoria = await this.envioProductoRepository.findOne({
         where: {
           isDeleted: false,
           id: idEnvioCategoria,
@@ -114,14 +115,14 @@ export class EnviosService {
         }
         envioEnProceso = envio;
         //Todo: Hacer un type para el envio en proceso
-        envioEnProceso.categoriasPlanificadas = envio.categoriasPlanificadas.map(ec => {
+        envioEnProceso.categoriasPlanificadas = envio.productosPlanificados.map(ec => {
           delete ec.isDeleted;
           const newDetalle = {
             ...ec,
             isComplete: ec.movimiento != null,
-            categoria: ec.categoria.nombre,
-            categoriaId: ec.categoria.id,
-            urlImagen: ec.categoria.urlImagen,
+            producto: ec.producto.nombre,
+            productoId: ec.producto.id,
+            urlImagen: ec.producto.urlImagen,
           };
           delete newDetalle?.movimiento;
           return newDetalle;
@@ -134,36 +135,36 @@ export class EnviosService {
     }
   }
 
-  instanceEnvioCategoria(idEnvioCategoria: string) {
-    return this.envioCategoriaRepository.create({
-      id: idEnvioCategoria,
+  instanceEnvioProducto(idEnvioProducto: string) {
+    return this.envioProductoRepository.create({
+      id: idEnvioProducto,
     })
   }
-  async findOneEnvioCategoria(id: string) {
+  async findOneEnvioProducto(id: string) {
     try {
-      const envioCategoria = await this.envioCategoriaRepository.findOne({ where: { id, isDeleted: false, } })
-      if (!envioCategoria) {
-        throw new NotFoundException(`Envio categoria with id ${id} not exists.`)
+      const envioProducto = await this.envioProductoRepository.findOne({ where: { id, isDeleted: false, } })
+      if (!envioProducto) {
+        throw new NotFoundException(`Envio producto with id ${id} not exists.`)
       }
-      return envioCategoria;
+      return envioProducto;
     } catch (error) {
       console.log({ error })
     }
   }
 
-  async updateEnvioCategoria(queryRunner: QueryRunner, movimiento: Movimiento) {
+  async updateEnvioProducto(queryRunner: QueryRunner, movimiento: Movimiento) {
     try {
-      const envioCategoria = await this.findOneEnvioCategoria(movimiento.envioCategoria.id);
-      delete movimiento.envioCategoria;
-      envioCategoria.movimiento = movimiento;
-      await queryRunner.manager.save(envioCategoria);
+      const envioProducto = await this.findOneEnvioProducto(movimiento.envioProducto.id);
+      delete movimiento.envioProducto;
+      envioProducto.movimiento = movimiento;
+      await queryRunner.manager.save(envioProducto);
     } catch (error) {
       throw new InternalServerErrorException(error);
     }
   }
 
   async deleteAll() {
-    const query1 = this.envioCategoriaRepository.createQueryBuilder('enviosCategorias');
+    const query1 = this.envioProductoRepository.createQueryBuilder('enviosProductos');
     const query2 = this.envioRepository.createQueryBuilder('envios');
     try {
       await query1.delete().where({}).execute();

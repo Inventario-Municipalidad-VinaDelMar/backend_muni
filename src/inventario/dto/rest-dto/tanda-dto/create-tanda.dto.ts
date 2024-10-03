@@ -16,7 +16,4 @@ export class CreateTandaDto {
 
     @IsUUID()
     idUbicacion: string;
-
-    @IsUUID()
-    idCategoria: string;
 }

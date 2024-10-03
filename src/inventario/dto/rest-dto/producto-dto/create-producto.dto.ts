@@ -17,7 +17,7 @@ export class CreateProductoDto {
     @IsOptional()
     urlImagen?: string;
 
-    @IsUUID()
-    idCategoria: string;
+    // @IsUUID()
+    // idCategoria: string;
 
 }

@@ -2,7 +2,6 @@ import { BadRequestException, forwardRef, Inject, Injectable } from '@nestjs/com
 import { InventarioService } from '../rest/inventario.service';
 import { Server } from 'socket.io';
 import { TandaResponse } from '../interfaces/tanda-response.interface';
-import { GetProductosDto } from '../dto/socket-dto/productos/get-productos.dto';
 import { GetUbicacionByBodegaDto } from '../dto/rest-dto';
 
 @Injectable()
@@ -18,11 +17,11 @@ export class InventarioSocketService {
 
     async notifyTandaCreated(tanda: TandaResponse) {
         if (this.wss) {
-            const categoria = await this.inventarioService.findOneCategoria(tanda.categoria);
+            const producto = await this.inventarioService.findOneProducto(tanda.producto);
             //?Emision de cambios
             this.wss.emit('newTandaCreated', tanda);
-            //?Re-emitir categoria de la tanda.
-            this.wss.emit('stockCategoriaChange', categoria);
+            //?Re-emitir producto de la tanda.
+            this.wss.emit('stockProductoChange', producto);
 
         } else {
             console.error('WebSocket server not initialized - To notify tanda has been created');
@@ -31,11 +30,11 @@ export class InventarioSocketService {
     }
     async notifyTandaUpdate(tanda: TandaResponse) {
         if (this.wss) {
-            const categoria = await this.inventarioService.findOneCategoria(tanda.categoria);
+            const producto = await this.inventarioService.findOneProducto(tanda.producto);
             //?Emision de cambios
             this.wss.emit('newTandaUpdate', tanda);
             //?Re-emitir categoria de la tanda.
-            this.wss.emit('stockCategoriaChange', categoria);
+            this.wss.emit('stockProductoChange', producto);
         } else {
             console.error('WebSocket server not initialized - To notify tanda has been updated');
             throw new BadRequestException();
@@ -56,7 +55,7 @@ export class InventarioSocketService {
     async getInventarioUbicacionByBodega(getUbicacionByBodegaDto: GetUbicacionByBodegaDto) {
         if (this.wss) {
             const { idBodega } = getUbicacionByBodegaDto;
-            const ubicaciones = await this.inventarioService.findUbicacionesByCategoria(idBodega);
+            const ubicaciones = await this.inventarioService.findUbicacionesByBodega(idBodega);
             return ubicaciones;
         } else {
             console.error('WebSocket server not initialized - To get ubicaciones by bodega');
@@ -64,36 +63,36 @@ export class InventarioSocketService {
         }
     }
 
-    async getInventarioTandasByCategoria(idCategoria: string) {
+    async getInventarioTandasByProducto(idProducto: string) {
         if (this.wss) {
-            const tandas = await this.inventarioService.findAllTandasByCategoria(idCategoria);
+            const tandas = await this.inventarioService.findAllTandasByProducto(idProducto);
             return tandas;
         } else {
-            console.error('WebSocket server not initialized - To get tandas by categoria');
+            console.error('WebSocket server not initialized - To get tandas by producto');
             throw new BadRequestException();
         }
     }
-    async getInventarioCategorias() {
+    async getInventarioProductos() {
         if (this.wss) {
-            const categorias = await this.inventarioService.findAllCategorias();
-            return categorias;
+            const productos = await this.inventarioService.findAllProductos();
+            return productos;
         } else {
-            console.error('WebSocket server not initialized - To get categorias');
+            console.error('WebSocket server not initialized - To get productos');
             throw new BadRequestException();
         }
     }
 
-    async getAllProductos() {
-        // async getProductosByName(getProductosDto: GetProductosDto) {
-        // const { nameSuggest } = getProductosDto;
-        if (this.wss) {
-            const productos = await this.inventarioService.findManyProductos();
-            return productos;
-        } else {
-            console.error(`WebSocket server not initialized - To get all productos`);
-            throw new BadRequestException();
-        }
-    }
+    // async getAllProductos() {
+    //     // async getProductosByName(getProductosDto: GetProductosDto) {
+    //     // const { nameSuggest } = getProductosDto;
+    //     if (this.wss) {
+    //         const productos = await this.inventarioService.findManyProductos();
+    //         return productos;
+    //     } else {
+    //         console.error(`WebSocket server not initialized - To get all productos`);
+    //         throw new BadRequestException();
+    //     }
+    // }
 
 
 }

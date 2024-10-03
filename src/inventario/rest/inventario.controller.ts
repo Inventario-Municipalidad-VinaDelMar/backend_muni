@@ -1,6 +1,6 @@
-import { Controller, Post, Body, Param } from '@nestjs/common';
+import { Controller, Post, Body } from '@nestjs/common';
 import { InventarioService } from './inventario.service';
-import { CreateBodegaDto, CreateCategoriaDto, CreateProductoDto, CreateTandaDto, CreateUbicacionDto } from '../dto/rest-dto';
+import { CreateBodegaDto, CreateProductoDto, CreateTandaDto, CreateUbicacionDto } from '../dto/rest-dto';
 
 
 
@@ -12,10 +12,10 @@ export class InventarioController {
   createProducto(@Body() createProductoDto: CreateProductoDto) {
     return this.inventarioService.createProducto(createProductoDto);
   }
-  @Post('categorias')
-  createCategoria(@Body() createCategoriaDto: CreateCategoriaDto) {
-    return this.inventarioService.createCategoria(createCategoriaDto);
-  }
+  // @Post('categorias')
+  // createCategoria(@Body() createCategoriaDto: CreateCategoriaDto) {
+  //   return this.inventarioService.createCategoria(createCategoriaDto);
+  // }
   @Post('ubicaciones')
   createUbicacion(@Body() createUbicacionDto: CreateUbicacionDto) {
     return this.inventarioService.createUbicacion(createUbicacionDto);

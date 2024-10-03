@@ -1,6 +1,7 @@
-import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { Tanda } from "./tanda.entity";
-import { Categoria } from "./categoria.entity";
+import { PlanificacionDetalle } from "src/planificacion/entities/planificacion-detalle.entity";
+import { EnvioProducto } from "src/logistica/envios/entities/envio-producto.entity";
 
 @Entity()
 export class Producto {
@@ -23,9 +24,14 @@ export class Producto {
     @Column({ default: false })
     isDeleted: boolean;
 
-    @ManyToOne(() => Categoria, (categoria) => categoria.productos)
-    categoria: Categoria
-
     @OneToMany(() => Tanda, (tanda) => tanda.producto)
     tandas: Tanda[];
+
+    //Relacion con la seccion de "planificacion"
+    @OneToMany(() => PlanificacionDetalle, (planificacionDetalle) => planificacionDetalle.producto)
+    planificacionDetalles: PlanificacionDetalle[];
+
+    //Relacion con la seccion de "logistica"
+    @OneToMany(() => EnvioProducto, (envioProducto) => envioProducto.producto)
+    envios: EnvioProducto[]
 }

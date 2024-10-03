@@ -1,6 +1,6 @@
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { Planificacion } from "./planificacion.entity";
-import { Categoria } from "src/inventario/entities";
+import { Producto } from "src/inventario/entities";
 
 @Entity()
 export class PlanificacionDetalle {
@@ -16,7 +16,7 @@ export class PlanificacionDetalle {
     @ManyToOne(() => Planificacion, (planificacion) => planificacion.detalles)
     planificacionDiaria: Planificacion
 
-    @ManyToOne(() => Categoria, (categoria) => categoria.planificacionDetalles, { eager: true })
-    categoria: Categoria;
+    @ManyToOne(() => Producto, (producto) => producto.planificacionDetalles, { eager: true })
+    producto: Producto;
 
 }

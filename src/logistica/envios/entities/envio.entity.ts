@@ -1,5 +1,5 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
-import { EnvioCategoria } from "./envio-categoria.entity";
+import { EnvioProducto } from "./envio-producto.entity";
 import { normalizeDates } from "src/utils";
 
 export enum EnvioStatus {
@@ -31,6 +31,6 @@ export class Envio {
     @Column({ default: false })
     isDeleted: boolean;
 
-    @OneToMany(() => EnvioCategoria, (envioCategoria) => envioCategoria.envio, { eager: true, })
-    categoriasPlanificadas: EnvioCategoria[]
+    @OneToMany(() => EnvioProducto, (envioProducto) => envioProducto.envio, { eager: true, })
+    productosPlanificados: EnvioProducto[]
 }

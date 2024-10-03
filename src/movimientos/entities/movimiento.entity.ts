@@ -1,6 +1,6 @@
 import { Tanda } from "src/inventario/entities/tanda.entity";
-import { EnvioCategoria } from "src/logistica/envios/entities/envio-categoria.entity";
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { EnvioProducto } from "src/logistica/envios/entities/envio-producto.entity";
+import { Column, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 
 
 @Entity()
@@ -25,8 +25,8 @@ export class Movimiento {
     tanda: Tanda;
 
 
-    //Relacion obligatoria con EnvioCategoria
-    @OneToOne(() => EnvioCategoria, (envio) => envio.movimiento, { nullable: false, onDelete: 'CASCADE' })
+    //Relacion obligatoria con EnvioProducto
+    @OneToOne(() => EnvioProducto, (envio) => envio.movimiento, { nullable: false, onDelete: 'CASCADE' })
     @JoinColumn()
-    envioCategoria: EnvioCategoria;
+    envioProducto: EnvioProducto;
 }

@@ -6,7 +6,7 @@ export interface TandaResponse {
     bodega: string;
     producto: string;
     ubicacion: string;
-    categoria: string;
+    productoId: string;
     //propiedades
     cantidadIngresada: number;
     cantidadActual: number;

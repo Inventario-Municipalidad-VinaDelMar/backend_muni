@@ -15,12 +15,12 @@ export class InventarioSocketGateway {
     this.inventarioSocketService.setServer(server);
   }
 
-  @SubscribeMessage('getAllCategorias')
-  async findAllCategorias(client: Socket,) {
+  @SubscribeMessage('getAllProductos')
+  async findAllProductos(client: Socket,) {
     const data =
-      await this.inventarioSocketService.getInventarioCategorias();
+      await this.inventarioSocketService.getInventarioProductos();
 
-    client.emit('loadAllCategorias', data);
+    client.emit('loadAllProductos', data);
   }
 
   @SubscribeMessage('getUbicacionesByBodega',)
@@ -39,27 +39,25 @@ export class InventarioSocketGateway {
     client.emit('loadAllBodegas', data);
   }
 
-  @SubscribeMessage('getTandasByIdCategoria')
-  async findAllTandasOfCategoria(client: Socket, payload: GetTandaDto) {
-    const { idCategoria } = payload;
+  @SubscribeMessage('getTandasByIdProducto')
+  async findAllTandasOfProducto(client: Socket, payload: GetTandaDto) {
+    const { idProducto } = payload;
 
-    // const room = `${idCategoria}-categoria`;
-    // client.join(room);
 
-    if (!idCategoria) return;
+    if (!idProducto) return;
 
-    const tandasPorCategoria =
-      await this.inventarioSocketService.getInventarioTandasByCategoria(idCategoria);
-    client.emit(`${idCategoria}-tanda`, tandasPorCategoria);
+    const tandasPorProducto =
+      await this.inventarioSocketService.getInventarioTandasByProducto(idProducto);
+    client.emit(`${idProducto}-tanda`, tandasPorProducto);
   }
 
-  @SubscribeMessage('getAllProducts')
-  async findManyProductsByName(client: Socket) {
-    // async findManyProductsByName(client: Socket, payload: GetProductosDto) {
-    const data =
-      await this.inventarioSocketService.getAllProductos();
+  // @SubscribeMessage('getAllProducts')
+  // async findManyProductsByName(client: Socket) {
+  //   // async findManyProductsByName(client: Socket, payload: GetProductosDto) {
+  //   const data =
+  //     await this.inventarioSocketService.getAllProductos();
 
-    client.emit('loadProducts', data);
-  }
+  //   client.emit('loadProducts', data);
+  // }
 }
 

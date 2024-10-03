@@ -8,7 +8,7 @@ export class CreatePlanificacionDetalleDto {
 
     @IsNotEmpty()
     @IsUUID()
-    categoria: string;
+    producto: string;
 }
 
 export class CreatePlanificacionDto {

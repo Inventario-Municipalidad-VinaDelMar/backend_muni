@@ -6,7 +6,7 @@ import { Planificacion } from '../entities/planificacion.entity';
 import { normalizeDates } from 'src/utils';
 import { CreatePlanificacionDto, GetPlanificacionDto } from '../dto/rest';
 import { PlanificacionDetalle } from '../entities/planificacion-detalle.entity';
-import { CategoriasService } from 'src/inventario/rest/servicios-especificos';
+import { ProductosService } from 'src/inventario/rest/servicios-especificos';
 import { EnviosService } from 'src/logistica/envios/envios.service';
 
 
@@ -15,7 +15,7 @@ import { EnviosService } from 'src/logistica/envios/envios.service';
 export class PlanificacionService {
   protected readonly logger = new Logger('PlanificacionService');;
   constructor(
-    private readonly categoriaService: CategoriasService,
+    private readonly productosService: ProductosService,
     @Inject(forwardRef(() => EnviosService))
     private readonly enviosService: EnviosService,
     @InjectRepository(Planificacion)
@@ -39,9 +39,9 @@ export class PlanificacionService {
 
       //Crear el detalle de la planificacion
       const detallesCreated = detalles.map((d) => {
-        const categoria = this.categoriaService.generateClass(d.categoria);
+        const producto = this.productosService.generateClass(d.producto);
         return this.planificacionDetalleRepository.create({
-          categoria,
+          producto,
           planificacionDiaria: planificacion,
           cantidadPlanificada: d.cantidadPlanificada,
         })
@@ -98,13 +98,13 @@ export class PlanificacionService {
 
       const detalles = planificacion.detalles.map(d => {
         delete d.isDeleted;
-        delete d.categoria.isDeleted;
+        delete d.producto.isDeleted;
         const newDetalle = {
           ...d,
           isComplete: false,
-          categoria: d.categoria.nombre,
-          categoriaId: d.categoria.id,
-          urlImagen: d.categoria.urlImagen,
+          producto: d.producto.nombre,
+          productoId: d.producto.id,
+          urlImagen: d.producto.urlImagen,
         };
         return newDetalle;
       });

@@ -1,7 +1,7 @@
 import { BadRequestException, forwardRef, Inject, Injectable, } from '@nestjs/common';
 import { InventarioSocketService } from '../socket/inventario.socket.service';
-import { CreateBodegaDto, CreateCategoriaDto, CreateProductoDto, CreateTandaDto, CreateUbicacionDto } from '../dto/rest-dto';
-import { BodegasService, CategoriasService, ProductosService, TandasService, UbicacionesService } from './servicios-especificos';
+import { CreateBodegaDto, CreateProductoDto, CreateTandaDto, CreateUbicacionDto } from '../dto/rest-dto';
+import { BodegasService, ProductosService, TandasService, UbicacionesService } from './servicios-especificos';
 
 
 
@@ -10,7 +10,7 @@ export class InventarioService {
 
   constructor(
     private readonly productoService: ProductosService,
-    private readonly categoriaService: CategoriasService,
+    // private readonly categoriaService: CategoriasService,
     private readonly bodegasService: BodegasService,
     private readonly ubicacionesService: UbicacionesService,
     private readonly tandasService: TandasService,
@@ -25,11 +25,7 @@ export class InventarioService {
     //TODO: notificar por sockets
     return producto;
   }
-  async createCategoria(createCategoriaDto: CreateCategoriaDto) {
-    const categoria = await this.categoriaService.createCategoria(createCategoriaDto);
-    //TODO: notificar por sockets
-    return categoria;
-  }
+
   async createBodega(createBodegaDto: CreateBodegaDto) {
     const bodega = await this.bodegasService.createBodega(createBodegaDto);
     //TODO: notificar por sockets
@@ -44,9 +40,8 @@ export class InventarioService {
   //!Proceso que requiere mucha carga, será lento.
   async createTanda(createTandaDto: CreateTandaDto) {
     try {
-      const { idBodega, idCategoria, idProducto, idUbicacion } = createTandaDto;
+      const { idBodega, idProducto, idUbicacion } = createTandaDto;
       const bodega = this.bodegasService.generateClass(idBodega);
-      const categoria = this.categoriaService.generateClass(idCategoria);
       const producto = this.productoService.generateClass(idProducto);
       const ubicacion = this.ubicacionesService.generateClass(idUbicacion);
 
@@ -57,7 +52,6 @@ export class InventarioService {
         cantidadActual: cantidadIngresada,
         fechaVencimiento,
         bodega,
-        categoria,
         producto,
         ubicacion,
       });
@@ -76,13 +70,13 @@ export class InventarioService {
     return bodegas;
   }
 
-  async findUbicacionesByCategoria(idBodega: string) {
+  async findUbicacionesByBodega(idBodega: string) {
     const ubicaciones = await this.ubicacionesService.findAllByBodega(idBodega);
     return ubicaciones;
   }
 
-  async findAllTandasByCategoria(idCategoria: string) {
-    const tandas = await this.tandasService.findAllBy(idCategoria);
+  async findAllTandasByProducto(idProducto: string) {
+    const tandas = await this.tandasService.findAllBy(idProducto);
     return tandas;
   }
 
@@ -92,21 +86,21 @@ export class InventarioService {
     return productos;
   }
 
-  async findOneCategoria(idCategoria: string) {
+  async findOneProducto(idProducto: string) {
     try {
-      const categoria = await this.categoriaService.findOneById(idCategoria);
+      const producto = await this.productoService.findOneById(idProducto);
       const tandas = await this.tandasService.findAll();
       const stock = tandas.reduce((accum, tanda) => {
-        if (tanda.categoria.id === categoria.id) {
+        if (tanda.producto.id === producto.id) {
           return accum + tanda.cantidadActual;
         }
         return accum;
       }, 0);
 
-      delete categoria.isDeleted;
+      delete producto.isDeleted;
 
       return {
-        ...categoria,
+        ...producto,
         stock,
       }
 
@@ -115,33 +109,31 @@ export class InventarioService {
     }
   }
 
-  async findAllCategorias() {
+  async findAllProductos() {
     try {
-      // Categorias sin su cantidad total de stock
-      const categoriasData = await this.categoriaService.findAll();
+      // Productos sin su cantidad total de stock
+      const productosData = await this.productoService.findAll();
       const tandas = await this.tandasService.findAll();
-      // console.log({ tandas })
 
-      //Mapear cada categoría para calcular su stock total
-      const categorias = categoriasData.map(c => {
+      //Mapear cada producto para calcular su stock total
+      const productos = productosData.map(p => {
         const stock = tandas.reduce((accum, tanda) => {
-          if (tanda.categoria.id === c.id) {
+          if (tanda.producto.id === p.id) {
             return accum + tanda.cantidadActual;
           }
           return accum;
         }, 0);
 
-        delete c.isDeleted;
+        delete p.isDeleted;
 
-        // Retornar la categoría con su stock total
+        // Retornar el producto con su stock total
         return {
-          ...c,
+          ...p,
           stock
         };
-        // return c;
       });
 
-      return categorias;
+      return productos;
     } catch (error) {
       throw error;
     }
