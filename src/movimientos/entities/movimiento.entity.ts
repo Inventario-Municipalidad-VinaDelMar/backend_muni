@@ -26,7 +26,7 @@ export class Movimiento {
 
 
     //Relacion obligatoria con EnvioCategoria
-    @OneToOne(() => EnvioCategoria, (envio) => envio.movimiento, { nullable: false })
+    @OneToOne(() => EnvioCategoria, (envio) => envio.movimiento, { nullable: false, onDelete: 'CASCADE' })
     @JoinColumn()
     envioCategoria: EnvioCategoria;
 }

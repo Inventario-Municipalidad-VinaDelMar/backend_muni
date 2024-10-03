@@ -36,7 +36,7 @@ interface SeedPlanificacionDetalle {
     cantidadPlanificada: number;
     categoria: string;
 }
-interface SeedPlanificacion {
+export interface SeedPlanificacion {
     fecha: string;
     detalles: SeedPlanificacionDetalle[];
 }

@@ -4,16 +4,16 @@ import { CategoriasService } from 'src/inventario/rest/servicios-especificos/cat
 import { ProductosService } from 'src/inventario/rest/servicios-especificos/productos/productos.service';
 import { TandasService } from 'src/inventario/rest/servicios-especificos/tandas/tandas.service';
 import { UbicacionesService } from 'src/inventario/rest/servicios-especificos/ubicaciones/ubicaciones.service';
-import { initialData } from './data/seed-data';
+import { initialData, SeedPlanificacion } from './data/seed-data';
 import { PlanificacionService } from 'src/planificacion/rest/planificacion.service';
 import { EnviosService } from 'src/logistica/envios/envios.service';
-import { MovimientosService } from 'src/movimientos/rest/movimientos.service';
+// import { MovimientosService } from 'src/movimientos/rest/movimientos.service';
 
 @Injectable()
 export class SeedService {
     constructor(
         private readonly enviosService: EnviosService,
-        private readonly movimientoService: MovimientosService,
+        // private readonly movimientoService: MovimientosService,
         private readonly planificacionService: PlanificacionService,
         private readonly productoService: ProductosService,
         private readonly categoriaService: CategoriasService,
@@ -34,7 +34,7 @@ export class SeedService {
     }
 
     private async deleteTables() {
-        await this.movimientoService.deleteAll();
+        // await this.movimientoService.deleteAll(); --> Se borra con cascade
         await this.enviosService.deleteAll();
         await this.planificacionService.deleteAll();
         await this.tandasService.deleteAll();
@@ -46,7 +46,7 @@ export class SeedService {
     }
     private async insertNewPlanificaciones() {
         try {
-            const seedPlanificacion = JSON.parse(JSON.stringify(initialData.planificaciones));
+            const seedPlanificacion = JSON.parse(JSON.stringify(initialData.planificaciones)) as SeedPlanificacion[];
 
             // Obtener todas las categorías creadas
             const categorias = await this.categoriaService.findAll();

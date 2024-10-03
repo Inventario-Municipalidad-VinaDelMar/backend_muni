@@ -25,7 +25,7 @@ export class EnvioCategoria {
     categoria: Categoria;
 
     // Relación opcional con Movimiento
-    @OneToOne(() => Movimiento, (movimiento) => movimiento.envioCategoria, { nullable: true, eager: true })
+    @OneToOne(() => Movimiento, (movimiento) => movimiento.envioCategoria, { nullable: true, eager: true, cascade: ['remove'] })
     @JoinColumn()
     movimiento?: Movimiento;
 }
