@@ -85,10 +85,10 @@ export class PlanificacionService {
 
 
       if (envioEnProceso) {
-        const detalles = envio.categoriasPlanificadas;
+        const detalles = envio.productosPlanificados;
         //Todo: utilizar el type correspondiente para "envio"
         delete envio.isDeleted;
-        delete envio.categoriasPlanificadas;
+        delete envio.productosPlanificados;
         return {
           envioIniciado: envio,
           ...planificacion,

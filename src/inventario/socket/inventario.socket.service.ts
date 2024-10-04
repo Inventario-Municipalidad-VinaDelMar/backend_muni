@@ -17,7 +17,7 @@ export class InventarioSocketService {
 
     async notifyTandaCreated(tanda: TandaResponse) {
         if (this.wss) {
-            const producto = await this.inventarioService.findOneProducto(tanda.producto);
+            const producto = await this.inventarioService.findOneProducto(tanda.productoId);
             //?Emision de cambios
             this.wss.emit('newTandaCreated', tanda);
             //?Re-emitir producto de la tanda.
@@ -30,7 +30,7 @@ export class InventarioSocketService {
     }
     async notifyTandaUpdate(tanda: TandaResponse) {
         if (this.wss) {
-            const producto = await this.inventarioService.findOneProducto(tanda.producto);
+            const producto = await this.inventarioService.findOneProducto(tanda.productoId);
             //?Emision de cambios
             this.wss.emit('newTandaUpdate', tanda);
             //?Re-emitir categoria de la tanda.

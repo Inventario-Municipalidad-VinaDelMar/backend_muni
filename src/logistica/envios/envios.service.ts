@@ -64,24 +64,25 @@ export class EnviosService {
     }
   }
 
-  async verifyEnvioByEnvioCategoria(idEnvioCategoria: string): Promise<void> {
+
+  async verifyEnvioByEnvioProducto(idEnvioProducto: string): Promise<void> {
     try {
-      const envioCategoria = await this.envioProductoRepository.findOne({
+      const envioProducto = await this.envioProductoRepository.findOne({
         where: {
           isDeleted: false,
-          id: idEnvioCategoria,
+          id: idEnvioProducto,
         },
         relations: ['envio']
       })
 
-      if (!envioCategoria) {
-        throw new NotFoundException(`No hay envio categoria with id ${idEnvioCategoria}`);
+      if (!envioProducto) {
+        throw new NotFoundException(`No hay envio producto with id ${idEnvioProducto}`);
       }
-      if (envioCategoria.movimiento) {
+      if (envioProducto.movimiento) {
         throw new BadRequestException('Ya se ha realizo un movimiento en esta categoria.')
       }
       const fechaActual = normalizeDates.normalize(normalizeDates.currentFecha());
-      const fechaEnvio = envioCategoria.envio.fecha;
+      const fechaEnvio = envioProducto.envio.fecha;
       // console.log({ fechaActual })
       // console.log(fechaEnvio);
       // console.log(fechaEnvio !== fechaActual)
@@ -115,7 +116,7 @@ export class EnviosService {
         }
         envioEnProceso = envio;
         //Todo: Hacer un type para el envio en proceso
-        envioEnProceso.categoriasPlanificadas = envio.productosPlanificados.map(ec => {
+        envioEnProceso.productosPlanificados = envio.productosPlanificados.map(ec => {
           delete ec.isDeleted;
           const newDetalle = {
             ...ec,

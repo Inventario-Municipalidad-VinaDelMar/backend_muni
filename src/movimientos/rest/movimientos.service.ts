@@ -29,7 +29,7 @@ export class MovimientosService {
         const { idEnvioProducto, idTanda, cantidadRetirada } = createMovimientoDto;
 
         //Verificar si el movimiento tiene vinculo con un envio actual
-        await this.enviosService.verifyEnvioByEnvioCategoria(idEnvioProducto);
+        await this.enviosService.verifyEnvioByEnvioProducto(idEnvioProducto);
 
         // Iniciar la transacción
         const queryRunner: QueryRunner = this.dataSource.createQueryRunner();
@@ -62,7 +62,7 @@ export class MovimientosService {
             await this.movimientosSocketService.notifyMovimientoCreated(movimiento)
             //* Notificar por socket actualización de la tanda
             await this.movimientosSocketService.notifyTandaDiscount(tanda)
-            //* Notificar por socket movimiento asignado a EnvioCategoria
+            //* Notificar por socket movimiento asignado a EnvioProducto
             await this.planificacionSocketService.notifyEnvioUpdate()
 
             //Error de prueba

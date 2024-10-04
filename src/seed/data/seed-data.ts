@@ -56,7 +56,7 @@ export const initialData: SeedData = {
             fecha: '2024-10-1',
             detalles: [
                 { cantidadPlanificada: 30, producto: 'Fideos Corbatas Carozzi' },
-                { cantidadPlanificada: 100, producto: 'Croissants' },
+                { cantidadPlanificada: 100, producto: 'Sanwich' },
                 { cantidadPlanificada: 25, producto: 'Agua Mineral' },
                 { cantidadPlanificada: 150, producto: 'Tenedor de Mesa' },
             ]
@@ -65,7 +65,7 @@ export const initialData: SeedData = {
             fecha: '2024-10-2',
             detalles: [
                 { cantidadPlanificada: 15, producto: 'Arroz Largo Fino' },
-                { cantidadPlanificada: 88, producto: 'Croissants' },
+                { cantidadPlanificada: 88, producto: 'Sanwich' },
                 { cantidadPlanificada: 25, producto: 'Jugo de Naranja' },
                 { cantidadPlanificada: 150, producto: 'Tenedor de Mesa' },
             ]
@@ -111,15 +111,13 @@ export const initialData: SeedData = {
         {
             nombre: 'Fideos Corbatas Carozzi',
             descripcion: 'Fideos en forma de corbata, ideales para ensaladas y platos fríos.',
-            urlImagen: 'https://www.carozzi.com/wp-content/uploads/2021/06/Farfalle.png',
-            // categoriaNombre: 'Fideos'
+            urlImagen: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQhWSwLF3tf5H44P_3ncSzPV6Vou4nW4yGPEg&s',
 
         },
         {
             nombre: 'Fideos Spaghetti Carozzi',
             descripcion: 'Fideos largos y delgados, perfectos para acompañar con salsas.',
-            urlImagen: 'https://www.carozzi.com/wp-content/uploads/2021/06/Spaghetti.png',
-            // categoriaNombre: 'Fideos'
+            urlImagen: 'https://cdnx.jumpseller.com/serviceshop/image/7953630/Fideos_Spaguetti_N__5__1_Kg_Carozzi.jpg?1655730359',
 
         },
 
@@ -127,15 +125,13 @@ export const initialData: SeedData = {
         {
             nombre: 'Arroz Largo Fino',
             descripcion: 'Arroz de grano largo, ideal para guarniciones y ensaladas.',
-            urlImagen: 'https://www.lafallera.es/wp-content/uploads/2023/04/Coccio%CC%81n-para-el-arroz-largo-pasos-y-trucos.jpg',
-            // categoriaNombre: 'Arroz'
+            urlImagen: 'https://comedera.com/wp-content/uploads/sites/9/2019/11/arroz-blanco-cocido.jpg?w=500&h=375&crop=1',
 
         },
         {
             nombre: 'Arroz Integral',
             descripcion: 'Arroz con cáscara conservada, rico en fibra y nutrientes.',
-            urlImagen: 'https://www.naturalezapop.com/wp-content/uploads/2021/09/arroz-integral.jpg',
-            // categoriaNombre: 'Arroz'
+            urlImagen: 'https://assets.tmecosys.com/image/upload/t_web767x639/img/recipe/ras/Assets/a0426521-e822-4653-b77e-a83670388cd9/Derivates/2ee94377-3c62-42a7-b36f-b40e587e6bd3.jpg',
 
         },
 
@@ -143,15 +139,13 @@ export const initialData: SeedData = {
         {
             nombre: 'Lentejas',
             descripcion: 'Legumbres ricas en proteínas y fibra, ideales para sopas y guisos.',
-            urlImagen: 'https://i.blogs.es/23a158/legumbres/450_1000.jpg',
-            // categoriaNombre: 'Legumbres'
+            urlImagen: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTsqTDVZEVxuc-4gmSXtpCZlbV7n1jxpmV47w&s',
 
         },
         {
             nombre: 'Garbanzos',
             descripcion: 'Legumbres versátiles para hummus, ensaladas y guisos.',
-            urlImagen: 'https://www.gastroactitud.com/wp-content/uploads/2021/04/garbanzos.jpg',
-            // categoriaNombre: 'Legumbres'
+            urlImagen: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSjzteU5TuAxa2c8jJ_xjYqn5F5WawQkAQFoA&s',
 
         },
 
@@ -159,15 +153,13 @@ export const initialData: SeedData = {
         {
             nombre: 'Manzanas',
             descripcion: 'Frutas frescas y crujientes, perfectas para comer solas o en ensaladas.',
-            urlImagen: 'https://s1.abcstatics.com/abc/www/multimedia/ciencia/2023/03/31/frutas-kfNH-RL11aJz79VzsPThFeaE6g5L-1200x840@abc.jpg',
-            // categoriaNombre: 'Frutas'
+            urlImagen: 'https://5aldia.cl/wp-content/uploads/2018/03/manzana.jpg',
 
         },
         {
             nombre: 'Bananas',
             descripcion: 'Frutas dulces y nutritivas, ricas en potasio.',
-            urlImagen: 'https://www.bananalink.org.uk/wp-content/uploads/2021/04/bananas.jpeg',
-            // categoriaNombre: 'Frutas'
+            urlImagen: 'https://images.immediate.co.uk/production/volatile/sites/30/2017/01/Bunch-of-bananas-67e91d5.jpg?quality=90&resize=440,400',
 
         },
 
@@ -175,15 +167,13 @@ export const initialData: SeedData = {
         {
             nombre: 'Zanahorias',
             descripcion: 'Verduras ricas en betacaroteno, ideales para ensaladas y cocidos.',
-            urlImagen: 'https://s2.abcstatics.com/abc/www/multimedia/bienestar/2024/04/30/verduras-pocas-calorias-R3Vfbjx9Nok0nxp9QObH7xH-1200x840@diario_abc.jpg',
-            // categoriaNombre: 'Verduras'
+            urlImagen: 'https://5aldia.cl/wp-content/uploads/2018/03/zanahoria.jpg',
 
         },
         {
             nombre: 'Papas',
             descripcion: 'Tubérculos versátiles para puré, fritas o cocidas.',
-            urlImagen: 'https://www.thespruceeats.com/thmb/dGLQhlG3zK00a9u8osND8XM59Ng=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/easy-roasted-potatoes-recipe-4149362-hero-01-39c63eab8b714ec3a9c768fb7dd82bda.jpg',
-            // categoriaNombre: 'Verduras'
+            urlImagen: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRrSkZPW6XLWrKft-iwB5D7Ime-3pxRPixuXg&s',
 
         },
 
@@ -191,22 +181,19 @@ export const initialData: SeedData = {
         {
             nombre: 'Cuchillo de Mesa',
             descripcion: 'Cuchillo básico para cortar alimentos en la mesa.',
-            urlImagen: 'https://eurohome.cl/cdn/shop/products/0302.914-5_1800x.jpg?v=1637683715',
-            // categoriaNombre: 'Cubiertos'
+            urlImagen: 'https://steward.cl/10311-large_default/set-12-cuchillo-mesa-celebration-inox-180.jpg5',
 
         },
         {
             nombre: 'Tenedor de Mesa',
             descripcion: 'Tenedor estándar para comidas.',
-            urlImagen: 'https://cdn.pixabay.com/photo/2016/03/09/09/31/cutlery-1246651_1280.jpg',
-            // categoriaNombre: 'Cubiertos'
+            urlImagen: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRtYbvKbAjm3n8-1l_RAcddQ17MxWm5qU1kMA&s',
 
         },
         {
             nombre: 'Cuchara de Mesa',
             descripcion: 'Cuchara estándar para comidas liquidas.',
-            urlImagen: 'https://cdn.pixabay.com/photo/2016/03/09/09/31/cutlery-1246651_1280.jpg',
-            // categoriaNombre: 'Cubiertos'
+            urlImagen: 'https://cdnx.jumpseller.com/santa-mariana/image/7682407/resize/610/610?1609339753',
 
         },
 
@@ -214,15 +201,13 @@ export const initialData: SeedData = {
         {
             nombre: 'Detergente Líquido',
             descripcion: 'Detergente líquido para lavar ropa y vajilla.',
-            urlImagen: 'https://img.freepik.com/fotos-premium/productos-limpieza-hogar_863013-118483.jpg',
-            // categoriaNombre: 'Limpiezas'
+            urlImagen: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTpsY5OeGT095gGI7r6fy81Uk1rX9GxkSnJJQ&s',
 
         },
         {
             nombre: 'Esponja de Cocina',
             descripcion: 'Esponja suave y resistente para lavar platos y utensilios.',
-            urlImagen: 'https://cdn.pixabay.com/photo/2015/12/09/17/06/sponge-1080994_1280.jpg',
-            // categoriaNombre: 'Limpiezas'
+            urlImagen: 'https://rgc.cl/wp-content/uploads/2023/06/esponja-acanalada-con-fibra-abrasiva-600x630-1.jpg',
 
         },
 
@@ -230,15 +215,13 @@ export const initialData: SeedData = {
         {
             nombre: 'Leche Entera',
             descripcion: 'Leche fresca y entera, rica en calcio y vitaminas.',
-            urlImagen: 'https://cdn.pixabay.com/photo/2016/11/29/03/53/milk-1867510_1280.jpg',
-            // categoriaNombre: 'Lacteos'
+            urlImagen: 'https://jumbo.vteximg.com.br/arquivos/ids/687146/Leche-entera-1-L.jpg?v=638240207835200000',
 
         },
         {
-            nombre: 'Queso Cheddar',
+            nombre: 'Queso',
             descripcion: 'Queso madurado, ideal para sándwiches y platos horneados.',
-            urlImagen: 'https://cdn.pixabay.com/photo/2016/04/23/14/47/cheese-1349162_1280.jpg',
-            // categoriaNombre: 'Lacteos'
+            urlImagen: 'https://alvicl.vtexassets.com/arquivos/ids/157080/Queso-gauda-laminado.jpg?v=637868443541230000',
 
         },
 
@@ -246,15 +229,13 @@ export const initialData: SeedData = {
         {
             nombre: 'Jugo de Naranja',
             descripcion: 'Jugo natural de naranja, rico en vitamina C.',
-            urlImagen: 'https://cdn.pixabay.com/photo/2017/08/30/12/03/orange-juice-2690576_1280.jpg',
-            // categoriaNombre: 'Bebidas'
+            urlImagen: 'https://tost.cl/cdn/shop/files/20JUX01_1_1200x.jpg?v=1721845283',
 
         },
         {
             nombre: 'Agua Mineral',
             descripcion: 'Agua mineral embotellada, ideal para hidratarse.',
-            urlImagen: 'https://cdn.pixabay.com/photo/2016/02/12/18/52/bottle-1192062_1280.jpg',
-            // categoriaNombre: 'Bebidas'
+            urlImagen: 'https://santaisabel.vtexassets.com/arquivos/ids/175921/Agua-Mineral-sin-Gas-Vital-990-ml.jpg?v=637602368673430000',
 
         },
 
@@ -262,85 +243,148 @@ export const initialData: SeedData = {
         {
             nombre: 'Pan de Molde',
             descripcion: 'Pan suave y esponjoso, perfecto para tostadas y sándwiches.',
-            urlImagen: 'https://cdn.pixabay.com/photo/2017/06/15/11/32/bread-2403186_1280.jpg',
-            // categoriaNombre: 'Panadería'
+            urlImagen: 'https://jumbo.vtexassets.com/arquivos/ids/682957/Pan-de-molde-blanco-sandwich-700-g.jpg?v=638236666659500000',
 
         },
         {
-            nombre: 'Croissants',
-            descripcion: 'Bollo de hojaldre, ideal para desayunos y meriendas.',
-            urlImagen: 'https://cdn.pixabay.com/photo/2017/09/10/19/47/croissant-2731959_1280.jpg',
-            // categoriaNombre: 'Panadería'
+            nombre: 'Sanwich',
+            descripcion: 'Ideal para desayunos y meriendas.',
+            urlImagen: 'https://www.gob.mx/cms/uploads/image/file/761647/WhatsApp_Image_2022-11-01_at_2.23.08_PM.jpeg',
 
         },
     ],
 
     tandas: [
-        {
-            cantidadIngresada: 100,
-            fechaVencimiento: '2024-09-15',
-            productoNombre: 'Leche Entera',
-            // categoriaNombre: 'Lacteos',
-            bodegaNombre: 'Bodega A',
-            ubicacionNombre: 'Rack Rojo, Piso 1'
-        },
-        {
-            cantidadIngresada: 50,
-            fechaVencimiento: '2024-09-12',
-            productoNombre: 'Pan de Molde',
-            // categoriaNombre: 'Panadería',
-            bodegaNombre: 'Bodega A',
-            ubicacionNombre: 'Rack Azul, Piso 2'
-        },
-        {
-            cantidadIngresada: 137,
-            fechaVencimiento: '2024-09-15',
-            productoNombre: 'Queso Cheddar',
-            // categoriaNombre: 'Lacteos',
-            bodegaNombre: 'Bodega A',
-            ubicacionNombre: 'Rack Azul, Piso 3'
-        },
-        {
-            cantidadIngresada: 100,
-            fechaVencimiento: '2024-10-25',
-            productoNombre: 'Croissants',
-            // categoriaNombre: 'Panadería',
-            bodegaNombre: 'Bodega A',
-            ubicacionNombre: 'Sector A'
-        },
-        {
-            cantidadIngresada: 50,
-            fechaVencimiento: '2024-10-10',
-            productoNombre: 'Jugo de Naranja',
-            // categoriaNombre: 'Bebidas',
-            bodegaNombre: 'Bodega A',
-            ubicacionNombre: 'Sector B'
-        },
-        {
-            cantidadIngresada: 1000,
-            fechaVencimiento: '2025-06-27',
-            productoNombre: 'Fideos Spaghetti Carozzi',
-            // categoriaNombre: 'Fideos',
-            bodegaNombre: 'Bodega A',
-            ubicacionNombre: 'Rack Rojo, Piso 2'
-        },
-        {
-            cantidadIngresada: 500,
-            fechaVencimiento: '2027-03-10',
-            productoNombre: 'Arroz Largo Fino',
-            // categoriaNombre: 'Arroz',
-            bodegaNombre: 'Bodega A',
-            ubicacionNombre: 'Rack Rojo, Piso 3'
-        },
-        {
-            cantidadIngresada: 100,
-            fechaVencimiento: '2024-12-21',
-            productoNombre: 'Manzanas',
-            // categoriaNombre: 'Frutas',
-            bodegaNombre: 'Bodega A',
-            ubicacionNombre: 'Sector C'
-        },
+        // Fideos
+
+        { cantidadIngresada: 200, fechaVencimiento: '2024-11-01', productoNombre: 'Fideos Corbatas Carozzi', bodegaNombre: 'Bodega A', ubicacionNombre: 'Rack Rojo, Piso 1' },
+        { cantidadIngresada: 150, fechaVencimiento: '2024-11-05', productoNombre: 'Fideos Corbatas Carozzi', bodegaNombre: 'Bodega A', ubicacionNombre: 'Rack Rojo, Piso 2' },
+        { cantidadIngresada: 100, fechaVencimiento: '2024-11-10', productoNombre: 'Fideos Corbatas Carozzi', bodegaNombre: 'Bodega A', ubicacionNombre: 'Rack Azul, Piso 1' },
+        { cantidadIngresada: 250, fechaVencimiento: '2024-11-15', productoNombre: 'Fideos Corbatas Carozzi', bodegaNombre: 'Bodega A', ubicacionNombre: 'Almacenaje Centro bodega' },
+        { cantidadIngresada: 180, fechaVencimiento: '2024-11-20', productoNombre: 'Fideos Corbatas Carozzi', bodegaNombre: 'Bodega A', ubicacionNombre: 'Sector A' },
+
+        { cantidadIngresada: 200, fechaVencimiento: '2024-11-01', productoNombre: 'Fideos Spaghetti Carozzi', bodegaNombre: 'Bodega A', ubicacionNombre: 'Rack Rojo, Piso 1' },
+        { cantidadIngresada: 150, fechaVencimiento: '2024-11-05', productoNombre: 'Fideos Spaghetti Carozzi', bodegaNombre: 'Bodega A', ubicacionNombre: 'Rack Rojo, Piso 2' },
+        { cantidadIngresada: 100, fechaVencimiento: '2024-11-10', productoNombre: 'Fideos Spaghetti Carozzi', bodegaNombre: 'Bodega A', ubicacionNombre: 'Rack Azul, Piso 1' },
+        { cantidadIngresada: 250, fechaVencimiento: '2024-11-15', productoNombre: 'Fideos Spaghetti Carozzi', bodegaNombre: 'Bodega A', ubicacionNombre: 'Almacenaje Centro bodega' },
+        { cantidadIngresada: 180, fechaVencimiento: '2024-11-20', productoNombre: 'Fideos Spaghetti Carozzi', bodegaNombre: 'Bodega A', ubicacionNombre: 'Sector A' },
+        // Arroz
+        { cantidadIngresada: 200, fechaVencimiento: '2024-11-01', productoNombre: 'Arroz Largo Fino', bodegaNombre: 'Bodega A', ubicacionNombre: 'Rack Rojo, Piso 1' },
+        { cantidadIngresada: 150, fechaVencimiento: '2024-11-05', productoNombre: 'Arroz Largo Fino', bodegaNombre: 'Bodega A', ubicacionNombre: 'Rack Rojo, Piso 2' },
+        { cantidadIngresada: 100, fechaVencimiento: '2024-11-10', productoNombre: 'Arroz Largo Fino', bodegaNombre: 'Bodega A', ubicacionNombre: 'Rack Azul, Piso 1' },
+        { cantidadIngresada: 250, fechaVencimiento: '2024-11-15', productoNombre: 'Arroz Largo Fino', bodegaNombre: 'Bodega A', ubicacionNombre: 'Almacenaje Centro bodega' },
+        { cantidadIngresada: 180, fechaVencimiento: '2024-11-20', productoNombre: 'Arroz Largo Fino', bodegaNombre: 'Bodega A', ubicacionNombre: 'Sector A' },
+
+        { cantidadIngresada: 200, fechaVencimiento: '2024-11-01', productoNombre: 'Arroz Integral', bodegaNombre: 'Bodega A', ubicacionNombre: 'Rack Rojo, Piso 1' },
+        { cantidadIngresada: 150, fechaVencimiento: '2024-11-05', productoNombre: 'Arroz Integral', bodegaNombre: 'Bodega A', ubicacionNombre: 'Rack Rojo, Piso 2' },
+        { cantidadIngresada: 100, fechaVencimiento: '2024-11-10', productoNombre: 'Arroz Integral', bodegaNombre: 'Bodega A', ubicacionNombre: 'Rack Azul, Piso 1' },
+        { cantidadIngresada: 250, fechaVencimiento: '2024-11-15', productoNombre: 'Arroz Integral', bodegaNombre: 'Bodega A', ubicacionNombre: 'Almacenaje Centro bodega' },
+        { cantidadIngresada: 180, fechaVencimiento: '2024-11-20', productoNombre: 'Arroz Integral', bodegaNombre: 'Bodega A', ubicacionNombre: 'Sector A' },
+        // Legumbres
+        { cantidadIngresada: 200, fechaVencimiento: '2024-11-01', productoNombre: 'Lentejas', bodegaNombre: 'Bodega A', ubicacionNombre: 'Rack Rojo, Piso 1' },
+        { cantidadIngresada: 150, fechaVencimiento: '2024-11-05', productoNombre: 'Lentejas', bodegaNombre: 'Bodega A', ubicacionNombre: 'Rack Rojo, Piso 2' },
+        { cantidadIngresada: 100, fechaVencimiento: '2024-11-10', productoNombre: 'Lentejas', bodegaNombre: 'Bodega A', ubicacionNombre: 'Rack Azul, Piso 1' },
+        { cantidadIngresada: 250, fechaVencimiento: '2024-11-15', productoNombre: 'Lentejas', bodegaNombre: 'Bodega A', ubicacionNombre: 'Almacenaje Centro bodega' },
+        { cantidadIngresada: 180, fechaVencimiento: '2024-11-20', productoNombre: 'Lentejas', bodegaNombre: 'Bodega A', ubicacionNombre: 'Sector A' },
+
+        { cantidadIngresada: 200, fechaVencimiento: '2024-11-01', productoNombre: 'Garbanzos', bodegaNombre: 'Bodega A', ubicacionNombre: 'Rack Rojo, Piso 1' },
+        { cantidadIngresada: 150, fechaVencimiento: '2024-11-05', productoNombre: 'Garbanzos', bodegaNombre: 'Bodega A', ubicacionNombre: 'Rack Rojo, Piso 2' },
+        { cantidadIngresada: 100, fechaVencimiento: '2024-11-10', productoNombre: 'Garbanzos', bodegaNombre: 'Bodega A', ubicacionNombre: 'Rack Azul, Piso 1' },
+        { cantidadIngresada: 250, fechaVencimiento: '2024-11-15', productoNombre: 'Garbanzos', bodegaNombre: 'Bodega A', ubicacionNombre: 'Almacenaje Centro bodega' },
+        { cantidadIngresada: 180, fechaVencimiento: '2024-11-20', productoNombre: 'Garbanzos', bodegaNombre: 'Bodega A', ubicacionNombre: 'Sector A' },
+        // Frutas
+        { cantidadIngresada: 200, fechaVencimiento: '2024-11-01', productoNombre: 'Manzanas', bodegaNombre: 'Bodega A', ubicacionNombre: 'Rack Rojo, Piso 1' },
+        { cantidadIngresada: 150, fechaVencimiento: '2024-11-05', productoNombre: 'Manzanas', bodegaNombre: 'Bodega A', ubicacionNombre: 'Rack Rojo, Piso 2' },
+        { cantidadIngresada: 100, fechaVencimiento: '2024-11-10', productoNombre: 'Manzanas', bodegaNombre: 'Bodega A', ubicacionNombre: 'Rack Azul, Piso 1' },
+        { cantidadIngresada: 250, fechaVencimiento: '2024-11-15', productoNombre: 'Manzanas', bodegaNombre: 'Bodega A', ubicacionNombre: 'Almacenaje Centro bodega' },
+        { cantidadIngresada: 180, fechaVencimiento: '2024-11-20', productoNombre: 'Manzanas', bodegaNombre: 'Bodega A', ubicacionNombre: 'Sector A' },
+
+        { cantidadIngresada: 200, fechaVencimiento: '2024-11-01', productoNombre: 'Bananas', bodegaNombre: 'Bodega A', ubicacionNombre: 'Rack Rojo, Piso 1' },
+        { cantidadIngresada: 150, fechaVencimiento: '2024-11-05', productoNombre: 'Bananas', bodegaNombre: 'Bodega A', ubicacionNombre: 'Rack Rojo, Piso 2' },
+        { cantidadIngresada: 100, fechaVencimiento: '2024-11-10', productoNombre: 'Bananas', bodegaNombre: 'Bodega A', ubicacionNombre: 'Rack Azul, Piso 1' },
+        { cantidadIngresada: 250, fechaVencimiento: '2024-11-15', productoNombre: 'Bananas', bodegaNombre: 'Bodega A', ubicacionNombre: 'Almacenaje Centro bodega' },
+        { cantidadIngresada: 180, fechaVencimiento: '2024-11-20', productoNombre: 'Bananas', bodegaNombre: 'Bodega A', ubicacionNombre: 'Sector A' },
+        // Verduras   
+        { cantidadIngresada: 200, fechaVencimiento: '2024-11-01', productoNombre: 'Zanahorias', bodegaNombre: 'Bodega A', ubicacionNombre: 'Rack Rojo, Piso 1' },
+        { cantidadIngresada: 150, fechaVencimiento: '2024-11-05', productoNombre: 'Zanahorias', bodegaNombre: 'Bodega A', ubicacionNombre: 'Rack Rojo, Piso 2' },
+        { cantidadIngresada: 100, fechaVencimiento: '2024-11-10', productoNombre: 'Zanahorias', bodegaNombre: 'Bodega A', ubicacionNombre: 'Rack Azul, Piso 1' },
+        { cantidadIngresada: 250, fechaVencimiento: '2024-11-15', productoNombre: 'Zanahorias', bodegaNombre: 'Bodega A', ubicacionNombre: 'Almacenaje Centro bodega' },
+        { cantidadIngresada: 180, fechaVencimiento: '2024-11-20', productoNombre: 'Zanahorias', bodegaNombre: 'Bodega A', ubicacionNombre: 'Sector A' },
+
+        { cantidadIngresada: 200, fechaVencimiento: '2024-11-01', productoNombre: 'Papas', bodegaNombre: 'Bodega A', ubicacionNombre: 'Rack Rojo, Piso 1' },
+        { cantidadIngresada: 150, fechaVencimiento: '2024-11-05', productoNombre: 'Papas', bodegaNombre: 'Bodega A', ubicacionNombre: 'Rack Rojo, Piso 2' },
+        { cantidadIngresada: 100, fechaVencimiento: '2024-11-10', productoNombre: 'Papas', bodegaNombre: 'Bodega A', ubicacionNombre: 'Rack Azul, Piso 1' },
+        { cantidadIngresada: 250, fechaVencimiento: '2024-11-15', productoNombre: 'Papas', bodegaNombre: 'Bodega A', ubicacionNombre: 'Almacenaje Centro bodega' },
+        { cantidadIngresada: 180, fechaVencimiento: '2024-11-20', productoNombre: 'Papas', bodegaNombre: 'Bodega A', ubicacionNombre: 'Sector A' },
+        // Cubiertos
+        { cantidadIngresada: 200, fechaVencimiento: '2024-11-01', productoNombre: 'Cuchillo de Mesa', bodegaNombre: 'Bodega A', ubicacionNombre: 'Rack Rojo, Piso 1' },
+        { cantidadIngresada: 150, fechaVencimiento: '2024-11-05', productoNombre: 'Cuchillo de Mesa', bodegaNombre: 'Bodega A', ubicacionNombre: 'Rack Rojo, Piso 2' },
+        { cantidadIngresada: 100, fechaVencimiento: '2024-11-10', productoNombre: 'Cuchillo de Mesa', bodegaNombre: 'Bodega A', ubicacionNombre: 'Rack Azul, Piso 1' },
+        { cantidadIngresada: 250, fechaVencimiento: '2024-11-15', productoNombre: 'Cuchillo de Mesa', bodegaNombre: 'Bodega A', ubicacionNombre: 'Almacenaje Centro bodega' },
+        { cantidadIngresada: 180, fechaVencimiento: '2024-11-20', productoNombre: 'Cuchillo de Mesa', bodegaNombre: 'Bodega A', ubicacionNombre: 'Sector A' },
+
+        { cantidadIngresada: 200, fechaVencimiento: '2024-11-01', productoNombre: 'Tenedor de Mesa', bodegaNombre: 'Bodega A', ubicacionNombre: 'Rack Rojo, Piso 1' },
+        { cantidadIngresada: 150, fechaVencimiento: '2024-11-05', productoNombre: 'Tenedor de Mesa', bodegaNombre: 'Bodega A', ubicacionNombre: 'Rack Rojo, Piso 2' },
+        { cantidadIngresada: 100, fechaVencimiento: '2024-11-10', productoNombre: 'Tenedor de Mesa', bodegaNombre: 'Bodega A', ubicacionNombre: 'Rack Azul, Piso 1' },
+        { cantidadIngresada: 250, fechaVencimiento: '2024-11-15', productoNombre: 'Tenedor de Mesa', bodegaNombre: 'Bodega A', ubicacionNombre: 'Almacenaje Centro bodega' },
+        { cantidadIngresada: 180, fechaVencimiento: '2024-11-20', productoNombre: 'Tenedor de Mesa', bodegaNombre: 'Bodega A', ubicacionNombre: 'Sector A' },
+
+        { cantidadIngresada: 200, fechaVencimiento: '2024-11-01', productoNombre: 'Cuchara de Mesa', bodegaNombre: 'Bodega A', ubicacionNombre: 'Rack Rojo, Piso 1' },
+        { cantidadIngresada: 150, fechaVencimiento: '2024-11-05', productoNombre: 'Cuchara de Mesa', bodegaNombre: 'Bodega A', ubicacionNombre: 'Rack Rojo, Piso 2' },
+        { cantidadIngresada: 100, fechaVencimiento: '2024-11-10', productoNombre: 'Cuchara de Mesa', bodegaNombre: 'Bodega A', ubicacionNombre: 'Rack Azul, Piso 1' },
+        { cantidadIngresada: 250, fechaVencimiento: '2024-11-15', productoNombre: 'Cuchara de Mesa', bodegaNombre: 'Bodega A', ubicacionNombre: 'Almacenaje Centro bodega' },
+        { cantidadIngresada: 180, fechaVencimiento: '2024-11-20', productoNombre: 'Cuchara de Mesa', bodegaNombre: 'Bodega A', ubicacionNombre: 'Sector A' },
+        // Limpiezas
+        { cantidadIngresada: 200, fechaVencimiento: '2024-11-01', productoNombre: 'Detergente Líquido', bodegaNombre: 'Bodega A', ubicacionNombre: 'Rack Rojo, Piso 1' },
+        { cantidadIngresada: 150, fechaVencimiento: '2024-11-05', productoNombre: 'Detergente Líquido', bodegaNombre: 'Bodega A', ubicacionNombre: 'Rack Rojo, Piso 2' },
+        { cantidadIngresada: 100, fechaVencimiento: '2024-11-10', productoNombre: 'Detergente Líquido', bodegaNombre: 'Bodega A', ubicacionNombre: 'Rack Azul, Piso 1' },
+        { cantidadIngresada: 250, fechaVencimiento: '2024-11-15', productoNombre: 'Detergente Líquido', bodegaNombre: 'Bodega A', ubicacionNombre: 'Almacenaje Centro bodega' },
+        { cantidadIngresada: 180, fechaVencimiento: '2024-11-20', productoNombre: 'Detergente Líquido', bodegaNombre: 'Bodega A', ubicacionNombre: 'Sector A' },
+
+        { cantidadIngresada: 200, fechaVencimiento: '2024-11-01', productoNombre: 'Esponja de Cocina', bodegaNombre: 'Bodega A', ubicacionNombre: 'Rack Rojo, Piso 1' },
+        { cantidadIngresada: 150, fechaVencimiento: '2024-11-05', productoNombre: 'Esponja de Cocina', bodegaNombre: 'Bodega A', ubicacionNombre: 'Rack Rojo, Piso 2' },
+        { cantidadIngresada: 100, fechaVencimiento: '2024-11-10', productoNombre: 'Esponja de Cocina', bodegaNombre: 'Bodega A', ubicacionNombre: 'Rack Azul, Piso 1' },
+        { cantidadIngresada: 250, fechaVencimiento: '2024-11-15', productoNombre: 'Esponja de Cocina', bodegaNombre: 'Bodega A', ubicacionNombre: 'Almacenaje Centro bodega' },
+        { cantidadIngresada: 180, fechaVencimiento: '2024-11-20', productoNombre: 'Esponja de Cocina', bodegaNombre: 'Bodega A', ubicacionNombre: 'Sector A' },
+        // Lácteos
+        { cantidadIngresada: 200, fechaVencimiento: '2024-11-01', productoNombre: 'Leche Entera', bodegaNombre: 'Bodega A', ubicacionNombre: 'Rack Rojo, Piso 1' },
+        { cantidadIngresada: 150, fechaVencimiento: '2024-11-05', productoNombre: 'Leche Entera', bodegaNombre: 'Bodega A', ubicacionNombre: 'Rack Rojo, Piso 2' },
+        { cantidadIngresada: 100, fechaVencimiento: '2024-11-10', productoNombre: 'Leche Entera', bodegaNombre: 'Bodega A', ubicacionNombre: 'Rack Azul, Piso 1' },
+        { cantidadIngresada: 250, fechaVencimiento: '2024-11-15', productoNombre: 'Leche Entera', bodegaNombre: 'Bodega A', ubicacionNombre: 'Almacenaje Centro bodega' },
+        { cantidadIngresada: 180, fechaVencimiento: '2024-11-20', productoNombre: 'Leche Entera', bodegaNombre: 'Bodega A', ubicacionNombre: 'Sector A' },
+
+        { cantidadIngresada: 200, fechaVencimiento: '2024-11-01', productoNombre: 'Queso', bodegaNombre: 'Bodega A', ubicacionNombre: 'Rack Rojo, Piso 1' },
+        { cantidadIngresada: 150, fechaVencimiento: '2024-11-05', productoNombre: 'Queso', bodegaNombre: 'Bodega A', ubicacionNombre: 'Rack Rojo, Piso 2' },
+        { cantidadIngresada: 100, fechaVencimiento: '2024-11-10', productoNombre: 'Queso', bodegaNombre: 'Bodega A', ubicacionNombre: 'Rack Azul, Piso 1' },
+        { cantidadIngresada: 250, fechaVencimiento: '2024-11-15', productoNombre: 'Queso', bodegaNombre: 'Bodega A', ubicacionNombre: 'Almacenaje Centro bodega' },
+        { cantidadIngresada: 180, fechaVencimiento: '2024-11-20', productoNombre: 'Queso', bodegaNombre: 'Bodega A', ubicacionNombre: 'Sector A' },
+        // Bebidas
+        { cantidadIngresada: 200, fechaVencimiento: '2024-11-01', productoNombre: 'Jugo de Naranja', bodegaNombre: 'Bodega A', ubicacionNombre: 'Rack Rojo, Piso 1' },
+        { cantidadIngresada: 150, fechaVencimiento: '2024-11-05', productoNombre: 'Jugo de Naranja', bodegaNombre: 'Bodega A', ubicacionNombre: 'Rack Rojo, Piso 2' },
+        { cantidadIngresada: 100, fechaVencimiento: '2024-11-10', productoNombre: 'Jugo de Naranja', bodegaNombre: 'Bodega A', ubicacionNombre: 'Rack Azul, Piso 1' },
+        { cantidadIngresada: 250, fechaVencimiento: '2024-11-15', productoNombre: 'Jugo de Naranja', bodegaNombre: 'Bodega A', ubicacionNombre: 'Almacenaje Centro bodega' },
+        { cantidadIngresada: 180, fechaVencimiento: '2024-11-20', productoNombre: 'Jugo de Naranja', bodegaNombre: 'Bodega A', ubicacionNombre: 'Sector A' },
+
+        { cantidadIngresada: 200, fechaVencimiento: '2024-11-01', productoNombre: 'Agua Mineral', bodegaNombre: 'Bodega A', ubicacionNombre: 'Rack Rojo, Piso 1' },
+        { cantidadIngresada: 150, fechaVencimiento: '2024-11-05', productoNombre: 'Agua Mineral', bodegaNombre: 'Bodega A', ubicacionNombre: 'Rack Rojo, Piso 2' },
+        { cantidadIngresada: 100, fechaVencimiento: '2024-11-10', productoNombre: 'Agua Mineral', bodegaNombre: 'Bodega A', ubicacionNombre: 'Rack Azul, Piso 1' },
+        { cantidadIngresada: 250, fechaVencimiento: '2024-11-15', productoNombre: 'Agua Mineral', bodegaNombre: 'Bodega A', ubicacionNombre: 'Almacenaje Centro bodega' },
+        { cantidadIngresada: 180, fechaVencimiento: '2024-11-20', productoNombre: 'Agua Mineral', bodegaNombre: 'Bodega A', ubicacionNombre: 'Sector A' },
+        // Panadería
+
+        { cantidadIngresada: 200, fechaVencimiento: '2024-11-01', productoNombre: 'Pan de Molde', bodegaNombre: 'Bodega A', ubicacionNombre: 'Rack Rojo, Piso 1' },
+        { cantidadIngresada: 150, fechaVencimiento: '2024-11-05', productoNombre: 'Pan de Molde', bodegaNombre: 'Bodega A', ubicacionNombre: 'Rack Rojo, Piso 2' },
+        { cantidadIngresada: 100, fechaVencimiento: '2024-11-10', productoNombre: 'Pan de Molde', bodegaNombre: 'Bodega A', ubicacionNombre: 'Rack Azul, Piso 1' },
+        { cantidadIngresada: 250, fechaVencimiento: '2024-11-15', productoNombre: 'Pan de Molde', bodegaNombre: 'Bodega A', ubicacionNombre: 'Almacenaje Centro bodega' },
+        { cantidadIngresada: 180, fechaVencimiento: '2024-11-20', productoNombre: 'Pan de Molde', bodegaNombre: 'Bodega A', ubicacionNombre: 'Sector A' },
+
+        { cantidadIngresada: 200, fechaVencimiento: '2024-11-01', productoNombre: 'Sanwich', bodegaNombre: 'Bodega A', ubicacionNombre: 'Rack Rojo, Piso 1' },
+        { cantidadIngresada: 150, fechaVencimiento: '2024-11-05', productoNombre: 'Sanwich', bodegaNombre: 'Bodega A', ubicacionNombre: 'Rack Rojo, Piso 2' },
+        { cantidadIngresada: 100, fechaVencimiento: '2024-11-10', productoNombre: 'Sanwich', bodegaNombre: 'Bodega A', ubicacionNombre: 'Rack Azul, Piso 1' },
+        { cantidadIngresada: 250, fechaVencimiento: '2024-11-15', productoNombre: 'Sanwich', bodegaNombre: 'Bodega A', ubicacionNombre: 'Almacenaje Centro bodega' },
+        { cantidadIngresada: 180, fechaVencimiento: '2024-11-20', productoNombre: 'Sanwich', bodegaNombre: 'Bodega A', ubicacionNombre: 'Sector A' },
     ]
+
 
 
 }

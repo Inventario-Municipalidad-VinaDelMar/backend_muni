@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Post, Body } from '@nestjs/common';
 import { CreatePlanificacionDto } from '../dto/rest/planificacion/create-planificacion.dto';
 import { PlanificacionService } from './planificacion.service';
 
@@ -10,11 +10,5 @@ export class PlanificacionController {
   create(@Body() createPlanificacionDto: CreatePlanificacionDto) {
     return this.planificacionService.create(createPlanificacionDto);
   }
-
-  // @Get('')
-  // findByFecha() {
-  //   return this.planificacionService.findByFecha();
-  // }
-
 
 }

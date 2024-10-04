@@ -54,7 +54,8 @@ export class BaseService<T> {
 
     async findOne(id: string) {
         try {
-            //Siempre existe la propiedad id
+
+            //Siempre existe la propiedad id, en las clases que extienden de esta
             const entity = await this.repository.findOne({ where: { id } as any });
             if (!entity) {
                 throw new NotFoundException();

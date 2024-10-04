@@ -6,10 +6,13 @@ export class EnviosController {
   constructor(private readonly enviosService: EnviosService) { }
 
   @Post('newEnvio')
-  create() {
+  createNewEnvio() {
     return this.enviosService.create();
-    // return this.enviosService.create(createEnvioDto);
   }
+  // @Post(':id/load',)
+  // updateProductLoaded(@Param('id', ParseUUIDPipe) id: string) {
+  //   return id;
+  // }
 
   // @Get()
   // findAll() {
