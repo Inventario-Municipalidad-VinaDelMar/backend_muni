@@ -29,7 +29,7 @@ export class InventarioSocketGateway {
 
 
   @SubscribeMessage('getAllProductos')
-  @AuthSocket(ValidRoles.externo)
+  @AuthSocket(ValidRoles.admin)
   async findAllProductos(client: Socket,) {
     const data =
       await this.inventarioSocketService.getInventarioProductos();
