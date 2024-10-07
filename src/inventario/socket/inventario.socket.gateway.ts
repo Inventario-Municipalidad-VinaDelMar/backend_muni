@@ -3,19 +3,33 @@ import { InventarioSocketService } from './inventario.socket.service';
 import { Server, Socket } from 'socket.io';
 import { GetTandaDto } from '../dto/socket-dto';
 import { GetUbicacionByBodegaDto, } from '../dto/rest-dto';
+import { AuthSocket } from 'src/auth/decorators';
+import { JwtService } from '@nestjs/jwt';
+import { middleWareSocketAuth } from 'src/auth/guards/socket/middleware-socket.guard';
+import { ValidRoles } from 'src/auth/interfaces';
+import { UseFilters } from '@nestjs/common';
+import { WsExceptionLoggerFilter } from 'src/common/handle-exceptions/socket-logger-filter.exception';
+
+
 
 @WebSocketGateway({ cors: true, namespace: 'inventario' })
+@UseFilters(new WsExceptionLoggerFilter())
 export class InventarioSocketGateway {
-  constructor(private readonly inventarioSocketService: InventarioSocketService) { }
+  constructor(private readonly inventarioSocketService: InventarioSocketService,
+    private readonly jwtService: JwtService,
+  ) { }
 
   @WebSocketServer()
   wss: Server;
 
   afterInit(server: Server) {
     this.inventarioSocketService.setServer(server);
+    server.use((socket: Socket, next) => middleWareSocketAuth(socket, next, this.jwtService));
   }
 
+
   @SubscribeMessage('getAllProductos')
+  @AuthSocket(ValidRoles.externo)
   async findAllProductos(client: Socket,) {
     const data =
       await this.inventarioSocketService.getInventarioProductos();

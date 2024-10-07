@@ -1,40 +1,23 @@
 import { Controller, Post, } from '@nestjs/common';
 import { EnviosService } from './envios.service';
+import { Auth, GetUser } from 'src/auth/decorators';
+import { User } from 'src/auth/entities/user.entity';
+import { ValidRoles } from 'src/auth/interfaces';
 
+@Auth()
 @Controller('envios')
 export class EnviosController {
   constructor(private readonly enviosService: EnviosService) { }
 
+  // @Auth(ValidRoles.admin, ValidRoles.bodeguero)
   @Post('newEnvio')
-  createNewEnvio() {
+  createNewEnvio(@GetUser() user: User) {
+    // console.log({ user });
     return this.enviosService.create();
   }
+  // @Auth()
   @Post('completeNewEnvio')
   completeNewEnvio() {
     return this.enviosService.completeNewEnvio();
   }
-  // @Post(':id/load',)
-  // updateProductLoaded(@Param('id', ParseUUIDPipe) id: string) {
-  //   return id;
-  // }
-
-  // @Get()
-  // findAll() {
-  //   return this.enviosService.findAll();
-  // }
-
-  // @Get(':id')
-  // findOne(@Param('id') id: string) {
-  //   return this.enviosService.findOne(+id);
-  // }
-
-  // @Patch(':id')
-  // update(@Param('id') id: string, @Body() updateEnvioDto: UpdateEnvioDto) {
-  //   return this.enviosService.update(+id, updateEnvioDto);
-  // }
-
-  // @Delete(':id')
-  // remove(@Param('id') id: string) {
-  //   return this.enviosService.remove(+id);
-  // }
 }

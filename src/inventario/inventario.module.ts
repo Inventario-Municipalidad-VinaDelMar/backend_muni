@@ -10,10 +10,12 @@ import { MovimientosModule } from "src/movimientos/movimientos.module";
 import { Bodega, Producto, Tanda, Ubicacion } from "./entities";
 import { BodegasService, ProductosService, TandasService, UbicacionesService } from "./rest/servicios-especificos";
 import { LogisticaModule } from "src/logistica/logistica.module";
+import { AuthModule } from "src/auth/auth.module";
 
 
 @Module({
     imports: [
+        AuthModule,
         LogisticaModule,
 
         TypeOrmModule.forFeature([Bodega, Ubicacion, Producto, Tanda,]),

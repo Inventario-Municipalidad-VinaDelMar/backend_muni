@@ -5,6 +5,17 @@ interface SeedBodega {
     nombreEncargado: string;
 }
 
+interface SeedUser {
+    email: string;
+    password: string;
+
+    nombre: string;
+    apellidoPaterno: string;
+    apellidoMaterno: string;
+    rut: string;
+    roles?: string[];
+}
+
 interface SeedUbicacion {
     descripcion: string;
     // idBodega: string;
@@ -33,6 +44,7 @@ export interface SeedPlanificacion {
 }
 
 interface SeedData {
+    users: SeedUser[];
     planificaciones: SeedPlanificacion[];
     //inventario
     ubicaciones: SeedUbicacion[];
@@ -42,6 +54,12 @@ interface SeedData {
 }
 
 export const initialData: SeedData = {
+    users: [
+        { email: 'cristobal@gmail.com', password: 'Abc12345', nombre: 'Cristóbal', apellidoPaterno: 'Herrera', apellidoMaterno: 'Rojas', rut: '20440649-9', roles: ['administrador'] },
+        { email: 'mangini@gmail.com', password: 'Abc12345', nombre: 'Franco', apellidoPaterno: 'Mangini', apellidoMaterno: 'Tapia', rut: '20175289-2', roles: ['administrador'] },
+        { email: 'diego@gmail.com', password: 'Abc12345', nombre: 'Diego', apellidoPaterno: 'Hidalgo', apellidoMaterno: 'Carvajal', rut: '21069070-0', roles: ['administrador'] },
+        { email: 'renato@gmail.com', password: 'Abc12345', nombre: 'Renato', apellidoPaterno: 'Plaza', apellidoMaterno: 'Díaz', rut: '20482871-7' },
+    ],
     planificaciones: [
         {
             fecha: '',

@@ -7,12 +7,14 @@ import { SeedModule } from './seed/seed.module';
 import { MovimientosModule } from './movimientos/movimientos.module';
 import { LogisticaModule } from './logistica/logistica.module';
 import { PlanificacionModule } from './planificacion/planificacion.module';
-
+import { AuthModule } from './auth/auth.module';
 
 
 @Module({
   controllers: [],
-  providers: [],
+  providers: [
+
+  ],
   imports: [
     ScheduleModule.forRoot(),
     ConfigModule.forRoot(),
@@ -31,6 +33,7 @@ import { PlanificacionModule } from './planificacion/planificacion.module';
     MovimientosModule,
     LogisticaModule,
     PlanificacionModule,
+    AuthModule,
   ],
 })
 export class AppModule { }

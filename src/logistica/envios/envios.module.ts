@@ -7,9 +7,11 @@ import { EnvioProducto } from './entities/envio-producto.entity';
 import { InventarioModule } from 'src/inventario/inventario.module';
 import { PlanificacionModule } from 'src/planificacion/planificacion.module';
 import { MovimientosModule } from 'src/movimientos/movimientos.module';
+import { AuthModule } from 'src/auth/auth.module';
 
 @Module({
   imports: [
+    AuthModule,
     forwardRef(() => MovimientosModule),
     PlanificacionModule,
     forwardRef(() => InventarioModule),

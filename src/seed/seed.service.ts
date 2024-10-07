@@ -8,6 +8,9 @@ import { initialData, SeedPlanificacion } from './data/seed-data';
 import { PlanificacionService } from 'src/planificacion/rest/planificacion.service';
 import { EnviosService } from 'src/logistica/envios/envios.service';
 import { weekDates } from 'src/utils';
+import { AuthService } from 'src/auth/auth.service';
+import { User } from 'src/auth/entities/user.entity';
+import { CreateUserDto } from 'src/auth/dto/create-user.dto';
 // import { MovimientosService } from 'src/movimientos/rest/movimientos.service';
 
 @Injectable()
@@ -21,10 +24,12 @@ export class SeedService {
         private readonly bodegasService: BodegasService,
         private readonly ubicacionesService: UbicacionesService,
         private readonly tandasService: TandasService,
+        private readonly authService: AuthService,
 
     ) { }
     async runSeed() {
         await this.deleteTables();
+        await this.insertNewUsers();
         const bodega = await this.insertNewBodegas();
         // await this.insertNewCategorias();
         await this.insertNewProductos();
@@ -36,6 +41,7 @@ export class SeedService {
 
     private async deleteTables() {
         // await this.movimientoService.deleteAll(); --> Se borra con cascade
+        await this.authService.deleteAll();
         await this.enviosService.deleteAll();
         await this.planificacionService.deleteAll();
         await this.tandasService.deleteAll();
@@ -45,6 +51,22 @@ export class SeedService {
         await this.bodegasService.deleteAll();
 
     }
+
+    private async insertNewUsers() {
+        const seedUsers = initialData.users;
+        const usersPromises = [];
+
+        seedUsers.forEach((user) => {
+            usersPromises.push(
+                this.authService.create({
+                    ...user as CreateUserDto,
+                }),
+            );
+        });
+
+        await Promise.all(usersPromises);
+    }
+
     private async insertNewPlanificaciones() {
         try {
             const datesSemana = weekDates.getCurrentWeekDates();
