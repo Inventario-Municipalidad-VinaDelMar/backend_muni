@@ -7,6 +7,7 @@ import { UbicacionesService } from 'src/inventario/rest/servicios-especificos/ub
 import { initialData, SeedPlanificacion } from './data/seed-data';
 import { PlanificacionService } from 'src/planificacion/rest/planificacion.service';
 import { EnviosService } from 'src/logistica/envios/envios.service';
+import { weekDates } from 'src/utils';
 // import { MovimientosService } from 'src/movimientos/rest/movimientos.service';
 
 @Injectable()
@@ -46,8 +47,13 @@ export class SeedService {
     }
     private async insertNewPlanificaciones() {
         try {
+            const datesSemana = weekDates.getCurrentWeekDates();
             const seedPlanificacion = JSON.parse(JSON.stringify(initialData.planificaciones)) as SeedPlanificacion[];
-
+            seedPlanificacion.forEach((plan, index) => {
+                if (datesSemana[index]) {
+                    plan.fecha = datesSemana[index];  // Asigna la fecha de la semana actual
+                }
+            });
             // Obtener todas las categorías creadas
             const productos = await this.productoService.findAll();
             // Mapeo de nombre de categoría a ID de categoría

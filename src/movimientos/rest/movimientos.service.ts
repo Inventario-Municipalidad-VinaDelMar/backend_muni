@@ -52,10 +52,12 @@ export class MovimientosService {
             // Descontar la cantidad del movimiento a la tanda
             const tanda = await this.tandasService.substractAmountToTanda(queryRunner, idTanda, cantidadRetirada);
 
-            // Asignar el nuevo movimiento al EnvioCategoria;
+            // Asignar el nuevo movimiento al EnvioProducto;
             await this.enviosService.updateEnvioProducto(queryRunner, movimiento)
             // throw new InternalServerErrorException();
             // Confirmar la transacción
+
+            delete movimiento.tanda
             await queryRunner.commitTransaction();
 
             //* Notificar por socket movimiento nuevo

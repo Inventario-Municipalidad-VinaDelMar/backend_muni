@@ -64,6 +64,52 @@ export class EnviosService {
     }
   }
 
+  async completeNewEnvio() {
+    try {
+      const fechaActual = normalizeDates.currentFecha();
+      const envios = await this.envioRepository.find({
+        where: {
+          fecha: normalizeDates.normalize(fechaActual),
+          isDeleted: false,
+        },
+      })
+
+      let envioEnCurso: Envio;
+      envios.map(e => {
+        if (e.status === EnvioStatus.CARGANDO) {
+          envioEnCurso = e;
+        }
+      })
+
+      if (!envioEnCurso) {
+        throw new BadRequestException('No hay ningun envio en curso');
+      }
+
+      let completeAllProducto = true;
+
+      envioEnCurso.productosPlanificados.map(p => {
+        if (p.movimiento !== null) return;
+        completeAllProducto = false;
+      })
+
+      if (!completeAllProducto) {
+        throw new BadRequestException('Aun no se han cargado todos los productos planificados');
+      }
+
+      envioEnCurso.status = EnvioStatus.EN_ENVIO;
+      delete envioEnCurso.productosPlanificados;
+      const envioUpdated = await this.envioRepository.save(envioEnCurso);
+
+      //*Notificar por sockets a planificacion que un envio termino de cargar en bodega
+      await this.planificacionSocketService.notifyEnvioUpdate();
+
+      return envioUpdated;
+
+    } catch (error) {
+      throw error;
+    }
+  }
+
 
   async verifyEnvioByEnvioProducto(idEnvioProducto: string): Promise<void> {
     try {
@@ -79,7 +125,7 @@ export class EnviosService {
         throw new NotFoundException(`No hay envio producto with id ${idEnvioProducto}`);
       }
       if (envioProducto.movimiento) {
-        throw new BadRequestException('Ya se ha realizo un movimiento en esta categoria.')
+        throw new BadRequestException('Ya se ha realizo un movimiento para este producto.')
       }
       const fechaActual = normalizeDates.normalize(normalizeDates.currentFecha());
       const fechaEnvio = envioProducto.envio.fecha;
@@ -143,7 +189,15 @@ export class EnviosService {
   }
   async findOneEnvioProducto(id: string) {
     try {
-      const envioProducto = await this.envioProductoRepository.findOne({ where: { id, isDeleted: false, } })
+      const envioProducto = await this.envioProductoRepository.findOne(
+        {
+          where: {
+            id,
+            isDeleted: false,
+          },
+          relations: ['envio'],
+        }
+      )
       if (!envioProducto) {
         throw new NotFoundException(`Envio producto with id ${id} not exists.`)
       }
@@ -158,7 +212,16 @@ export class EnviosService {
       const envioProducto = await this.findOneEnvioProducto(movimiento.envioProducto.id);
       delete movimiento.envioProducto;
       envioProducto.movimiento = movimiento;
+
       await queryRunner.manager.save(envioProducto);
+
+      //Actualizar el estado del envio
+      const envio = envioProducto.envio;
+      if (envio.status !== EnvioStatus.SIN_CARGAR) return;
+
+      envio.status = EnvioStatus.CARGANDO;
+      delete envio.productosPlanificados
+      await queryRunner.manager.save(envio);
     } catch (error) {
       throw new InternalServerErrorException(error);
     }

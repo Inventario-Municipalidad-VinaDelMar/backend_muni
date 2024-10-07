@@ -44,7 +44,8 @@ interface SeedData {
 export const initialData: SeedData = {
     planificaciones: [
         {
-            fecha: '2024-09-30',
+            fecha: '',
+            // fecha: '2024-09-30',
             detalles: [
                 { cantidadPlanificada: 10, producto: 'Fideos Corbatas Carozzi' },
                 { cantidadPlanificada: 100, producto: 'Pan de Molde' },
@@ -53,7 +54,8 @@ export const initialData: SeedData = {
             ]
         },
         {
-            fecha: '2024-10-1',
+            fecha: '',
+            // fecha: '2024-10-1',
             detalles: [
                 { cantidadPlanificada: 30, producto: 'Fideos Corbatas Carozzi' },
                 { cantidadPlanificada: 100, producto: 'Sanwich' },
@@ -62,7 +64,8 @@ export const initialData: SeedData = {
             ]
         },
         {
-            fecha: '2024-10-2',
+            fecha: '',
+            // fecha: '2024-10-2',
             detalles: [
                 { cantidadPlanificada: 15, producto: 'Arroz Largo Fino' },
                 { cantidadPlanificada: 88, producto: 'Sanwich' },
@@ -71,7 +74,8 @@ export const initialData: SeedData = {
             ]
         },
         {
-            fecha: '2024-10-3',
+            fecha: '',
+            // fecha: '2024-10-3',
             detalles: [
                 { cantidadPlanificada: 10, producto: 'Garbanzos' },
                 { cantidadPlanificada: 90, producto: 'Pan de Molde' },
@@ -80,7 +84,8 @@ export const initialData: SeedData = {
             ]
         },
         {
-            fecha: '2024-10-4',
+            fecha: '',
+            // fecha: '2024-10-4',
             detalles: [
                 { cantidadPlanificada: 10, producto: 'Fideos Corbatas Carozzi' },
                 { cantidadPlanificada: 100, producto: 'Pan de Molde' },

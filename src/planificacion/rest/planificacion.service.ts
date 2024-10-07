@@ -99,6 +99,7 @@ export class PlanificacionService {
       const detalles = planificacion.detalles.map(d => {
         delete d.isDeleted;
         delete d.producto.isDeleted;
+        d.id = null;//Significa que no hay id de "envio producto" asociado aún
         const newDetalle = {
           ...d,
           isComplete: false,

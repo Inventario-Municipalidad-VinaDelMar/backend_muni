@@ -9,6 +9,10 @@ export class EnviosController {
   createNewEnvio() {
     return this.enviosService.create();
   }
+  @Post('completeNewEnvio')
+  completeNewEnvio() {
+    return this.enviosService.completeNewEnvio();
+  }
   // @Post(':id/load',)
   // updateProductLoaded(@Param('id', ParseUUIDPipe) id: string) {
   //   return id;

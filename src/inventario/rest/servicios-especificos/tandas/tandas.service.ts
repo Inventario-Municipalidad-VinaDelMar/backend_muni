@@ -81,6 +81,10 @@ export class TandasService extends BaseService<Tanda> {
             }
             tandaToUpdate.cantidadActual -= amount;//Restar cantidad
 
+            //TODO: hacer algo cuando la cantidad de la tanda llega a cero.
+            if (tandaToUpdate.cantidadActual == 0) {
+                console.log(`Una tanda de "${tandaToUpdate.producto.nombre}" a llegado a ${tandaToUpdate.cantidadActual}`);
+            }
             const tanda = await queryRunner.manager.save(tandaToUpdate);
             delete tanda.isDeleted;
             return {
