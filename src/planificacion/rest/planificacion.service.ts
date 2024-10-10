@@ -1,14 +1,15 @@
 import { BadRequestException, forwardRef, Inject, Injectable, InternalServerErrorException, Logger, NotFoundException } from '@nestjs/common';
 import { PlanificacionSocketService } from '../socket/planificacion.socket.service';
-import { Repository } from 'typeorm';
+import { Between, DataSource, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Planificacion } from '../entities/planificacion.entity';
 import { normalizeDates } from 'src/utils';
-import { CreatePlanificacionDto, GetPlanificacionDto } from '../dto/rest';
+import { CreatePlanificacionDto, GetPlanificacionDto, SetPlanificacionSemanalDto } from '../dto/rest';
 import { PlanificacionDetalle } from '../entities/planificacion-detalle.entity';
 import { ProductosService } from 'src/inventario/rest/servicios-especificos';
 import { EnviosService } from 'src/logistica/envios/envios.service';
-
+import { isMonday, isFriday, differenceInCalendarDays } from 'date-fns';
+import { IPlanificacionSemanal } from '../interface/planificacion-semanal.interface';
 
 
 @Injectable()
@@ -25,8 +26,12 @@ export class PlanificacionService {
 
     @Inject(forwardRef(() => PlanificacionSocketService))
     private readonly planificacionSocketService: PlanificacionSocketService,
+
+    private readonly dataSource: DataSource,
   ) { }
 
+
+  //?Solo utilizado por el seed
   async create(createPlanificacionDto: CreatePlanificacionDto) {
     try {
       const { fecha, detalles } = createPlanificacionDto;
@@ -53,6 +58,135 @@ export class PlanificacionService {
       this.handleDbExceptions(error);
     }
   }
+
+  //?Utilizado por el socket service
+  async getPlanificacionBySemana(fechaInicio: Date, fechaFin: Date) {
+    try {
+
+      // Validar que la fecha de inicio sea un lunes y la fecha de fin sea un viernes
+      if (!isMonday(fechaInicio) || !isFriday(fechaFin)) {
+        throw new Error('La fecha de inicio debe ser un lunes y la fecha de fin un viernes.');
+      }
+
+      // Verificar que haya exactamente 5 días entre inicio y fin
+      const diff = differenceInCalendarDays(fechaFin, fechaInicio) + 1;
+      if (diff !== 5) {
+        throw new Error('Debe haber exactamente 5 días entre las fechas de inicio y fin.');
+      }
+
+      const planificacionSemanalData = await this.planificacionRepository.find({
+        where: {
+          fecha: Between(fechaInicio, fechaFin),
+        },
+      });
+      const planificacionSemanal = planificacionSemanalData.map(planificacion => {
+        delete planificacion.isDeleted;
+        planificacion.detalles = planificacion.detalles.map(d => {
+          const productoInfo = d.producto;
+          delete d.isDeleted;
+          delete d.producto;
+          return {
+            id: d.id,
+            producto: productoInfo.nombre,
+            productoId: productoInfo.id,
+            ...d
+          };
+        });
+        return {
+          ...planificacion,
+        };
+      });
+      return planificacionSemanal;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async updatePlanificacionSemanal(setPlanificacionSemanalDto: SetPlanificacionSemanalDto): Promise<IPlanificacionSemanal[]> {
+    // Iniciar la transacción
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try {
+      this.validarPlanificacionSemanal(setPlanificacionSemanalDto);
+
+      const planificacionesActualizadas = [];  // Lista para acumular las planificaciones actualizadas
+
+      for (const diaDto of setPlanificacionSemanalDto.dias) {
+        const fechaDia = normalizeDates.normalize(diaDto.fecha);
+
+        // Buscar o crear la planificación diaria
+        let planificacion = await queryRunner.manager.findOne(Planificacion, { where: { fecha: fechaDia }, relations: ['detalles'] });
+
+        if (!planificacion) {
+          // Crear una nueva planificación diaria si no existe
+          planificacion = this.planificacionRepository.create({ fecha: diaDto.fecha });
+          planificacion.detalles = [];  // Inicializar detalles como un array vacío
+        }
+
+        // Limpiar los detalles anteriores (si existen) si ya no se envían productos para ese día
+        // if (planificacion.detalles.length > 0 && diaDto.detalles.length === 0) {
+        await queryRunner.manager.delete(PlanificacionDetalle, { planificacionDiaria: planificacion });
+        // }
+
+        // Crear los nuevos detalles
+        const detallesPromises = diaDto.detalles.map(async (detalleDto) => {
+          const producto = await this.productosService.findOneById(detalleDto.productoId);
+          return this.planificacionDetalleRepository.create({
+            producto,  // Solo pasas el id del producto
+            cantidadPlanificada: detalleDto.cantidadPlanificada,
+            planificacionDiaria: planificacion
+          });
+        });
+
+        const detallesCreated = await Promise.all(detallesPromises);
+
+        // Guardar los detalles nuevos en la base de datos
+        const detallesGuardados = await queryRunner.manager.save(PlanificacionDetalle, detallesCreated);
+
+        const detalles = detallesGuardados.map(d => {
+          const productoInfo = d.producto;
+          delete d.planificacionDiaria;
+          delete d.isDeleted;
+          delete d.producto;
+          return {
+            id: d.id,
+            producto: productoInfo.nombre,
+            productoId: productoInfo.id,
+            ...d
+          };
+        })
+        // Asignar los detalles guardados a la planificación
+        planificacion.detalles = detalles;
+        delete planificacion.isDeleted;
+        // Guardar la planificación con los detalles
+        const planificacionGuardada = await queryRunner.manager.save(planificacion);
+
+        // Añadir la planificación guardada a la lista
+        planificacionesActualizadas.push(planificacionGuardada);
+      }
+
+      //TODO:Notificar por sockets.
+      await this.planificacionSocketService.notifyPlanificacionSemanalUpdate(planificacionesActualizadas)
+      // Commit de la transacción si todo fue exitoso
+      await queryRunner.commitTransaction();
+
+      // Devolver la lista de planificaciones actualizadas
+      return planificacionesActualizadas;
+
+    } catch (error) {
+      // Revertir los cambios en caso de error
+      await queryRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      // Liberar el query runner
+      await queryRunner.release();
+    }
+  }
+
+
+
 
   async findPlanificacionByFecha(fecha: string) {
     try {
@@ -128,6 +262,26 @@ export class PlanificacionService {
       return;
     } catch (error) {
       throw error;
+    }
+  }
+
+  // Función privada que valida que los días sean de lunes a viernes y que haya exactamente 5 días
+  private validarPlanificacionSemanal(setPlanificacionSemanalDto: SetPlanificacionSemanalDto) {
+    const { dias } = setPlanificacionSemanalDto;
+    // Validar que siempre vengan exactamente 5 días
+    if (dias.length !== 5) {
+      throw new BadRequestException('Deben enviarse exactamente 5 días de lunes a viernes.');
+    }
+
+    // Obtener los días de la semana a partir de las fechas enviadas
+    const diasSemana = dias.map(dia => new Date(dia.fecha).getUTCDay()); // Usar getUTCDay para evitar posibles problemas con zonas horarias
+
+    // Validar que el primer día sea lunes (1) y que los demás sigan de martes a viernes
+    const diasValidos = [1, 2, 3, 4, 5];  // Lunes = 1, Martes = 2, etc.
+    const sonDiasConsecutivos = diasSemana.every((dia, index) => dia === diasValidos[index]);
+
+    if (!sonDiasConsecutivos) {
+      throw new BadRequestException('Los días deben corresponder a lunes a viernes consecutivos.');
     }
   }
 
