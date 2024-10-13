@@ -58,7 +58,6 @@ export class MovimientosService {
             // Confirmar la transacción
 
             delete movimiento.tanda
-            await queryRunner.commitTransaction();
 
             //* Notificar por socket movimiento nuevo
             await this.movimientosSocketService.notifyMovimientoCreated(movimiento)
@@ -66,6 +65,8 @@ export class MovimientosService {
             await this.movimientosSocketService.notifyTandaDiscount(tanda)
             //* Notificar por socket movimiento asignado a EnvioProducto
             await this.planificacionSocketService.notifyEnvioUpdate()
+
+            await queryRunner.commitTransaction();
 
             //Error de prueba
             return movimiento;

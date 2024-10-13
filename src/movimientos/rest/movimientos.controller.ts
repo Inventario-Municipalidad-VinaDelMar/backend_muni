@@ -8,6 +8,7 @@ export class MovimientosController {
 
   @Post('/')
   createMovimiento(@Body() createMovimientoDto: CreateMovimientoDto) {
+    console.log({ createMovimientoDto });
     return this.movimientosService.createMovimiento(createMovimientoDto);
   }
 }

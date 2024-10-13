@@ -18,8 +18,8 @@ export class Envio {
     @Column({ type: 'date', default: () => 'CURRENT_DATE' })
     fecha: Date;
 
-    @Column({ type: 'time', default: normalizeDates.getHoraInicioChile() })
-    // @Column({ type: 'time', default: () => 'CURRENT_TIME' })
+    // @Column({ type: 'time', default: normalizeDates.getHoraInicioChile() })
+    @Column({ type: 'time', default: () => 'CURRENT_TIME' })
     horaInicio: string;
 
     @Column({ type: 'time', nullable: true })

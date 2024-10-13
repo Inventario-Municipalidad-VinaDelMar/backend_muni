@@ -127,11 +127,10 @@ export class EnviosService {
       if (envioProducto.movimiento) {
         throw new BadRequestException('Ya se ha realizo un movimiento para este producto.')
       }
-      const fechaActual = normalizeDates.normalize(normalizeDates.currentFecha());
-      const fechaEnvio = envioProducto.envio.fecha;
-      // console.log({ fechaActual })
-      // console.log(fechaEnvio);
-      // console.log(fechaEnvio !== fechaActual)
+      const fechaActual = new Date();  // La fecha actual como Date
+      const fechaEnvioString = envioProducto.envio.fecha as unknown as string;  // Aseguramos que es un string
+      const fechaEnvio = new Date(fechaEnvioString);
+
       if (fechaEnvio < fechaActual || fechaEnvio > fechaActual) {
         throw new BadRequestException('Este envio no es de hoy')
       }

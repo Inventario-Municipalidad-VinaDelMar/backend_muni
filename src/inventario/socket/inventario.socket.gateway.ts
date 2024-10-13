@@ -57,7 +57,6 @@ export class InventarioSocketGateway {
   async findAllTandasOfProducto(client: Socket, payload: GetTandaDto) {
     const { idProducto } = payload;
 
-
     if (!idProducto) return;
 
     const tandasPorProducto =

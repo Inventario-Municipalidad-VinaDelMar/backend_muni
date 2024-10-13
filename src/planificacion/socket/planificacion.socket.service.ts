@@ -50,9 +50,9 @@ export class PlanificacionSocketService {
         return planificacionSemanal;
     }
 
-    async notifyEnvioUpdate() {
+    async notifyEnvioUpdate(fecha?: string) {
         if (this.wss) {
-            const fechaActual = normalizeDates.currentFecha();
+            const fechaActual = normalizeDates.currentFecha(fecha);
             const planificacion = await this.planificacionService.findByFecha({ fecha: fechaActual })
             this.wss.emit('loadPlanificacion', planificacion);
         } else {

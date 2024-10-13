@@ -8,6 +8,7 @@ import { InventarioModule } from 'src/inventario/inventario.module';
 import { PlanificacionModule } from 'src/planificacion/planificacion.module';
 import { MovimientosModule } from 'src/movimientos/movimientos.module';
 import { AuthModule } from 'src/auth/auth.module';
+import { SolicitudEnvio } from './entities/solicitud-envio.entity';
 
 @Module({
   imports: [
@@ -15,7 +16,7 @@ import { AuthModule } from 'src/auth/auth.module';
     forwardRef(() => MovimientosModule),
     PlanificacionModule,
     forwardRef(() => InventarioModule),
-    TypeOrmModule.forFeature([Envio, EnvioProducto]),
+    TypeOrmModule.forFeature([Envio, EnvioProducto, SolicitudEnvio]),
   ],
   controllers: [EnviosController],
   providers: [EnviosService],
