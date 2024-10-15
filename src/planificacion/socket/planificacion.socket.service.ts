@@ -52,7 +52,11 @@ export class PlanificacionSocketService {
 
     async notifyEnvioUpdate(fecha?: string) {
         if (this.wss) {
-            const fechaActual = normalizeDates.currentFecha(fecha);
+            let fechaActual = fecha;
+            if (!fechaActual) {
+                console.log('La fecha actual era nulla')
+                fechaActual = normalizeDates.currentFecha();
+            }
             const planificacion = await this.planificacionService.findByFecha({ fecha: fechaActual })
             this.wss.emit('loadPlanificacion', planificacion);
         } else {

@@ -72,7 +72,7 @@ export class TandasService extends BaseService<Tanda> {
     }
 
     //?@Update
-    async substractAmountToTanda(queryRunner: QueryRunner, idTanda: string, amount: number) {
+    async substractAmountToTanda(queryRunner: QueryRunner, idTanda: string, amount: number): Promise<TandaResponse> {
         try {
             const tandaToUpdate = await this.findOne(idTanda);
 

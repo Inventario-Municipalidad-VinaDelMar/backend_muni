@@ -20,4 +20,8 @@ export class EnviosController {
   completeNewEnvio() {
     return this.enviosService.completeNewEnvio();
   }
+  @Post('autorizeNewEnvio')
+  autorizeNewEnvio() {
+    return this.enviosService.completeNewEnvio();
+  }
 }

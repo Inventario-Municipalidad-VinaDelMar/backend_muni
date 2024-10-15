@@ -7,6 +7,8 @@ import { TandasService } from 'src/inventario/rest/servicios-especificos';
 import { MovimientosSocketService } from '../socket/movimientos.socket.service';
 import { EnviosService } from 'src/logistica/envios/envios.service';
 import { PlanificacionSocketService } from 'src/planificacion/socket/planificacion.socket.service';
+import { MovimientoResponse } from '../interfaces/movimiento_response.interface';
+import { TandaResponse } from 'src/inventario/interfaces/tanda-response.interface';
 
 @Injectable()
 export class MovimientosService {
@@ -15,11 +17,11 @@ export class MovimientosService {
         private readonly enviosService: EnviosService,
         private readonly tandasService: TandasService,
         private readonly planificacionSocketService: PlanificacionSocketService,
-        @InjectRepository(Movimiento)
-        private readonly movimientoRepository: Repository<Movimiento>,
 
         private readonly dataSource: DataSource, // Inyección de DataSource para transaccion
 
+        @InjectRepository(Movimiento)
+        private readonly movimientoRepository: Repository<Movimiento>,
         @Inject(forwardRef(() => MovimientosSocketService))
         private readonly movimientosSocketService: MovimientosSocketService,
     ) {
@@ -29,7 +31,7 @@ export class MovimientosService {
         const { idEnvioProducto, idTanda, cantidadRetirada } = createMovimientoDto;
 
         //Verificar si el movimiento tiene vinculo con un envio actual
-        await this.enviosService.verifyEnvioByEnvioProducto(idEnvioProducto);
+        const { fechaEnvio, idEnvio } = await this.enviosService.verifyEnvioByEnvioProducto(idEnvioProducto);
 
         // Iniciar la transacción
         const queryRunner: QueryRunner = this.dataSource.createQueryRunner();
@@ -50,24 +52,30 @@ export class MovimientosService {
             const movimiento = await queryRunner.manager.save(movimientoCreated);
 
             // Descontar la cantidad del movimiento a la tanda
-            const tanda = await this.tandasService.substractAmountToTanda(queryRunner, idTanda, cantidadRetirada);
+            const tanda: TandaResponse = await this.tandasService.substractAmountToTanda(queryRunner, idTanda, cantidadRetirada);
 
             // Asignar el nuevo movimiento al EnvioProducto;
             await this.enviosService.updateEnvioProducto(queryRunner, movimiento)
             // throw new InternalServerErrorException();
             // Confirmar la transacción
-
+            const producto = tanda.producto;
+            const productoId = tanda.productoId;
             delete movimiento.tanda
+            delete movimiento.isDeleted;
 
+
+            await queryRunner.commitTransaction();
             //* Notificar por socket movimiento nuevo
-            await this.movimientosSocketService.notifyMovimientoCreated(movimiento)
+            await this.movimientosSocketService.notifyMovimientoCreated({
+                ...movimiento,
+                producto,
+                productoId,
+                envioId: idEnvio,
+            }, idEnvio)
             //* Notificar por socket actualización de la tanda
             await this.movimientosSocketService.notifyTandaDiscount(tanda)
             //* Notificar por socket movimiento asignado a EnvioProducto
-            await this.planificacionSocketService.notifyEnvioUpdate()
-
-            await queryRunner.commitTransaction();
-
+            await this.planificacionSocketService.notifyEnvioUpdate(fechaEnvio,)
             //Error de prueba
             return movimiento;
         } catch (error) {
@@ -80,6 +88,38 @@ export class MovimientosService {
             await queryRunner.release();
         }
     }
+
+    async getMovimientoByIdEnvio(id: string): Promise<MovimientoResponse[]> {
+        try {
+            const movimientosList = await this.movimientoRepository.find({
+                where: {
+                    envioProducto: {
+                        envio: {
+                            id
+                        }
+                    }
+                }
+            })
+
+            const movimientos = movimientosList.map(m => {
+                const producto = m.tanda.producto.nombre;
+                const productoId = m.tanda.producto.id;
+                delete m.isDeleted
+                delete m.tanda;
+                return {
+                    ...m,
+                    producto,
+                    productoId,
+                    envioId: id,
+                }
+            })
+
+            return movimientos;
+        } catch (error) {
+            throw error;
+        }
+    }
+
 
     async deleteAll() {
         const query = this.movimientoRepository.createQueryBuilder('movimientos');

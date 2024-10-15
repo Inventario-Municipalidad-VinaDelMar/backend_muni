@@ -9,6 +9,7 @@ import { PlanificacionSocketService } from 'src/planificacion/socket/planificaci
 import { PlanificacionService } from 'src/planificacion/rest/planificacion.service';
 import { Movimiento } from 'src/movimientos/entities/movimiento.entity';
 import { ProductosService } from 'src/inventario/rest/servicios-especificos';
+import { SolicitudEnvio } from './entities/solicitud-envio.entity';
 
 @Injectable()
 export class EnviosService {
@@ -19,6 +20,9 @@ export class EnviosService {
     private readonly planificacionService: PlanificacionService,
     @InjectRepository(Envio)
     private readonly envioRepository: Repository<Envio>,
+
+    @InjectRepository(SolicitudEnvio)
+    private readonly solicitudEnvioRepository: Repository<SolicitudEnvio>,
 
     @InjectRepository(EnvioProducto)
     private readonly envioProductoRepository: Repository<EnvioProducto>,
@@ -110,8 +114,9 @@ export class EnviosService {
     }
   }
 
+  async autorizeNewEnvioToClient() { }
 
-  async verifyEnvioByEnvioProducto(idEnvioProducto: string): Promise<void> {
+  async verifyEnvioByEnvioProducto(idEnvioProducto: string) {
     try {
       const envioProducto = await this.envioProductoRepository.findOne({
         where: {
@@ -130,9 +135,15 @@ export class EnviosService {
       const fechaActual = new Date();  // La fecha actual como Date
       const fechaEnvioString = envioProducto.envio.fecha as unknown as string;  // Aseguramos que es un string
       const fechaEnvio = new Date(fechaEnvioString);
-
+      // console.log({ fechaEnvio })
+      // console.log({ fechaActual })
+      // console.log({ fechaEnvioString })
       if (fechaEnvio < fechaActual || fechaEnvio > fechaActual) {
         throw new BadRequestException('Este envio no es de hoy')
+      }
+      return {
+        fechaEnvio: fechaEnvioString,
+        idEnvio: envioProducto.envio.id,
       }
     } catch (error) {
       throw error;
@@ -238,19 +249,4 @@ export class EnviosService {
     }
   }
 
-  // findAll() {
-  //   return `This action returns all envios`;
-  // }
-
-  // findOne(id: number) {
-  //   return `This action returns a #${id} envio`;
-  // }
-
-  // update(id: number, updateEnvioDto: UpdateEnvioDto) {
-  //   return `This action updates a #${id} envio`;
-  // }
-
-  // remove(id: number) {
-  //   return `This action removes a #${id} envio`;
-  // }
 }

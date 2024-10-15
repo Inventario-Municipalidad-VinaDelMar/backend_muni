@@ -4,10 +4,10 @@ import { Socket } from 'socket.io';
 import { ExtendedError } from 'socket.io/dist/namespace';
 
 export const middleWareSocketAuth = (socket: Socket, next: (err?: ExtendedError) => void, jwtService: JwtService) => {
-
     const token = socket.handshake.headers['authentication'] as string;
 
     if (!token) {
+        console.log('Token not provided')
         return next(new UnauthorizedException('Token not provided'));
     }
 

@@ -21,7 +21,7 @@ export class Movimiento {
     @Column({ default: false })
     isDeleted: boolean;
 
-    @ManyToOne(() => Tanda, (tanda) => tanda.movimientos)
+    @ManyToOne(() => Tanda, (tanda) => tanda.movimientos, { eager: true })
     tanda: Tanda;
 
 

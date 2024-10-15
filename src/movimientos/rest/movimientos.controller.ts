@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseUUIDPipe, Post } from '@nestjs/common';
 import { MovimientosService } from './movimientos.service';
 import { CreateMovimientoDto } from '../dto/create_movimiento.dto';
 
@@ -8,7 +8,11 @@ export class MovimientosController {
 
   @Post('/')
   createMovimiento(@Body() createMovimientoDto: CreateMovimientoDto) {
-    console.log({ createMovimientoDto });
     return this.movimientosService.createMovimiento(createMovimientoDto);
   }
+  @Get(':id')
+  getMovimientosByPlanificacion(@Param('id', ParseUUIDPipe) id: string) {
+    return this.movimientosService.getMovimientoByIdEnvio(id);
+  }
+
 }
