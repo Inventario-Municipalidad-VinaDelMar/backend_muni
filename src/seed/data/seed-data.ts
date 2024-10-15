@@ -204,7 +204,7 @@ export const initialData: SeedData = {
         {
             nombre: 'Cuchillo de Mesa',
             descripcion: 'Cuchillo básico para cortar alimentos en la mesa.',
-            urlImagen: 'https://steward.cl/10311-large_default/set-12-cuchillo-mesa-celebration-inox-180.jpg5',
+            urlImagen: 'https://steward.cl/10311-large_default/set-12-cuchillo-mesa-celebration-inox-180.jpg',
 
         },
         {

@@ -1,4 +1,6 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Movimiento } from 'src/movimientos/entities/movimiento.entity';
+import { SolicitudEnvio } from 'src/planificacion/entities/solicitud-envio.entity';
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
 
 //?Roles: Bodeguero, Administrador, Externo, Cargador
 
@@ -42,7 +44,14 @@ export class User {
     })
     roles: string[];
 
+    @OneToMany(() => SolicitudEnvio, (solicitudEnvio) => solicitudEnvio.solicitante)
+    solicitudesRealizadas: SolicitudEnvio;  // Usuario que crea la solicitud desde la app móvil
 
+    @OneToMany(() => SolicitudEnvio, (solicitudEnvio) => solicitudEnvio.administrador)
+    solicitudesAutorizadas: SolicitudEnvio;  // Administrador que autoriza o rechaza la solicitud
+
+    @OneToMany(() => Movimiento, (movimiento) => movimiento.realizador)
+    movimientos: Movimiento[];  // Administrador que autoriza o rechaza la solicitud
 
 
 }

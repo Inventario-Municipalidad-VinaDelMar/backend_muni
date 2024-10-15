@@ -62,7 +62,6 @@ export class AuthService {
           roles: true,
         },
       });
-      console.log({ user });
       if (!user) {
         throw new UnauthorizedException('Credenciales no validas');
       }
@@ -80,6 +79,36 @@ export class AuthService {
       // throw new BadRequestException(error.message);
       // return error;
       // this.handleDbErrors(error);
+    }
+  }
+
+  async renewToken(idToken: string) {
+    try {
+      // Verificar el token (aunque esté caducado)
+      const payload = this.jwtService.decode(idToken) as JwtPayload;
+
+      if (!payload || !payload.id) {
+        throw new UnauthorizedException('Token no válido');
+      }
+
+      const user = await this.getUserById(payload.id);
+
+      if (!user) {
+        throw new UnauthorizedException('Usuario no encontrado');
+      }
+
+      // Generar un nuevo token JWT
+      const newToken = this.getjwtToken({ id: user.id });
+
+      // Devolver el usuario y el nuevo token
+      delete user.password;
+      delete user.isActive;
+      return {
+        ...user,
+        token: newToken,
+      };
+    } catch (error) {
+      throw new UnauthorizedException('Token no válido');
     }
   }
 

@@ -9,6 +9,7 @@ import { EnviosService } from 'src/logistica/envios/envios.service';
 import { PlanificacionSocketService } from 'src/planificacion/socket/planificacion.socket.service';
 import { MovimientoResponse } from '../interfaces/movimiento_response.interface';
 import { TandaResponse } from 'src/inventario/interfaces/tanda-response.interface';
+import { User } from 'src/auth/entities/user.entity';
 
 @Injectable()
 export class MovimientosService {
@@ -27,7 +28,7 @@ export class MovimientosService {
     ) {
     }
 
-    async createMovimiento(createMovimientoDto: CreateMovimientoDto) {
+    async createMovimiento(createMovimientoDto: CreateMovimientoDto, user: User) {
         const { idEnvioProducto, idTanda, cantidadRetirada } = createMovimientoDto;
 
         //Verificar si el movimiento tiene vinculo con un envio actual
@@ -45,7 +46,8 @@ export class MovimientosService {
             const movimientoCreated = this.movimientoRepository.create({
                 cantidadRetirada,
                 tanda: tandaInstance,
-                envioProducto: this.enviosService.instanceEnvioProducto(idEnvioProducto)
+                envioProducto: this.enviosService.instanceEnvioProducto(idEnvioProducto),
+                realizador: user,
             });
 
             // Guardar el movimiento dentro de la transacción

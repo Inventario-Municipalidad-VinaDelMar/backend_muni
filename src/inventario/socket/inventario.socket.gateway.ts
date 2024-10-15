@@ -14,6 +14,7 @@ import { WsExceptionLoggerFilter } from 'src/common/handle-exceptions/socket-log
 
 @WebSocketGateway({ cors: true, namespace: 'inventario' })
 @UseFilters(new WsExceptionLoggerFilter())
+@AuthSocket()
 export class InventarioSocketGateway {
   constructor(private readonly inventarioSocketService: InventarioSocketService,
     private readonly jwtService: JwtService,

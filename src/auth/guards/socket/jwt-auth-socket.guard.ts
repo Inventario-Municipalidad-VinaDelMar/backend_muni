@@ -15,7 +15,6 @@ export class JwtAuthSocketGuard implements CanActivate {
     async canActivate(context: ExecutionContext): Promise<boolean> {
         const client = context.switchToWs().getClient();
         const token = client.handshake.headers['authentication'];
-        console.log('AuthSocket')
         if (!token) {
             throw new UnauthorizedException('Token not provided');
         }
@@ -32,7 +31,7 @@ export class JwtAuthSocketGuard implements CanActivate {
             }
 
             client.data.user = user;  // Attach full user information to the socket instance
-            console.log(`USUARIO SOCKET ${JSON.stringify(user.id)}`);
+            console.log(`Socket-Solicitud por: ${user.nombre} ${user.apellidoPaterno}`);
             return true;
         } catch (error) {
             throw new UnauthorizedException('Token not valid');

@@ -7,13 +7,13 @@ export const middleWareSocketAuth = (socket: Socket, next: (err?: ExtendedError)
     const token = socket.handshake.headers['authentication'] as string;
 
     if (!token) {
-        console.log('Token not provided')
         return next(new UnauthorizedException('Token not provided'));
     }
 
     try {
         const decoded = jwtService.verify(token);
         socket.data.user = decoded; // Guardamos los datos del usuario en el socket
+        // console.log(`Socket-Conexion con: ${JSON.stringify(user.nombre)} ${JSON.stringify(user.apellidoPaterno)}`);
         next(); // Permitir la conexión
     } catch (error) {
         return next(new UnauthorizedException('Token not valid'));

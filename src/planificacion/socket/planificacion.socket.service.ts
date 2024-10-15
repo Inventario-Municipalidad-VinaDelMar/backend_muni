@@ -5,6 +5,7 @@ import { GetPlanificacionDto } from '../dto/rest/planificacion/get-planificacion
 import { normalizeDates, weekDates } from 'src/utils';
 import { PlanificacionSemanaDto } from '../dto/socket';
 import { IPlanificacionSemanal } from '../interface/planificacion-semanal.interface';
+import { SolicitudEnvio } from '../entities/solicitud-envio.entity';
 
 @Injectable()
 export class PlanificacionSocketService {
@@ -30,6 +31,15 @@ export class PlanificacionSocketService {
         }
     }
 
+    async notifySolicitudEnvio(solicitud: SolicitudEnvio) {
+        if (this.wss) {
+            this.wss.emit('loadSolicitud', solicitud);
+        } else {
+            console.error('WebSocket server not initialized - To emit solicitud has been created ');
+            throw new BadRequestException();
+        }
+    }
+
     async getPlanificacionByFecha(getPlanificacionDto: GetPlanificacionDto) {
         if (this.wss) {
             const planificacion = await this.planificacionService.findByFecha(getPlanificacionDto)
@@ -40,14 +50,28 @@ export class PlanificacionSocketService {
         }
     }
 
+    async getSolicitudEnCurso() {
+        try {
+            const solicitud = await this.planificacionService.getSolicitudEnCurso();
+            return solicitud;
+        } catch (error) {
+            console.log('Error getSolicitudesEnCurso');
+            return null;
+        }
+    }
     async getPlanificacionBySemana(planificacionSemanaDto: PlanificacionSemanaDto) {
-        const { inicio, fin } = planificacionSemanaDto;
+        try {
+            const { inicio, fin } = planificacionSemanaDto;
 
-        const planificacionSemanal = await this.planificacionService.getPlanificacionBySemana(
-            normalizeDates.normalize(inicio),
-            normalizeDates.normalize(fin),
-        );
-        return planificacionSemanal;
+            const planificacionSemanal = await this.planificacionService.getPlanificacionBySemana(
+                normalizeDates.normalize(inicio),
+                normalizeDates.normalize(fin),
+            );
+            return planificacionSemanal;
+        } catch (error) {
+            console.log('Error getPlanificacionBySemana');
+            return null;
+        }
     }
 
     async notifyEnvioUpdate(fecha?: string) {

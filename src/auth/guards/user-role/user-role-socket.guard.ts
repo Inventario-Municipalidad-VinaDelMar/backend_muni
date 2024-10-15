@@ -34,6 +34,6 @@ export class UserRoleSocketGuard implements CanActivate {
                 return true;
             }
         }
-        throw new ForbiddenException(`El usuario '${user.nombre} ${user.apellidoPaterno} ${user.apellidoMaterno}' necesita un rol permitido.`);
+        throw new ForbiddenException(`Socket-El usuario '${user.nombre} ${user.apellidoPaterno} ${user.apellidoMaterno}' necesita un rol permitido.`);
     }
 }

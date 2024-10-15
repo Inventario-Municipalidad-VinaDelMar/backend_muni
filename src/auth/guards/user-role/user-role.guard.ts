@@ -35,6 +35,6 @@ export class UserRoleGuard implements CanActivate {
                 return true;
             }
         }
-        throw new ForbiddenException(`El usuario '${user.nombre} ${user.apellidoPaterno} ${user.apellidoMaterno}' necesita un rol permitido.`);
+        throw new ForbiddenException(`Rest-El usuario '${user.nombre} ${user.apellidoPaterno} ${user.apellidoMaterno}' necesita un rol permitido.`);
     }
 }

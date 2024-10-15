@@ -4,12 +4,14 @@ import { Between, DataSource, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Planificacion } from '../entities/planificacion.entity';
 import { normalizeDates } from 'src/utils';
-import { CreatePlanificacionDto, GetPlanificacionDto, SetPlanificacionSemanalDto } from '../dto/rest';
+import { AutorizeSolicitudEnvioDto, CreatePlanificacionDto, GetPlanificacionDto, SetPlanificacionSemanalDto } from '../dto/rest';
 import { PlanificacionDetalle } from '../entities/planificacion-detalle.entity';
 import { ProductosService } from 'src/inventario/rest/servicios-especificos';
 import { EnviosService } from 'src/logistica/envios/envios.service';
 import { isMonday, isFriday, differenceInCalendarDays } from 'date-fns';
 import { IPlanificacionSemanal } from '../interface/planificacion-semanal.interface';
+import { SolicitudEnvio, SolicitudEnvioStatus } from '../entities/solicitud-envio.entity';
+import { User } from 'src/auth/entities/user.entity';
 
 
 @Injectable()
@@ -23,13 +25,100 @@ export class PlanificacionService {
     private readonly planificacionRepository: Repository<Planificacion>,
     @InjectRepository(PlanificacionDetalle)
     private readonly planificacionDetalleRepository: Repository<PlanificacionDetalle>,
+    @InjectRepository(SolicitudEnvio)
+    private readonly solicitudEnvioRepository: Repository<SolicitudEnvio>,
+
+
 
     @Inject(forwardRef(() => PlanificacionSocketService))
     private readonly planificacionSocketService: PlanificacionSocketService,
 
     private readonly dataSource: DataSource,
   ) { }
+  async autorizeSolicitudEnvio(autorizeSolicitudEnvioDto: AutorizeSolicitudEnvioDto, user: User) {
+    try {
+      const { idSolicitud, aceptada } = autorizeSolicitudEnvioDto;
+      const solicitud = await this.solicitudEnvioRepository.findOneBy({ id: idSolicitud });
+      if (!solicitud) {
+        throw new BadRequestException(`La solicitud ${idSolicitud} no existe.`)
+      }
+      if (solicitud.horaResolucion) {
+        throw new BadRequestException(`La solicitud ya se resolvio.`)
 
+      }
+
+      solicitud.status = aceptada ? SolicitudEnvioStatus.ACEPTADA : SolicitudEnvioStatus.RECHAZADA;
+      solicitud.administrador = user;
+
+      if (aceptada) {
+        //*Notificar por socket envio autorizado en planificacion actual
+        const envio = await this.enviosService.create();
+        solicitud.envioAsociado = envio;
+        await this.planificacionSocketService.notifyEnvioUpdate();
+      }
+
+      const solicitudUpdated = await this.solicitudEnvioRepository.save(solicitud);
+      delete solicitudUpdated.isDeleted;
+
+      //*Notificar por socket solicitud actualizada
+      await this.planificacionSocketService.notifySolicitudEnvio(solicitudUpdated)
+
+      //*Notificar por socket cierre de solicitud en pagina web
+
+      return solicitudUpdated;
+    } catch (error) {
+      throw error;
+    }
+  }
+  async sendSolicitudEnvio(user: User) {
+    try {
+      const fechaActual = normalizeDates.currentFecha();
+      const solicitudes = await this.solicitudEnvioRepository.find({
+        where: {
+          fechaSolicitud: normalizeDates.normalize(fechaActual),
+          status: SolicitudEnvioStatus.PENDIENTE,
+        }
+      })
+      if (solicitudes.length !== 0) {
+        throw new BadRequestException('Hay una solicitud en curso.')
+      }
+      const solicitudData = this.solicitudEnvioRepository.create({
+        solicitante: user,
+      })
+      const solicitud = await this.solicitudEnvioRepository.save(solicitudData);
+      delete solicitud.isDeleted;
+      solicitud.administrador = null;
+      solicitud.envioAsociado = null;
+      //*Notificar via socekt solicitud creada
+      await this.planificacionSocketService.notifySolicitudEnvio(solicitud);
+      return solicitud;
+    } catch (error) {
+      throw error;
+    }
+
+  }
+
+  async getSolicitudEnCurso() {
+    try {
+      const fechaActual = normalizeDates.currentFecha();
+      const solicitudes = await this.solicitudEnvioRepository.find({
+        where: {
+          isDeleted: false,
+          fechaSolicitud: normalizeDates.normalize(fechaActual),
+          status: SolicitudEnvioStatus.PENDIENTE,
+        },
+      });
+      if (solicitudes.length > 1) {
+        throw new InternalServerErrorException(`Hay ${solicitudes.length} solicitudes en simultaneo`);
+      }
+      if (solicitudes.length == 0) {
+        return null;
+      }
+      return solicitudes[0];
+    } catch (error) {
+      throw error;
+    }
+  }
 
   //?Solo utilizado por el seed
   async create(createPlanificacionDto: CreatePlanificacionDto) {
@@ -89,6 +178,8 @@ export class PlanificacionService {
             id: d.id,
             producto: productoInfo.nombre,
             productoId: productoInfo.id,
+            urlImagen: productoInfo.urlImagen,
+            // productoImgUrl: productoInfo.urlImagen,
             ...d
           };
         });

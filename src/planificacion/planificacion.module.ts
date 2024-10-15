@@ -8,12 +8,16 @@ import { Planificacion } from './entities/planificacion.entity';
 import { PlanificacionDetalle } from './entities/planificacion-detalle.entity';
 import { InventarioModule } from 'src/inventario/inventario.module';
 import { LogisticaModule } from 'src/logistica/logistica.module';
+import { SolicitudEnvio } from './entities/solicitud-envio.entity';
+import { AuthModule } from 'src/auth/auth.module';
 
 @Module({
   imports: [
+    // AuthModule,
+    forwardRef(() => AuthModule),
     forwardRef(() => LogisticaModule),
     forwardRef(() => InventarioModule),
-    TypeOrmModule.forFeature([Planificacion, PlanificacionDetalle]),
+    TypeOrmModule.forFeature([Planificacion, PlanificacionDetalle, SolicitudEnvio]),
     //to allow circular import between socket and rest in this module
     forwardRef(() => PlanificacionModule),
   ],

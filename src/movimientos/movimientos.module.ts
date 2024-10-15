@@ -8,9 +8,11 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { InventarioModule } from 'src/inventario/inventario.module';
 import { LogisticaModule } from 'src/logistica/logistica.module';
 import { PlanificacionModule } from 'src/planificacion/planificacion.module';
+import { AuthModule } from 'src/auth/auth.module';
 
 @Module({
   imports: [
+    AuthModule,
     PlanificacionModule,
     forwardRef(() => LogisticaModule),
     TypeOrmModule.forFeature([Movimiento]),

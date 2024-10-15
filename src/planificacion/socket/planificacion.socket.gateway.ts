@@ -19,7 +19,9 @@ export class PlanificacionSocketGateway {
   async findPlanificacionByFecha(client: Socket, payload: GetPlanificacionDto) {
     const data =
       await this.planificacionSocketService.getPlanificacionByFecha(payload);
-
+    const solicitud = await this.planificacionSocketService.getSolicitudEnCurso();
+    console.log({ solicitud })
+    client.emit('loadSolicitud', solicitud);
     client.emit('loadPlanificacion', data);
   }
 

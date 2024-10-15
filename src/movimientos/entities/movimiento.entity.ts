@@ -1,3 +1,4 @@
+import { User } from "src/auth/entities/user.entity";
 import { Tanda } from "src/inventario/entities/tanda.entity";
 import { EnvioProducto } from "src/logistica/envios/entities/envio-producto.entity";
 import { Column, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn } from "typeorm";
@@ -23,6 +24,9 @@ export class Movimiento {
 
     @ManyToOne(() => Tanda, (tanda) => tanda.movimientos, { eager: true })
     tanda: Tanda;
+
+    @ManyToOne(() => User, (user) => user.movimientos, { eager: true })
+    realizador: User;
 
 
     //Relacion obligatoria con EnvioProducto

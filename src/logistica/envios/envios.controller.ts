@@ -2,7 +2,6 @@ import { Controller, Post, } from '@nestjs/common';
 import { EnviosService } from './envios.service';
 import { Auth, GetUser } from 'src/auth/decorators';
 import { User } from 'src/auth/entities/user.entity';
-import { ValidRoles } from 'src/auth/interfaces';
 
 @Auth()
 @Controller('envios')
@@ -20,8 +19,5 @@ export class EnviosController {
   completeNewEnvio() {
     return this.enviosService.completeNewEnvio();
   }
-  @Post('autorizeNewEnvio')
-  autorizeNewEnvio() {
-    return this.enviosService.completeNewEnvio();
-  }
+
 }

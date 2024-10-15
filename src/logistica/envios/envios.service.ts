@@ -9,7 +9,6 @@ import { PlanificacionSocketService } from 'src/planificacion/socket/planificaci
 import { PlanificacionService } from 'src/planificacion/rest/planificacion.service';
 import { Movimiento } from 'src/movimientos/entities/movimiento.entity';
 import { ProductosService } from 'src/inventario/rest/servicios-especificos';
-import { SolicitudEnvio } from './entities/solicitud-envio.entity';
 
 @Injectable()
 export class EnviosService {
@@ -21,8 +20,6 @@ export class EnviosService {
     @InjectRepository(Envio)
     private readonly envioRepository: Repository<Envio>,
 
-    @InjectRepository(SolicitudEnvio)
-    private readonly solicitudEnvioRepository: Repository<SolicitudEnvio>,
 
     @InjectRepository(EnvioProducto)
     private readonly envioProductoRepository: Repository<EnvioProducto>,
@@ -132,12 +129,15 @@ export class EnviosService {
       if (envioProducto.movimiento) {
         throw new BadRequestException('Ya se ha realizo un movimiento para este producto.')
       }
-      const fechaActual = new Date();  // La fecha actual como Date
+      const fechaActual = normalizeDates.normalize(normalizeDates.currentFecha()) // La fecha actual como Date
       const fechaEnvioString = envioProducto.envio.fecha as unknown as string;  // Aseguramos que es un string
-      const fechaEnvio = new Date(fechaEnvioString);
+      const fechaEnvio = normalizeDates.normalize(fechaEnvioString);
+
+
       // console.log({ fechaEnvio })
       // console.log({ fechaActual })
       // console.log({ fechaEnvioString })
+
       if (fechaEnvio < fechaActual || fechaEnvio > fechaActual) {
         throw new BadRequestException('Este envio no es de hoy')
       }
