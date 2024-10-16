@@ -20,7 +20,6 @@ export class PlanificacionSocketGateway {
     const data =
       await this.planificacionSocketService.getPlanificacionByFecha(payload);
     const solicitud = await this.planificacionSocketService.getSolicitudEnCurso();
-    console.log({ solicitud })
     client.emit('loadSolicitud', solicitud);
     client.emit('loadPlanificacion', data);
   }
@@ -32,7 +31,6 @@ export class PlanificacionSocketGateway {
         await this.planificacionSocketService.getPlanificacionBySemana(planificacionSemanaDto);
 
       const room = `planificacion-${planificacionSemanaDto.inicio}-${planificacionSemanaDto.fin}`;
-      console.log({ room })
       client.join(room);
       client.emit('loadAdminPlanificacionManage', data);
     } catch (error) {

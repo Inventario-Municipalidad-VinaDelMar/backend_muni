@@ -22,12 +22,10 @@ export class MovimientosSocketGateway {
       throw new BadRequestException('Id del envio inexistente.')
     }
     const room = `${idEnvio}-movimientos`;
-    console.log({ room })
     client.join(room);
     const data =
       await this.movimientosSocketService.getMovimientosByEnvio(idEnvio);
     const loadEvent = `${idEnvio}-loadMovimientos`;
-    console.log({ loadEvent })
     client.emit(loadEvent, data);
   }
 }
