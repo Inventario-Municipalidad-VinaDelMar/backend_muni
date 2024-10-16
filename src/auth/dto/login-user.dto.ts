@@ -12,11 +12,11 @@ export class LoginUserDto {
     email: string;
 
     @IsString()
-    @MinLength(6)
-    @MaxLength(50)
-    @Matches(/(?:(?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/, {
-        message:
-            'La contraseña debe tener una Mayúscula, letra minúscula y un numero',
-    })
+    // @MinLength(6)
+    // @MaxLength(50)
+    // @Matches(/(?:(?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/, {
+    //     message:
+    //         'La contraseña debe tener una Mayúscula, letra minúscula y un numero',
+    // })
     password: string;
 }
