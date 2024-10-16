@@ -194,7 +194,6 @@ export class PlanificacionService {
   }
 
   async updatePlanificacionSemanal(setPlanificacionSemanalDto: SetPlanificacionSemanalDto): Promise<IPlanificacionSemanal[]> {
-    // Iniciar la transacción
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
@@ -202,76 +201,63 @@ export class PlanificacionService {
     try {
       this.validarPlanificacionSemanal(setPlanificacionSemanalDto);
 
-      const planificacionesActualizadas = [];  // Lista para acumular las planificaciones actualizadas
+      const planificacionesActualizadas = [];
 
       for (const diaDto of setPlanificacionSemanalDto.dias) {
         const fechaDia = normalizeDates.normalize(diaDto.fecha);
 
-        // Buscar o crear la planificación diaria
         let planificacion = await queryRunner.manager.findOne(Planificacion, { where: { fecha: fechaDia }, relations: ['detalles'] });
-
+        console.log({ previo: planificacion })
         if (!planificacion) {
-          // Crear una nueva planificación diaria si no existe
           planificacion = this.planificacionRepository.create({ fecha: diaDto.fecha });
-          planificacion.detalles = [];  // Inicializar detalles como un array vacío
+          planificacion.detalles = [];
+        } else {
+          // Eliminar los detalles anteriores asociados con la planificación
+          if (planificacion.detalles.length > 0) {
+            console.log({ detalles: planificacion.detalles });
+            await queryRunner.manager.remove(PlanificacionDetalle, planificacion.detalles);
+          }
         }
-
-        // Limpiar los detalles anteriores (si existen) si ya no se envían productos para ese día
-        // if (planificacion.detalles.length > 0 && diaDto.detalles.length === 0) {
-        await queryRunner.manager.delete(PlanificacionDetalle, { planificacionDiaria: planificacion });
-        // }
+        const planificacionGuardada = await queryRunner.manager.save(Planificacion, planificacion);
 
         // Crear los nuevos detalles
         const detallesPromises = diaDto.detalles.map(async (detalleDto) => {
           const producto = await this.productosService.findOneById(detalleDto.productoId);
+          if (!producto) {
+            throw new BadRequestException(`No hay un producto con id ${detalleDto.productoId}`);
+          }
+          console.log({ producto })
           return this.planificacionDetalleRepository.create({
-            producto,  // Solo pasas el id del producto
+            producto,
             cantidadPlanificada: detalleDto.cantidadPlanificada,
-            planificacionDiaria: planificacion
+            planificacionDiaria: planificacionGuardada
           });
         });
-
         const detallesCreated = await Promise.all(detallesPromises);
+        // console.log({ detallesCreated });
+        // console.log({ planificacion });
 
-        // Guardar los detalles nuevos en la base de datos
+        // Guardar los nuevos detalles
         const detallesGuardados = await queryRunner.manager.save(PlanificacionDetalle, detallesCreated);
+        // console.log({ detallesGuardados });
 
-        const detalles = detallesGuardados.map(d => {
-          const productoInfo = d.producto;
-          delete d.planificacionDiaria;
-          delete d.isDeleted;
-          delete d.producto;
-          return {
-            id: d.id,
-            producto: productoInfo.nombre,
-            productoId: productoInfo.id,
-            ...d
-          };
-        })
-        // Asignar los detalles guardados a la planificación
-        planificacion.detalles = detalles;
-        delete planificacion.isDeleted;
-        // Guardar la planificación con los detalles
-        const planificacionGuardada = await queryRunner.manager.save(planificacion);
+        // Asociar los nuevos detalles a la planificación
+        planificacion.detalles = detallesGuardados;
 
-        // Añadir la planificación guardada a la lista
+        // Guardar la planificación actualizada
         planificacionesActualizadas.push(planificacionGuardada);
       }
 
-      //TODO:Notificar por sockets.
-      await this.planificacionSocketService.notifyPlanificacionSemanalUpdate(planificacionesActualizadas)
-      // Commit de la transacción si todo fue exitoso
+      // Notificar la actualización
+      await this.planificacionSocketService.notifyPlanificacionSemanalUpdate(planificacionesActualizadas);
       await queryRunner.commitTransaction();
 
-      // Devolver la lista de planificaciones actualizadas
       return planificacionesActualizadas;
 
     } catch (error) {
-      // Revertir los cambios en caso de error
       await queryRunner.rollbackTransaction();
       throw error;
     } finally {
-      // Liberar el query runner
       await queryRunner.release();
     }
   }
@@ -347,7 +333,9 @@ export class PlanificacionService {
   async deleteAll() {
     const query1 = this.planificacionRepository.createQueryBuilder('planificacion');
     const query2 = this.planificacionDetalleRepository.createQueryBuilder('planificacionDetalle');
+    const query3 = this.solicitudEnvioRepository.createQueryBuilder('solicitudEnvio');
     try {
+      await query3.delete().where({}).execute();
       await query2.delete().where({}).execute();
       await query1.delete().where({}).execute();
       return;

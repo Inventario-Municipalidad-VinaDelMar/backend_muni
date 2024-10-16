@@ -33,7 +33,8 @@ export class ProductosService extends BaseService<Producto> {
             }
             return producto;
         } catch (error) {
-            this.handleDbExceptions(error);
+            throw error;
+            // this.handleDbExceptions(error);
         }
     }
 

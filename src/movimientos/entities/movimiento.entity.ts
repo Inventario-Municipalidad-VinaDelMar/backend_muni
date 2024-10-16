@@ -25,7 +25,7 @@ export class Movimiento {
     @ManyToOne(() => Tanda, (tanda) => tanda.movimientos, { eager: true })
     tanda: Tanda;
 
-    @ManyToOne(() => User, (user) => user.movimientos, { eager: true })
+    @ManyToOne(() => User, (user) => user.movimientos, { eager: true, onDelete: 'CASCADE' })
     realizador: User;
 
 

@@ -28,10 +28,10 @@ export class SolicitudEnvio {
 
     //TODO: Habilitar cuando se empieza a usar la autenticacion
 
-    @ManyToOne(() => User, (user) => user.solicitudesRealizadas, { eager: true })
+    @ManyToOne(() => User, (user) => user.solicitudesRealizadas, { eager: true, onDelete: 'CASCADE' })
     solicitante: User;  // Usuario que crea la solicitud desde la app móvil
 
-    @ManyToOne(() => User, (user) => user.solicitudesAutorizadas, { eager: true, nullable: true })
+    @ManyToOne(() => User, (user) => user.solicitudesAutorizadas, { eager: true, nullable: true, onDelete: 'CASCADE' })
     administrador?: User;  // Administrador que autoriza o rechaza la solicitud
 
     @ManyToOne(() => Envio, { nullable: true, })

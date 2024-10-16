@@ -44,13 +44,13 @@ export class User {
     })
     roles: string[];
 
-    @OneToMany(() => SolicitudEnvio, (solicitudEnvio) => solicitudEnvio.solicitante)
+    @OneToMany(() => SolicitudEnvio, (solicitudEnvio) => solicitudEnvio.solicitante, { cascade: ['remove'] })
     solicitudesRealizadas: SolicitudEnvio;  // Usuario que crea la solicitud desde la app móvil
 
-    @OneToMany(() => SolicitudEnvio, (solicitudEnvio) => solicitudEnvio.administrador)
+    @OneToMany(() => SolicitudEnvio, (solicitudEnvio) => solicitudEnvio.administrador, { cascade: ['remove'] })
     solicitudesAutorizadas: SolicitudEnvio;  // Administrador que autoriza o rechaza la solicitud
 
-    @OneToMany(() => Movimiento, (movimiento) => movimiento.realizador)
+    @OneToMany(() => Movimiento, (movimiento) => movimiento.realizador, { cascade: ['remove'] })
     movimientos: Movimiento[];  // Administrador que autoriza o rechaza la solicitud
 
 

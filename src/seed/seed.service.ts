@@ -41,14 +41,14 @@ export class SeedService {
 
     private async deleteTables() {
         // await this.movimientoService.deleteAll(); --> Se borra con cascade
-        await this.authService.deleteAll();
-        await this.enviosService.deleteAll();
         await this.planificacionService.deleteAll();
+        await this.enviosService.deleteAll();
         await this.tandasService.deleteAll();
         await this.ubicacionesService.deleteAll();
         await this.productoService.deleteAll();
         // await this.categoriaService.deleteAll();
         await this.bodegasService.deleteAll();
+        await this.authService.deleteAll();
 
     }
 
