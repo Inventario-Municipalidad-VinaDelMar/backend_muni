@@ -78,11 +78,12 @@ export class PlanificacionSocketService {
         if (this.wss) {
             let fechaActual = fecha;
             if (!fechaActual) {
-                console.log('La fecha actual era nulla')
                 fechaActual = normalizeDates.currentFecha();
             }
+            const room = `planificacion-${fechaActual}`;
             const planificacion = await this.planificacionService.findByFecha({ fecha: fechaActual })
-            this.wss.emit('loadPlanificacion', planificacion);
+            this.wss.to(room).emit('loadPlanificacion', planificacion);
+
         } else {
             console.error('WebSocket server not initialized - To notify a envio has been started ');
             throw new BadRequestException();

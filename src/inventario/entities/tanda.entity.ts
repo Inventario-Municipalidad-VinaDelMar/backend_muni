@@ -19,8 +19,8 @@ export class Tanda {
     @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
     fechaLlegada: Date;
 
-    @Column({ type: 'date' })
-    fechaVencimiento: Date;
+    @Column({ type: 'date', nullable: true })
+    fechaVencimiento?: Date;
 
     @Column({ default: false })
     isDeleted: boolean;

@@ -28,7 +28,7 @@ interface SeedProducto {
 
 interface SeedTanda {
     cantidadIngresada: number;
-    fechaVencimiento: string;
+    fechaVencimiento?: string;
     productoNombre: string;
     bodegaNombre: string;
     ubicacionNombre: string;
@@ -340,23 +340,23 @@ export const initialData: SeedData = {
         { cantidadIngresada: 250, fechaVencimiento: '2024-11-15', productoNombre: 'Papas', bodegaNombre: 'Bodega A', ubicacionNombre: 'Almacenaje Centro bodega' },
         { cantidadIngresada: 180, fechaVencimiento: '2024-11-20', productoNombre: 'Papas', bodegaNombre: 'Bodega A', ubicacionNombre: 'Sector A' },
         // Cubiertos
-        { cantidadIngresada: 200, fechaVencimiento: '2024-11-01', productoNombre: 'Cuchillo de Mesa', bodegaNombre: 'Bodega A', ubicacionNombre: 'Rack Rojo, Piso 1' },
-        { cantidadIngresada: 150, fechaVencimiento: '2024-11-05', productoNombre: 'Cuchillo de Mesa', bodegaNombre: 'Bodega A', ubicacionNombre: 'Rack Rojo, Piso 2' },
-        { cantidadIngresada: 100, fechaVencimiento: '2024-11-10', productoNombre: 'Cuchillo de Mesa', bodegaNombre: 'Bodega A', ubicacionNombre: 'Rack Azul, Piso 1' },
-        { cantidadIngresada: 250, fechaVencimiento: '2024-11-15', productoNombre: 'Cuchillo de Mesa', bodegaNombre: 'Bodega A', ubicacionNombre: 'Almacenaje Centro bodega' },
-        { cantidadIngresada: 180, fechaVencimiento: '2024-11-20', productoNombre: 'Cuchillo de Mesa', bodegaNombre: 'Bodega A', ubicacionNombre: 'Sector A' },
+        { cantidadIngresada: 200, fechaVencimiento: null, productoNombre: 'Cuchillo de Mesa', bodegaNombre: 'Bodega A', ubicacionNombre: 'Rack Rojo, Piso 1' },
+        { cantidadIngresada: 150, fechaVencimiento: null, productoNombre: 'Cuchillo de Mesa', bodegaNombre: 'Bodega A', ubicacionNombre: 'Rack Rojo, Piso 2' },
+        { cantidadIngresada: 100, fechaVencimiento: null, productoNombre: 'Cuchillo de Mesa', bodegaNombre: 'Bodega A', ubicacionNombre: 'Rack Azul, Piso 1' },
+        { cantidadIngresada: 250, fechaVencimiento: null, productoNombre: 'Cuchillo de Mesa', bodegaNombre: 'Bodega A', ubicacionNombre: 'Almacenaje Centro bodega' },
+        { cantidadIngresada: 180, fechaVencimiento: null, productoNombre: 'Cuchillo de Mesa', bodegaNombre: 'Bodega A', ubicacionNombre: 'Sector A' },
 
-        { cantidadIngresada: 200, fechaVencimiento: '2024-11-01', productoNombre: 'Tenedor de Mesa', bodegaNombre: 'Bodega A', ubicacionNombre: 'Rack Rojo, Piso 1' },
-        { cantidadIngresada: 150, fechaVencimiento: '2024-11-05', productoNombre: 'Tenedor de Mesa', bodegaNombre: 'Bodega A', ubicacionNombre: 'Rack Rojo, Piso 2' },
-        { cantidadIngresada: 100, fechaVencimiento: '2024-11-10', productoNombre: 'Tenedor de Mesa', bodegaNombre: 'Bodega A', ubicacionNombre: 'Rack Azul, Piso 1' },
-        { cantidadIngresada: 250, fechaVencimiento: '2024-11-15', productoNombre: 'Tenedor de Mesa', bodegaNombre: 'Bodega A', ubicacionNombre: 'Almacenaje Centro bodega' },
-        { cantidadIngresada: 180, fechaVencimiento: '2024-11-20', productoNombre: 'Tenedor de Mesa', bodegaNombre: 'Bodega A', ubicacionNombre: 'Sector A' },
+        { cantidadIngresada: 200, fechaVencimiento: null, productoNombre: 'Tenedor de Mesa', bodegaNombre: 'Bodega A', ubicacionNombre: 'Rack Rojo, Piso 1' },
+        { cantidadIngresada: 150, fechaVencimiento: null, productoNombre: 'Tenedor de Mesa', bodegaNombre: 'Bodega A', ubicacionNombre: 'Rack Rojo, Piso 2' },
+        { cantidadIngresada: 100, fechaVencimiento: null, productoNombre: 'Tenedor de Mesa', bodegaNombre: 'Bodega A', ubicacionNombre: 'Rack Azul, Piso 1' },
+        { cantidadIngresada: 250, fechaVencimiento: null, productoNombre: 'Tenedor de Mesa', bodegaNombre: 'Bodega A', ubicacionNombre: 'Almacenaje Centro bodega' },
+        { cantidadIngresada: 180, fechaVencimiento: null, productoNombre: 'Tenedor de Mesa', bodegaNombre: 'Bodega A', ubicacionNombre: 'Sector A' },
 
-        { cantidadIngresada: 200, fechaVencimiento: '2024-11-01', productoNombre: 'Cuchara de Mesa', bodegaNombre: 'Bodega A', ubicacionNombre: 'Rack Rojo, Piso 1' },
-        { cantidadIngresada: 150, fechaVencimiento: '2024-11-05', productoNombre: 'Cuchara de Mesa', bodegaNombre: 'Bodega A', ubicacionNombre: 'Rack Rojo, Piso 2' },
-        { cantidadIngresada: 100, fechaVencimiento: '2024-11-10', productoNombre: 'Cuchara de Mesa', bodegaNombre: 'Bodega A', ubicacionNombre: 'Rack Azul, Piso 1' },
-        { cantidadIngresada: 250, fechaVencimiento: '2024-11-15', productoNombre: 'Cuchara de Mesa', bodegaNombre: 'Bodega A', ubicacionNombre: 'Almacenaje Centro bodega' },
-        { cantidadIngresada: 180, fechaVencimiento: '2024-11-20', productoNombre: 'Cuchara de Mesa', bodegaNombre: 'Bodega A', ubicacionNombre: 'Sector A' },
+        { cantidadIngresada: 200, fechaVencimiento: null, productoNombre: 'Cuchara de Mesa', bodegaNombre: 'Bodega A', ubicacionNombre: 'Rack Rojo, Piso 1' },
+        { cantidadIngresada: 150, fechaVencimiento: null, productoNombre: 'Cuchara de Mesa', bodegaNombre: 'Bodega A', ubicacionNombre: 'Rack Rojo, Piso 2' },
+        { cantidadIngresada: 100, fechaVencimiento: null, productoNombre: 'Cuchara de Mesa', bodegaNombre: 'Bodega A', ubicacionNombre: 'Rack Azul, Piso 1' },
+        { cantidadIngresada: 250, fechaVencimiento: null, productoNombre: 'Cuchara de Mesa', bodegaNombre: 'Bodega A', ubicacionNombre: 'Almacenaje Centro bodega' },
+        { cantidadIngresada: 180, fechaVencimiento: null, productoNombre: 'Cuchara de Mesa', bodegaNombre: 'Bodega A', ubicacionNombre: 'Sector A' },
         // Limpiezas
         { cantidadIngresada: 200, fechaVencimiento: '2024-11-01', productoNombre: 'Detergente Líquido', bodegaNombre: 'Bodega A', ubicacionNombre: 'Rack Rojo, Piso 1' },
         { cantidadIngresada: 150, fechaVencimiento: '2024-11-05', productoNombre: 'Detergente Líquido', bodegaNombre: 'Bodega A', ubicacionNombre: 'Rack Rojo, Piso 2' },
@@ -364,11 +364,11 @@ export const initialData: SeedData = {
         { cantidadIngresada: 250, fechaVencimiento: '2024-11-15', productoNombre: 'Detergente Líquido', bodegaNombre: 'Bodega A', ubicacionNombre: 'Almacenaje Centro bodega' },
         { cantidadIngresada: 180, fechaVencimiento: '2024-11-20', productoNombre: 'Detergente Líquido', bodegaNombre: 'Bodega A', ubicacionNombre: 'Sector A' },
 
-        { cantidadIngresada: 200, fechaVencimiento: '2024-11-01', productoNombre: 'Esponja de Cocina', bodegaNombre: 'Bodega A', ubicacionNombre: 'Rack Rojo, Piso 1' },
-        { cantidadIngresada: 150, fechaVencimiento: '2024-11-05', productoNombre: 'Esponja de Cocina', bodegaNombre: 'Bodega A', ubicacionNombre: 'Rack Rojo, Piso 2' },
-        { cantidadIngresada: 100, fechaVencimiento: '2024-11-10', productoNombre: 'Esponja de Cocina', bodegaNombre: 'Bodega A', ubicacionNombre: 'Rack Azul, Piso 1' },
-        { cantidadIngresada: 250, fechaVencimiento: '2024-11-15', productoNombre: 'Esponja de Cocina', bodegaNombre: 'Bodega A', ubicacionNombre: 'Almacenaje Centro bodega' },
-        { cantidadIngresada: 180, fechaVencimiento: '2024-11-20', productoNombre: 'Esponja de Cocina', bodegaNombre: 'Bodega A', ubicacionNombre: 'Sector A' },
+        { cantidadIngresada: 200, fechaVencimiento: null, productoNombre: 'Esponja de Cocina', bodegaNombre: 'Bodega A', ubicacionNombre: 'Rack Rojo, Piso 1' },
+        { cantidadIngresada: 150, fechaVencimiento: null, productoNombre: 'Esponja de Cocina', bodegaNombre: 'Bodega A', ubicacionNombre: 'Rack Rojo, Piso 2' },
+        { cantidadIngresada: 100, fechaVencimiento: null, productoNombre: 'Esponja de Cocina', bodegaNombre: 'Bodega A', ubicacionNombre: 'Rack Azul, Piso 1' },
+        { cantidadIngresada: 250, fechaVencimiento: null, productoNombre: 'Esponja de Cocina', bodegaNombre: 'Bodega A', ubicacionNombre: 'Almacenaje Centro bodega' },
+        { cantidadIngresada: 180, fechaVencimiento: null, productoNombre: 'Esponja de Cocina', bodegaNombre: 'Bodega A', ubicacionNombre: 'Sector A' },
         // Lácteos
         { cantidadIngresada: 200, fechaVencimiento: '2024-11-01', productoNombre: 'Leche Entera', bodegaNombre: 'Bodega A', ubicacionNombre: 'Rack Rojo, Piso 1' },
         { cantidadIngresada: 150, fechaVencimiento: '2024-11-05', productoNombre: 'Leche Entera', bodegaNombre: 'Bodega A', ubicacionNombre: 'Rack Rojo, Piso 2' },

@@ -11,5 +11,5 @@ export interface TandaResponse {
     cantidadIngresada: number;
     cantidadActual: number;
     fechaLlegada: Date;
-    fechaVencimiento: Date;
+    fechaVencimiento?: Date;
 }

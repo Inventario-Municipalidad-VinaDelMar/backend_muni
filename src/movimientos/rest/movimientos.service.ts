@@ -1,4 +1,4 @@
-import { forwardRef, Inject, Injectable, } from '@nestjs/common';
+import { BadRequestException, forwardRef, Inject, Injectable, } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Movimiento } from '../entities/movimiento.entity';
 import { DataSource, QueryRunner, Repository } from 'typeorm';
@@ -13,6 +13,7 @@ import { User } from 'src/auth/entities/user.entity';
 
 @Injectable()
 export class MovimientosService {
+    processingMovimiento: boolean = false;
 
     constructor(
         private readonly enviosService: EnviosService,
@@ -31,6 +32,10 @@ export class MovimientosService {
     async createMovimiento(createMovimientoDto: CreateMovimientoDto, user: User) {
         const { idEnvioProducto, idTanda, cantidadRetirada } = createMovimientoDto;
 
+        if (this.processingMovimiento) {
+            throw new BadRequestException('Se esta procesado un movimiento');
+        }
+        this.processingMovimiento = true;
         //Verificar si el movimiento tiene vinculo con un envio actual
         const { fechaEnvio, idEnvio } = await this.enviosService.verifyEnvioByEnvioProducto(idEnvioProducto);
 
@@ -84,10 +89,12 @@ export class MovimientosService {
             console.log({ error })
             // Revertir todos los cambios si ocurre un error
             await queryRunner.rollbackTransaction();
+            this.processingMovimiento = false;
             throw error;
         } finally {
             // Liberar el queryRunner
             await queryRunner.release();
+            this.processingMovimiento = false;
         }
     }
 

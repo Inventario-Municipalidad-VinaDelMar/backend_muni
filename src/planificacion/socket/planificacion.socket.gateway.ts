@@ -17,9 +17,12 @@ export class PlanificacionSocketGateway {
 
   @SubscribeMessage('getPlanificacion')
   async findPlanificacionByFecha(client: Socket, payload: GetPlanificacionDto) {
+    const { fecha } = payload;
     const data =
       await this.planificacionSocketService.getPlanificacionByFecha(payload);
     const solicitud = await this.planificacionSocketService.getSolicitudEnCurso();
+    const room = `planificacion-${fecha}`;
+    client.join(room);
     client.emit('loadSolicitud', solicitud);
     client.emit('loadPlanificacion', data);
   }

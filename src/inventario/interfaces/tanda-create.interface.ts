@@ -6,7 +6,7 @@ import { Ubicacion } from "../entities/ubicacion.entity";
 export interface TandaCreateSchema {
     cantidadIngresada: number;
     cantidadActual: number,
-    fechaVencimiento: string;
+    fechaVencimiento?: string;
 
     producto: Producto;
 
