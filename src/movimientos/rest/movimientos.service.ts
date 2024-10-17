@@ -5,7 +5,7 @@ import { DataSource, QueryRunner, Repository } from 'typeorm';
 import { CreateMovimientoDto } from '../dto/create_movimiento.dto';
 import { TandasService } from 'src/inventario/rest/servicios-especificos';
 import { MovimientosSocketService } from '../socket/movimientos.socket.service';
-import { EnviosService } from 'src/logistica/envios/envios.service';
+import { EnviosService } from 'src/logistica/envios/rest/envios.service';
 import { PlanificacionSocketService } from 'src/planificacion/socket/planificacion.socket.service';
 import { MovimientoResponse } from '../interfaces/movimiento_response.interface';
 import { TandaResponse } from 'src/inventario/interfaces/tanda-response.interface';

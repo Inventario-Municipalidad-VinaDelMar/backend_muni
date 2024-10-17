@@ -7,7 +7,7 @@ import { normalizeDates } from 'src/utils';
 import { AutorizeSolicitudEnvioDto, CreatePlanificacionDto, GetPlanificacionDto, SetPlanificacionSemanalDto } from '../dto/rest';
 import { PlanificacionDetalle } from '../entities/planificacion-detalle.entity';
 import { ProductosService } from 'src/inventario/rest/servicios-especificos';
-import { EnviosService } from 'src/logistica/envios/envios.service';
+import { EnviosService } from 'src/logistica/envios/rest/envios.service';
 import { isMonday, isFriday, differenceInCalendarDays } from 'date-fns';
 import { IPlanificacionSemanal } from '../interface/planificacion-semanal.interface';
 import { SolicitudEnvio, SolicitudEnvioStatus } from '../entities/solicitud-envio.entity';
@@ -61,7 +61,7 @@ export class PlanificacionService {
 
       if (aceptada) {
         //*Notificar por socket envio autorizado en planificacion actual
-        const envio = await this.enviosService.create();
+        const envio = await this.enviosService.create(solicitud);
         solicitud.envioAsociado = envio;
         await this.planificacionSocketService.notifyEnvioUpdate();
       }

@@ -6,7 +6,7 @@ import { TandasService } from 'src/inventario/rest/servicios-especificos/tandas/
 import { UbicacionesService } from 'src/inventario/rest/servicios-especificos/ubicaciones/ubicaciones.service';
 import { initialData, SeedPlanificacion } from './data/seed-data';
 import { PlanificacionService } from 'src/planificacion/rest/planificacion.service';
-import { EnviosService } from 'src/logistica/envios/envios.service';
+import { EnviosService } from 'src/logistica/envios/rest/envios.service';
 import { weekDates } from 'src/utils';
 import { AuthService } from 'src/auth/auth.service';
 import { User } from 'src/auth/entities/user.entity';
@@ -41,8 +41,8 @@ export class SeedService {
 
     private async deleteTables() {
         // await this.movimientoService.deleteAll(); --> Se borra con cascade
-        await this.planificacionService.deleteAll();
         await this.enviosService.deleteAll();
+        await this.planificacionService.deleteAll();
         await this.tandasService.deleteAll();
         await this.ubicacionesService.deleteAll();
         await this.productoService.deleteAll();

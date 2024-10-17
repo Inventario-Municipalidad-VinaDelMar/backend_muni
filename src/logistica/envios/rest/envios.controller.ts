@@ -9,11 +9,11 @@ export class EnviosController {
   constructor(private readonly enviosService: EnviosService) { }
 
   // @Auth(ValidRoles.admin, ValidRoles.bodeguero)
-  @Post('newEnvio')
-  createNewEnvio(@GetUser() user: User) {
-    // console.log({ user });
-    return this.enviosService.create();
-  }
+  // @Post('newEnvio')
+  // createNewEnvio(@GetUser() user: User) {
+  //   // console.log({ user });
+  //   return this.enviosService.create();
+  // }
   // @Auth()
   @Post('completeNewEnvio')
   completeNewEnvio() {

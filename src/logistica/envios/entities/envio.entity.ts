@@ -1,6 +1,6 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { EnvioProducto } from "./envio-producto.entity";
-import { normalizeDates } from "src/utils";
+import { SolicitudEnvio } from "src/planificacion/entities/solicitud-envio.entity";
 
 export enum EnvioStatus {
     SIN_CARGAR = 'Sin Cargar',
@@ -33,4 +33,8 @@ export class Envio {
 
     @OneToMany(() => EnvioProducto, (envioProducto) => envioProducto.envio, { eager: true, })
     productosPlanificados: EnvioProducto[]
+
+    @OneToOne(() => SolicitudEnvio, (solicitud) => solicitud.envioAsociado, { cascade: ['remove'] })
+    @JoinColumn()
+    solicitud: SolicitudEnvio;
 }

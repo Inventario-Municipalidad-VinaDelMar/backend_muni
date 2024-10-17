@@ -1,4 +1,4 @@
-import { Column, Entity, PrimaryGeneratedColumn, ManyToOne, BeforeUpdate } from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn, ManyToOne, BeforeUpdate, OneToOne, JoinColumn } from 'typeorm';
 import { Envio } from '../../logistica/envios/entities/envio.entity';
 import { User } from 'src/auth/entities/user.entity';
 
@@ -34,7 +34,8 @@ export class SolicitudEnvio {
     @ManyToOne(() => User, (user) => user.solicitudesAutorizadas, { eager: true, nullable: true, onDelete: 'CASCADE' })
     administrador?: User;  // Administrador que autoriza o rechaza la solicitud
 
-    @ManyToOne(() => Envio, { nullable: true, })
+    @OneToOne(() => Envio, (envio) => envio.solicitud, { nullable: true, onDelete: 'CASCADE' })
+    @JoinColumn()
     envioAsociado?: Envio;  // Referencia al envío que se crea si se acepta la solicitud
 
     @Column({ default: false })

@@ -1,14 +1,16 @@
 import { BadRequestException, forwardRef, Inject, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
-import { Envio, EnvioStatus } from './entities/envio.entity';
+import { Envio, EnvioStatus } from '../entities/envio.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, QueryRunner } from 'typeorm';
+import { Repository, QueryRunner, Not, In } from 'typeorm';
 import { normalizeDates } from 'src/utils';
 // import { CategoriasService } from 'src/inventario/rest/servicios-especificos';
-import { EnvioProducto } from './entities/envio-producto.entity';
+import { EnvioProducto } from '../entities/envio-producto.entity';
 import { PlanificacionSocketService } from 'src/planificacion/socket/planificacion.socket.service';
 import { PlanificacionService } from 'src/planificacion/rest/planificacion.service';
 import { Movimiento } from 'src/movimientos/entities/movimiento.entity';
 import { ProductosService } from 'src/inventario/rest/servicios-especificos';
+import { EnviosSocketService } from '../socket/envios.socket.service';
+import { SolicitudEnvio } from 'src/planificacion/entities/solicitud-envio.entity';
 
 @Injectable()
 export class EnviosService {
@@ -23,8 +25,11 @@ export class EnviosService {
 
     @InjectRepository(EnvioProducto)
     private readonly envioProductoRepository: Repository<EnvioProducto>,
+
+    @Inject(forwardRef(() => EnviosSocketService))
+    private readonly enviosSocketService: EnviosSocketService,
   ) { }
-  async create() {
+  async create(solicitud: SolicitudEnvio) {
     try {
       const fechaActual = normalizeDates.currentFecha();
       const envios = await this.envioRepository.find({
@@ -42,6 +47,7 @@ export class EnviosService {
 
       const envioCreated = this.envioRepository.create({
         fecha: fechaActual,
+        solicitud,
       })
 
       //TODO: Transformar este proceso a una transaction
@@ -60,6 +66,45 @@ export class EnviosService {
       await this.planificacionSocketService.notifyEnvioUpdate();
 
       return envio;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async getEnviosByFecha(fecha: string) {
+    try {
+      const fechaFormatted = normalizeDates.normalize(fecha);
+      const enviosData = await this.envioRepository.find({
+        where: {
+          isDeleted: false,
+          fecha: fechaFormatted,
+          status: Not(In([EnvioStatus.SIN_CARGAR, EnvioStatus.CARGANDO])),
+        },
+        relations: ['solicitud'],
+        //?Activar si es necesaria
+      });
+      const envios = enviosData.map(e => {
+        delete e.isDeleted;
+        const productosData = e.productosPlanificados;
+        const productos = productosData.map(p => {
+          delete p.isDeleted;
+          return {
+            producto: p.producto.nombre,
+            productoId: p.producto.id,
+            urlImagen: p.producto.urlImagen,
+            //TODO: Hacer esta de lo que va quedando
+            cantidad: p.movimiento!.cantidadRetirada,
+          }
+        })
+
+        delete e.productosPlanificados;
+        return {
+          ...e,
+          productos,
+        };
+      });
+      return envios;
+
     } catch (error) {
       throw error;
     }
