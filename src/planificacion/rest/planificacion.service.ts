@@ -16,6 +16,10 @@ import { User } from 'src/auth/entities/user.entity';
 
 @Injectable()
 export class PlanificacionService {
+
+  processingSolicitud: boolean = false;
+  processingAutorizacion: boolean = false;
+
   protected readonly logger = new Logger('PlanificacionService');;
   constructor(
     private readonly productosService: ProductosService,
@@ -36,7 +40,12 @@ export class PlanificacionService {
     private readonly dataSource: DataSource,
   ) { }
   async autorizeSolicitudEnvio(autorizeSolicitudEnvioDto: AutorizeSolicitudEnvioDto, user: User) {
+    if (this.processingAutorizacion) {
+      return;
+    }
+
     try {
+      this.processingAutorizacion = true;
       const { idSolicitud, aceptada } = autorizeSolicitudEnvioDto;
       const solicitud = await this.solicitudEnvioRepository.findOneBy({ id: idSolicitud });
       if (!solicitud) {
@@ -64,14 +73,19 @@ export class PlanificacionService {
       await this.planificacionSocketService.notifySolicitudEnvio(solicitudUpdated)
 
       //*Notificar por socket cierre de solicitud en pagina web
-
+      this.processingAutorizacion = false;
       return solicitudUpdated;
     } catch (error) {
+      this.processingAutorizacion = false;
       throw error;
     }
   }
   async sendSolicitudEnvio(user: User) {
+    if (this.processingSolicitud) {
+      return;
+    }
     try {
+      this.processingSolicitud = true;
       const fechaActual = normalizeDates.currentFecha();
       const solicitudes = await this.solicitudEnvioRepository.find({
         where: {
@@ -91,8 +105,10 @@ export class PlanificacionService {
       solicitud.envioAsociado = null;
       //*Notificar via socekt solicitud creada
       await this.planificacionSocketService.notifySolicitudEnvio(solicitud);
+      this.processingSolicitud = false;
       return solicitud;
     } catch (error) {
+      this.processingSolicitud = false;
       throw error;
     }
 

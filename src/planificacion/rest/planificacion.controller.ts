@@ -25,6 +25,7 @@ export class PlanificacionController {
   sendSolicitudEnvioPlanificacion(@GetUser() user: User) {
     return this.planificacionService.sendSolicitudEnvio(user);
   }
+
   @Post('autorizeSolicitudEnvioPlanificacion')
   @Auth(ValidRoles.admin)
   autorizeSolicitudEnvioPlanificacion(@Body() autorizeSolicitudEnvioDto: AutorizeSolicitudEnvioDto, @GetUser() user: User) {
