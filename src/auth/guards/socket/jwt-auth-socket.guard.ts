@@ -31,7 +31,7 @@ export class JwtAuthSocketGuard implements CanActivate {
             }
 
             client.data.user = user;  // Attach full user information to the socket instance
-            console.log(`Socket-Solicitud por: ${user.nombre} ${user.apellidoPaterno}`);
+            // console.log(`Socket-Solicitud por: ${user.nombre} ${user.apellidoPaterno}`);
             return true;
         } catch (error) {
             throw new UnauthorizedException('Token not valid');

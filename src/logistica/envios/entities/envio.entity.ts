@@ -5,7 +5,7 @@ import { SolicitudEnvio } from "src/planificacion/entities/solicitud-envio.entit
 export enum EnvioStatus {
     SIN_CARGAR = 'Sin Cargar',
     CARGANDO = 'Cargando',
-    EN_ENVIO = 'En envío',
+    EN_ENVIO = 'En envio',
     FINALIZADO = 'Finalizado',
 }
 

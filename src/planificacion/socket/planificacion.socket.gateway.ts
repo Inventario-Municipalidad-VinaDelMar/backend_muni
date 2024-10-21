@@ -41,7 +41,7 @@ export class PlanificacionSocketGateway {
       client.emit('loadDetallesTaken', this.detallesTaken);
       return;
     }
-    console.log({ payload })
+    // console.log({ payload })
 
     // Buscar si existe un detalle con el mismo idDetalle y el mismo usuario
     const index = this.detallesTaken.findIndex(
@@ -71,6 +71,7 @@ export class PlanificacionSocketGateway {
     const room = `planificacion-${fecha}`;
     client.join(room);
     client.emit('loadSolicitud', solicitud);
+    console.log({ room })
     client.emit('loadPlanificacion', data);
   }
 
