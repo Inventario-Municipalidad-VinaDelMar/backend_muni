@@ -217,7 +217,7 @@ export class PlanificacionService {
     try {
       this.validarPlanificacionSemanal(setPlanificacionSemanalDto);
 
-      const planificacionesActualizadas = [];
+      const planificacionesActualizadas: IPlanificacionSemanal[] = [];
 
       for (const diaDto of setPlanificacionSemanalDto.dias) {
         const fechaDia = normalizeDates.normalize(diaDto.fecha);
@@ -261,7 +261,18 @@ export class PlanificacionService {
         planificacion.detalles = detallesGuardados;
 
         // Guardar la planificación actualizada
-        planificacionesActualizadas.push(planificacionGuardada);
+        planificacionesActualizadas.push({
+          id: planificacionGuardada.id,
+          fecha: normalizeDates.dateToString(planificacionGuardada.fecha),
+          detalles: planificacionGuardada.detalles.map(d => {
+            return {
+              id: d.id,
+              cantidadPlanificada: d.cantidadPlanificada,
+              producto: d.producto.nombre,
+              productoId: d.producto.id,
+            };
+          }),
+        });
       }
 
       // Notificar la actualización
