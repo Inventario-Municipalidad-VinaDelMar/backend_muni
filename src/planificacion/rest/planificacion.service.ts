@@ -263,7 +263,8 @@ export class PlanificacionService {
         // Guardar la planificación actualizada
         planificacionesActualizadas.push({
           id: planificacionGuardada.id,
-          fecha: normalizeDates.dateToString(planificacionGuardada.fecha),
+          fecha: planificacionGuardada.fecha.toString(),
+          // fecha: normalizeDates.dateToString(planificacionGuardada.fecha),
           detalles: planificacionGuardada.detalles.map(d => {
             return {
               id: d.id,
