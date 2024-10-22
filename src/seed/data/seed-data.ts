@@ -133,7 +133,7 @@ export const initialData: SeedData = {
         // Fideos
         {
             nombre: 'Fideos Corbatas Carozzi',
-            descripcion: 'Fideos en forma de corbata, ideales para ensaladas y platos fríos.',
+            descripcion: 'Fideos en forma de corbata, ideales para ensaladas y platos frios.',
             urlImagen: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQhWSwLF3tf5H44P_3ncSzPV6Vou4nW4yGPEg&s',
 
         },
@@ -161,13 +161,13 @@ export const initialData: SeedData = {
         // Legumbres
         {
             nombre: 'Lentejas',
-            descripcion: 'Legumbres ricas en proteínas y fibra, ideales para sopas y guisos.',
+            descripcion: 'Legumbres ricas en proteinas y fibra, ideales para sopas y guisos.',
             urlImagen: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTsqTDVZEVxuc-4gmSXtpCZlbV7n1jxpmV47w&s',
 
         },
         {
             nombre: 'Garbanzos',
-            descripcion: 'Legumbres versátiles para hummus, ensaladas y guisos.',
+            descripcion: 'Legumbres versatiles para hummus, ensaladas y guisos.',
             urlImagen: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSjzteU5TuAxa2c8jJ_xjYqn5F5WawQkAQFoA&s',
 
         },
@@ -195,7 +195,7 @@ export const initialData: SeedData = {
         },
         {
             nombre: 'Papas',
-            descripcion: 'Tubérculos versátiles para puré, fritas o cocidas.',
+            descripcion: 'Tuberculos versatiles para pure, fritas o cocidas.',
             urlImagen: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRrSkZPW6XLWrKft-iwB5D7Ime-3pxRPixuXg&s',
 
         },
@@ -215,14 +215,14 @@ export const initialData: SeedData = {
         },
         {
             nombre: 'Cuchara de Mesa',
-            descripcion: 'Cuchara estándar para comidas liquidas.',
+            descripcion: 'Cuchara estandar para comidas liquidas.',
             urlImagen: 'https://cdnx.jumpseller.com/santa-mariana/image/7682407/resize/610/610?1609339753',
 
         },
 
         // Limpiezas
         {
-            nombre: 'Detergente Líquido',
+            nombre: 'Detergente Liquido',
             descripcion: 'Detergente líquido para lavar ropa y vajilla.',
             urlImagen: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTpsY5OeGT095gGI7r6fy81Uk1rX9GxkSnJJQ&s',
 
@@ -243,7 +243,7 @@ export const initialData: SeedData = {
         },
         {
             nombre: 'Queso',
-            descripcion: 'Queso madurado, ideal para sándwiches y platos horneados.',
+            descripcion: 'Queso madurado, ideal para sandwiches y platos horneados.',
             urlImagen: 'https://alvicl.vtexassets.com/arquivos/ids/157080/Queso-gauda-laminado.jpg?v=637868443541230000',
 
         },
@@ -265,12 +265,12 @@ export const initialData: SeedData = {
         // Panadería
         {
             nombre: 'Pan de Molde',
-            descripcion: 'Pan suave y esponjoso, perfecto para tostadas y sándwiches.',
+            descripcion: 'Pan suave y esponjoso, perfecto para tostadas y sandwiches.',
             urlImagen: 'https://jumbo.vtexassets.com/arquivos/ids/682957/Pan-de-molde-blanco-sandwich-700-g.jpg?v=638236666659500000',
 
         },
         {
-            nombre: 'Sanwich',
+            nombre: 'Sandwich',
             descripcion: 'Ideal para desayunos y meriendas.',
             urlImagen: 'https://www.gob.mx/cms/uploads/image/file/761647/WhatsApp_Image_2022-11-01_at_2.23.08_PM.jpeg',
 
@@ -358,11 +358,11 @@ export const initialData: SeedData = {
         { cantidadIngresada: 250, fechaVencimiento: null, productoNombre: 'Cuchara de Mesa', bodegaNombre: 'Bodega A', ubicacionNombre: 'Almacenaje Centro bodega' },
         { cantidadIngresada: 180, fechaVencimiento: null, productoNombre: 'Cuchara de Mesa', bodegaNombre: 'Bodega A', ubicacionNombre: 'Sector A' },
         // Limpiezas
-        { cantidadIngresada: 200, fechaVencimiento: '2024-11-01', productoNombre: 'Detergente Líquido', bodegaNombre: 'Bodega A', ubicacionNombre: 'Rack Rojo, Piso 1' },
-        { cantidadIngresada: 150, fechaVencimiento: '2024-11-05', productoNombre: 'Detergente Líquido', bodegaNombre: 'Bodega A', ubicacionNombre: 'Rack Rojo, Piso 2' },
-        { cantidadIngresada: 100, fechaVencimiento: '2024-11-10', productoNombre: 'Detergente Líquido', bodegaNombre: 'Bodega A', ubicacionNombre: 'Rack Azul, Piso 1' },
-        { cantidadIngresada: 250, fechaVencimiento: '2024-11-15', productoNombre: 'Detergente Líquido', bodegaNombre: 'Bodega A', ubicacionNombre: 'Almacenaje Centro bodega' },
-        { cantidadIngresada: 180, fechaVencimiento: '2024-11-20', productoNombre: 'Detergente Líquido', bodegaNombre: 'Bodega A', ubicacionNombre: 'Sector A' },
+        { cantidadIngresada: 200, fechaVencimiento: '2024-11-01', productoNombre: 'Detergente Liquido', bodegaNombre: 'Bodega A', ubicacionNombre: 'Rack Rojo, Piso 1' },
+        { cantidadIngresada: 150, fechaVencimiento: '2024-11-05', productoNombre: 'Detergente Liquido', bodegaNombre: 'Bodega A', ubicacionNombre: 'Rack Rojo, Piso 2' },
+        { cantidadIngresada: 100, fechaVencimiento: '2024-11-10', productoNombre: 'Detergente Liquido', bodegaNombre: 'Bodega A', ubicacionNombre: 'Rack Azul, Piso 1' },
+        { cantidadIngresada: 250, fechaVencimiento: '2024-11-15', productoNombre: 'Detergente Liquido', bodegaNombre: 'Bodega A', ubicacionNombre: 'Almacenaje Centro bodega' },
+        { cantidadIngresada: 180, fechaVencimiento: '2024-11-20', productoNombre: 'Detergente Liquido', bodegaNombre: 'Bodega A', ubicacionNombre: 'Sector A' },
 
         { cantidadIngresada: 200, fechaVencimiento: null, productoNombre: 'Esponja de Cocina', bodegaNombre: 'Bodega A', ubicacionNombre: 'Rack Rojo, Piso 1' },
         { cantidadIngresada: 150, fechaVencimiento: null, productoNombre: 'Esponja de Cocina', bodegaNombre: 'Bodega A', ubicacionNombre: 'Rack Rojo, Piso 2' },
@@ -401,11 +401,11 @@ export const initialData: SeedData = {
         { cantidadIngresada: 250, fechaVencimiento: '2024-11-15', productoNombre: 'Pan de Molde', bodegaNombre: 'Bodega A', ubicacionNombre: 'Almacenaje Centro bodega' },
         { cantidadIngresada: 180, fechaVencimiento: '2024-11-20', productoNombre: 'Pan de Molde', bodegaNombre: 'Bodega A', ubicacionNombre: 'Sector A' },
 
-        { cantidadIngresada: 200, fechaVencimiento: '2024-11-01', productoNombre: 'Sanwich', bodegaNombre: 'Bodega A', ubicacionNombre: 'Rack Rojo, Piso 1' },
-        { cantidadIngresada: 150, fechaVencimiento: '2024-11-05', productoNombre: 'Sanwich', bodegaNombre: 'Bodega A', ubicacionNombre: 'Rack Rojo, Piso 2' },
-        { cantidadIngresada: 100, fechaVencimiento: '2024-11-10', productoNombre: 'Sanwich', bodegaNombre: 'Bodega A', ubicacionNombre: 'Rack Azul, Piso 1' },
-        { cantidadIngresada: 250, fechaVencimiento: '2024-11-15', productoNombre: 'Sanwich', bodegaNombre: 'Bodega A', ubicacionNombre: 'Almacenaje Centro bodega' },
-        { cantidadIngresada: 180, fechaVencimiento: '2024-11-20', productoNombre: 'Sanwich', bodegaNombre: 'Bodega A', ubicacionNombre: 'Sector A' },
+        { cantidadIngresada: 200, fechaVencimiento: '2024-11-01', productoNombre: 'Sandwich', bodegaNombre: 'Bodega A', ubicacionNombre: 'Rack Rojo, Piso 1' },
+        { cantidadIngresada: 150, fechaVencimiento: '2024-11-05', productoNombre: 'Sandwich', bodegaNombre: 'Bodega A', ubicacionNombre: 'Rack Rojo, Piso 2' },
+        { cantidadIngresada: 100, fechaVencimiento: '2024-11-10', productoNombre: 'Sandwich', bodegaNombre: 'Bodega A', ubicacionNombre: 'Rack Azul, Piso 1' },
+        { cantidadIngresada: 250, fechaVencimiento: '2024-11-15', productoNombre: 'Sandwich', bodegaNombre: 'Bodega A', ubicacionNombre: 'Almacenaje Centro bodega' },
+        { cantidadIngresada: 180, fechaVencimiento: '2024-11-20', productoNombre: 'Sandwich', bodegaNombre: 'Bodega A', ubicacionNombre: 'Sector A' },
     ]
 
 

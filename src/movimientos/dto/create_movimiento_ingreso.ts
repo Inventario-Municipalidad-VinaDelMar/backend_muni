@@ -1,14 +1,11 @@
 import { IsNumber, IsUUID } from "class-validator";
 
-export class CreateMovimientoDto {
+export class CreateMovimientoIngresoDto {
 
     @IsNumber()
     cantidadRetirada: number;
 
     @IsUUID()
     idTanda: string;
-
-    @IsUUID()
-    idEnvioProducto: string;
 
 }

@@ -7,5 +7,5 @@ export interface MovimientoResponse {
     hora: string;
     producto: string;
     productoId: string;
-    envioId: string;
+    envioId?: string;
 }

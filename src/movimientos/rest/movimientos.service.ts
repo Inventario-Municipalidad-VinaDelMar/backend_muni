@@ -1,8 +1,8 @@
 import { BadRequestException, forwardRef, Inject, Injectable, } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Movimiento } from '../entities/movimiento.entity';
+import { Movimiento, MovimientoType } from '../entities/movimiento.entity';
 import { DataSource, QueryRunner, Repository } from 'typeorm';
-import { CreateMovimientoDto } from '../dto/create_movimiento.dto';
+import { CreateMovimientoRetiroDto } from '../dto/create_movimiento_retiro.dto';
 import { TandasService } from 'src/inventario/rest/servicios-especificos';
 import { MovimientosSocketService } from '../socket/movimientos.socket.service';
 import { EnviosService } from 'src/logistica/envios/rest/envios.service';
@@ -10,6 +10,7 @@ import { PlanificacionSocketService } from 'src/planificacion/socket/planificaci
 import { MovimientoResponse } from '../interfaces/movimiento_response.interface';
 import { TandaResponse } from 'src/inventario/interfaces/tanda-response.interface';
 import { User } from 'src/auth/entities/user.entity';
+import { CreateMovimientoIngresoDto } from '../dto/create_movimiento_ingreso';
 
 @Injectable()
 export class MovimientosService {
@@ -29,8 +30,8 @@ export class MovimientosService {
     ) {
     }
 
-    async createMovimiento(createMovimientoDto: CreateMovimientoDto, user: User) {
-        const { idEnvioProducto, idTanda, cantidadRetirada } = createMovimientoDto;
+    async createMovimientoAsRetiro(createMovimientoRetiroDto: CreateMovimientoRetiroDto, user: User) {
+        const { idEnvioProducto, idTanda, cantidadRetirada } = createMovimientoRetiroDto;
 
         if (this.processingMovimiento) {
             throw new BadRequestException('Se esta procesado un movimiento');
@@ -53,6 +54,7 @@ export class MovimientosService {
                 tanda: tandaInstance,
                 envioProducto: this.enviosService.instanceEnvioProducto(idEnvioProducto),
                 realizador: user,
+                // type: MovimientoType.RETIRO, //default es RETIRO
             });
 
             // Guardar el movimiento dentro de la transacción
@@ -72,7 +74,7 @@ export class MovimientosService {
 
 
             await queryRunner.commitTransaction();
-            //* Notificar por socket movimiento nuevo
+            //* Notificar por socket que hay movimiento nuevo en un ENVIO
             await this.movimientosSocketService.notifyMovimientoCreated({
                 ...movimiento,
                 producto,
@@ -81,12 +83,12 @@ export class MovimientosService {
             }, idEnvio)
             //* Notificar por socket actualización de la tanda
             await this.movimientosSocketService.notifyTandaDiscount(tanda)
+
             //* Notificar por socket movimiento asignado a EnvioProducto
             await this.planificacionSocketService.notifyEnvioUpdate(fechaEnvio,)
             //Error de prueba
             return movimiento;
         } catch (error) {
-            console.log({ error })
             // Revertir todos los cambios si ocurre un error
             await queryRunner.rollbackTransaction();
             this.processingMovimiento = false;
@@ -97,6 +99,50 @@ export class MovimientosService {
             this.processingMovimiento = false;
         }
     }
+
+    async createMovimientoAsIngreso(createMovimientoIngresoDto: CreateMovimientoIngresoDto, user: User) {
+        const { idTanda, cantidadRetirada } = createMovimientoIngresoDto;
+
+        // Iniciar la transacción
+        const queryRunner: QueryRunner = this.dataSource.createQueryRunner();
+        await queryRunner.connect();
+        await queryRunner.startTransaction();
+
+        try {
+            // Crear el movimiento
+            const tandaInstance = this.tandasService.generateClass(idTanda);
+            const movimientoCreated = this.movimientoRepository.create({
+                cantidadRetirada,
+                tanda: tandaInstance,
+                realizador: user,
+                type: MovimientoType.INGRESO,
+            });
+
+            // Guardar el movimiento dentro de la transacción
+            const movimiento = await queryRunner.manager.save(movimientoCreated);
+
+            // const producto = tanda.producto;
+            // const productoId = tanda.productoId;
+            delete movimiento.tanda
+            delete movimiento.isDeleted;
+
+
+            await queryRunner.commitTransaction();
+
+            //Error de prueba
+            return movimiento;
+        } catch (error) {
+            // Revertir todos los cambios si ocurre un error
+            await queryRunner.rollbackTransaction();
+            this.processingMovimiento = false;
+            throw error;
+        } finally {
+            // Liberar el queryRunner
+            await queryRunner.release();
+            this.processingMovimiento = false;
+        }
+    }
+
 
     async getMovimientoByIdEnvio(id: string): Promise<MovimientoResponse[]> {
         try {

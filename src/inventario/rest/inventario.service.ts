@@ -2,6 +2,8 @@ import { BadRequestException, forwardRef, Inject, Injectable, } from '@nestjs/co
 import { InventarioSocketService } from '../socket/inventario.socket.service';
 import { CreateBodegaDto, CreateProductoDto, CreateTandaDto, CreateUbicacionDto } from '../dto/rest-dto';
 import { BodegasService, ProductosService, TandasService, UbicacionesService } from './servicios-especificos';
+import { MovimientosService } from 'src/movimientos/rest/movimientos.service';
+import { User } from 'src/auth/entities/user.entity';
 
 
 
@@ -14,6 +16,7 @@ export class InventarioService {
     private readonly bodegasService: BodegasService,
     private readonly ubicacionesService: UbicacionesService,
     private readonly tandasService: TandasService,
+    private readonly movimientosService: MovimientosService,
 
 
     @Inject(forwardRef(() => InventarioSocketService))
@@ -38,7 +41,7 @@ export class InventarioService {
   }
 
   //!Proceso que requiere mucha carga, será lento.
-  async createTanda(createTandaDto: CreateTandaDto) {
+  async createTanda(createTandaDto: CreateTandaDto, user: User) {
     try {
       const { idBodega, idProducto, idUbicacion } = createTandaDto;
       const bodega = this.bodegasService.generateClass(idBodega);
@@ -56,9 +59,15 @@ export class InventarioService {
         ubicacion,
       });
 
-      //*Se notifica a los clientes por socket
+      //*Se notifica a los clientes una tanda de productos nueva
       await this.inventarioSocketService.notifyTandaCreated(tanda);
+      //*Se registra esta tanda como un movimiento tipo ingreso
+      await this.movimientosService.createMovimientoAsIngreso({
+        cantidadRetirada: tanda.cantidadIngresada,
+        idTanda: tanda.id,
+      }, user)
       return tanda;
+
     } catch (error) {
       console.log({ error })
       throw new BadRequestException(error.message);
