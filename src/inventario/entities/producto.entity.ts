@@ -2,6 +2,8 @@ import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { Tanda } from "./tanda.entity";
 import { PlanificacionDetalle } from "src/planificacion/entities/planificacion-detalle.entity";
 import { EnvioProducto } from "src/logistica/envios/entities/envio-producto.entity";
+import { Entrega } from "src/logistica/entregas/entities/entrega.entity";
+import { EntregaDetalle } from "src/logistica/entregas/entities/entrega-detalle.entity";
 
 @Entity()
 export class Producto {
@@ -34,4 +36,7 @@ export class Producto {
     //Relacion con la seccion de "logistica"
     @OneToMany(() => EnvioProducto, (envioProducto) => envioProducto.producto)
     envios: EnvioProducto[]
+
+    @OneToMany(() => EntregaDetalle, (detalleEntrega) => detalleEntrega.producto,)
+    entregas: EntregaDetalle;
 }

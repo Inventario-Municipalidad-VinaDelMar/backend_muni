@@ -13,6 +13,7 @@ import { EntregasModule } from './entregas/entregas.module';
     providers: [],
     exports: [
         EnviosModule,
+        EntregasModule,
     ],
 })
 export class LogisticaModule { }

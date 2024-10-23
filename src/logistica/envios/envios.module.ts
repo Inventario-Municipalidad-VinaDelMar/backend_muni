@@ -14,6 +14,7 @@ import { EnviosSocketGateway } from './socket/envios.socket.gateway';
 @Module({
   imports: [
     AuthModule,
+    // forwardRef(() => EntregasModule),
     forwardRef(() => MovimientosModule),
     PlanificacionModule,
     forwardRef(() => InventarioModule),

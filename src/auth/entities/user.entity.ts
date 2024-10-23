@@ -1,3 +1,4 @@
+import { Entrega } from 'src/logistica/entregas/entities/entrega.entity';
 import { Movimiento } from 'src/movimientos/entities/movimiento.entity';
 import { SolicitudEnvio } from 'src/planificacion/entities/solicitud-envio.entity';
 import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
@@ -53,5 +54,7 @@ export class User {
     @OneToMany(() => Movimiento, (movimiento) => movimiento.realizador, { cascade: ['remove'] })
     movimientos: Movimiento[];  // Administrador que autoriza o rechaza la solicitud
 
+    @OneToMany(() => Entrega, (entrega) => entrega.copiloto, { cascade: ['remove'] })
+    entregasRealizadas: Entrega[]; //Entregas que realizo un usuario a comedores solidarios
 
 }
