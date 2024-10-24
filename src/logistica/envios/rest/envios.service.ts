@@ -12,6 +12,7 @@ import { ProductosService } from 'src/inventario/rest/servicios-especificos';
 import { EnviosSocketService } from '../socket/envios.socket.service';
 import { SolicitudEnvio } from 'src/planificacion/entities/solicitud-envio.entity';
 import { User } from 'src/auth/entities/user.entity';
+import { EnvioResponseUnique, ProductoOnEnvio } from '../interfaces/envio-response-unique.interface';
 
 @Injectable()
 export class EnviosService {
@@ -83,7 +84,6 @@ export class EnviosService {
         //Se espera que la lista quede vacia
         statusAvailables.splice(0, statusAvailables.length);
       }
-
       const enviosData = await this.envioRepository.find({
         where: {
           isDeleted: false,
@@ -103,7 +103,7 @@ export class EnviosService {
             productoId: p.producto.id,
             urlImagen: p.producto.urlImagen,
             //TODO: Hacer esta de lo que va quedando
-            cantidad: p.movimiento!.cantidadRetirada,
+            cantidad: p.movimiento?.cantidadRetirada,
           }
         })
 
@@ -114,6 +114,105 @@ export class EnviosService {
         };
       });
       return envios;
+
+    } catch (error) {
+      throw error;
+    }
+  }
+  async getEnvioById(idEnvio: string): Promise<EnvioResponseUnique> {
+    try {
+
+      const envioData = await this.envioRepository.findOne({
+        where: {
+          isDeleted: false,
+          id: idEnvio,
+        },
+        relations: ['entregas', 'solicitud']
+      })
+      if (!envioData) {
+        throw new BadRequestException(`El envio con id ${idEnvio} no existe`)
+      }
+      const envio: EnvioResponseUnique = {
+        id: envioData.id,
+        fecha: envioData.fecha,
+        horaInicio: envioData.horaInicio,
+        horaFinalizacion: envioData.horaFinalizacion,
+        status: envioData.status,
+        administrador: envioData.solicitud.administrador,
+        solicitante: envioData.solicitud.solicitante,
+        movimientos: [],
+        entregas: [],
+        cargaInicial: [],
+        cargaActual: [],
+      };
+
+      envio.movimientos = envioData.productosPlanificados
+        .filter(pp => pp.movimiento) // Filtrar los que tienen movimiento
+        .map(pp => ({
+          id: pp.movimiento.id,
+          cantidadRetirada: pp.movimiento.cantidadRetirada,
+          producto: pp.producto.nombre,
+          productoId: pp.producto.id,
+          fecha: pp.movimiento.fecha,
+          hora: pp.movimiento.hora,
+        }));
+
+      envio.entregas = envioData.entregas.map(e => ({
+        id: e.id,
+        comedorSolidario: e.comedorSolidario.nombre,
+        comedorSolidarioId: e.comedorSolidario.id,
+        copiloto: e.copiloto,
+        fecha: normalizeDates.dateToString(e.fecha),
+        hora: e.hora,
+        urlActaLegal: e.url_acta_legal,
+        productosEntregados: e.detallesEntrega.map(ed => ({
+          producto: ed.producto.nombre,
+          productoId: ed.producto.id,
+          cantidad: ed.cantidadEntregada,
+          urlImagen: ed.producto.urlImagen,
+        })),
+      }));
+
+      if (![EnvioStatus.EN_ENVIO, EnvioStatus.FINALIZADO].includes(envioData.status)) {
+        return envio;
+      }
+
+      envio.cargaInicial = envioData.productosPlanificados
+        .filter(pp => pp.movimiento).map(p => ({
+          cantidad: p.cantidadPlanificada,
+
+          producto: p.producto.nombre,
+          productoId: p.producto.id,
+          urlImagen: p.producto.urlImagen,
+        }));
+
+      envio.cargaActual = envioData.productosPlanificados
+        .filter(pp => pp.movimiento).map(p => {
+          const carga: ProductoOnEnvio = {
+            cantidad: p.cantidadPlanificada,
+            producto: p.producto.nombre,
+            productoId: p.producto.id,
+            urlImagen: p.producto.urlImagen,
+          }
+          //Restar carga inicial con productos entregados
+          envioData.entregas.map(e => {
+            e.detallesEntrega.map(detalle => {
+              if (detalle.producto.id === carga.productoId) {
+                carga.cantidad -= detalle.cantidadEntregada;
+                if (carga.cantidad < 0) {
+                  throw new BadRequestException(`El producto ${carga.producto} a quedado con carga negativa: ${carga.cantidad}`);
+                }
+              }
+            })
+          });
+          //TODO: añadir la resta de incidente envio
+          return {
+            ...carga,
+          }
+        });
+
+
+      return envio;
 
     } catch (error) {
       throw error;
@@ -161,6 +260,9 @@ export class EnviosService {
 
       //*Notificar cambio en un envio de la lista de envios para todos los usuarios
       await this.enviosSocketService.notifyListEnviosUpdate();
+
+      //*Notificar que ha cambiado un envio en especifico
+      await this.enviosSocketService.notifyEnvioUpdate(envioEnCurso.id)
 
       return envioUpdated;
 
@@ -304,5 +406,7 @@ export class EnviosService {
       throw error;
     }
   }
+
+
 
 }

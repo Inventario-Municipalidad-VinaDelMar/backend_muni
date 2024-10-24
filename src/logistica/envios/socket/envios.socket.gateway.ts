@@ -9,6 +9,7 @@ import { GetUserWs } from "src/auth/decorators/get-user-ws.decorator";
 import { User } from "src/auth/entities/user.entity";
 import { JwtService } from "@nestjs/jwt";
 import { middleWareSocketAuth } from "src/auth/guards/socket/middleware-socket.guard";
+import { GetEnvioByIdDto } from "../dto/get-envio-by-id.dto";
 
 @WebSocketGateway({ cors: true, namespace: 'logistica/envios' })
 @AuthSocket()
@@ -24,18 +25,29 @@ export class EnviosSocketGateway {
     }
 
     @SubscribeMessage('getEnviosByFecha')
-    @AuthSocket(ValidRoles.admin, ValidRoles.externo)
+    @AuthSocket(ValidRoles.admin, ValidRoles.bodeguero)
     async findEnviosByFecha(@ConnectedSocket() client: Socket, @MessageBody() payload: GetEnviosDto, @GetUserWs() user: User,) {
         const { fecha } = payload;
         if (!fecha) {
             throw new BadRequestException('Fecha de envios inexistente.')
         }
-        const adminView = user.roles.includes('admin');
+        const adminView = user.roles.includes('administrador');
         const room = `envios-${fecha}-${adminView ? 'all' : 'partial'}`;
         const data =
             await this.enviosSocketService.getEnviosByFecha(fecha, adminView);
         //Example room expected: 'envios-2024-10-23-all' o 'envios-2024-10-23-partial'
         client.join(room);
         client.emit('loadEnviosByFecha', data);
+    }
+    @SubscribeMessage('getEnvioById')
+    @AuthSocket(ValidRoles.admin)
+    async findEnvioById(@ConnectedSocket() client: Socket, @MessageBody() payload: GetEnvioByIdDto, @GetUserWs() user: User,) {
+        const { idEnvio } = payload;
+        if (!idEnvio) {
+            throw new BadRequestException('El id del envio es inexistente.')
+        }
+        const data =
+            await this.enviosSocketService.getEnvioById(idEnvio);
+        client.emit(`${idEnvio}-loadEnvioById`, data);
     }
 }

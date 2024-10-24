@@ -11,6 +11,7 @@ import { MovimientoResponse } from '../interfaces/movimiento_response.interface'
 import { TandaResponse } from 'src/inventario/interfaces/tanda-response.interface';
 import { User } from 'src/auth/entities/user.entity';
 import { CreateMovimientoIngresoDto } from '../dto/create_movimiento_ingreso';
+import { EnviosSocketService } from 'src/logistica/envios/socket/envios.socket.service';
 
 @Injectable()
 export class MovimientosService {
@@ -18,6 +19,7 @@ export class MovimientosService {
 
     constructor(
         private readonly enviosService: EnviosService,
+        private readonly enviosSocketService: EnviosSocketService,
         private readonly tandasService: TandasService,
         private readonly planificacionSocketService: PlanificacionSocketService,
 
@@ -86,6 +88,8 @@ export class MovimientosService {
 
             //* Notificar por socket movimiento asignado a EnvioProducto
             await this.planificacionSocketService.notifyEnvioUpdate(fechaEnvio,)
+            //* Notificar por socket que el envio ha tenido un cambio
+            await this.enviosSocketService.notifyEnvioUpdate(idEnvio)
             //Error de prueba
             return movimiento;
         } catch (error) {

@@ -32,6 +32,7 @@ import { EnviosSocketGateway } from './socket/envios.socket.gateway';
   exports: [
     TypeOrmModule,
     EnviosService,
+    EnviosSocketService,
 
   ]
 })

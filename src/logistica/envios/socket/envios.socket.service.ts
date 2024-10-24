@@ -33,11 +33,28 @@ export class EnviosSocketService {
             throw new BadRequestException();
         }
     }
-
+    async notifyEnvioUpdate(idEnvio: string) {
+        if (this.wss) {
+            const envio = await this.enviosService.getEnvioById(idEnvio);
+            this.wss.emit(`${idEnvio}-loadEnvioById`, envio);
+        } else {
+            console.error('WebSocket server not initialized - To emit envio by id updated');
+            throw new BadRequestException();
+        }
+    }
     async getEnviosByFecha(fecha: string, adminView: boolean) {
         if (this.wss) {
             const envios = await this.enviosService.getEnviosByFecha(fecha, adminView);
             return envios;
+        } else {
+            console.error('WebSocket server not initialized - To emit envios by fecha');
+            throw new BadRequestException();
+        }
+    }
+    async getEnvioById(idEnvio: string) {
+        if (this.wss) {
+            const envio = await this.enviosService.getEnvioById(idEnvio);
+            return envio;
         } else {
             console.error('WebSocket server not initialized - To emit envios by fecha');
             throw new BadRequestException();
