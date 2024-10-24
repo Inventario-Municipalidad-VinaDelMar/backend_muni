@@ -34,6 +34,6 @@ export class Tanda {
     @ManyToOne(() => Ubicacion, (ubicacion) => ubicacion.tandas, { eager: true })
     ubicacion: Ubicacion;
 
-    @OneToMany(() => Movimiento, (movimiento) => movimiento.tanda)
+    @OneToMany(() => Movimiento, (movimiento) => movimiento.tanda, { cascade: true })
     movimientos: Movimiento[];
 }

@@ -41,7 +41,7 @@ export class Movimiento {
     //* MERMA --> Se necesita registrar en que tanda hubo merma
     //* INGRESO --> Se registra la tanda que se creará con este movimiento
     //* RETIRO --> Se registra de que tanda se descuenta stock
-    @ManyToOne(() => Tanda, (tanda) => tanda.movimientos, { eager: true })
+    @ManyToOne(() => Tanda, (tanda) => tanda.movimientos, { eager: true, onDelete: 'CASCADE', })
     tanda: Tanda;
 
     //! MERMA --> Como es merma, no se envia producto vencido, envio = null

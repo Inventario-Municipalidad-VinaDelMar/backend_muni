@@ -76,7 +76,7 @@ export const initialData: SeedData = {
             // fecha: '2024-10-1',
             detalles: [
                 { cantidadPlanificada: 30, producto: 'Fideos Corbatas Carozzi' },
-                { cantidadPlanificada: 100, producto: 'Sanwich' },
+                { cantidadPlanificada: 100, producto: 'Sandwich' },
                 { cantidadPlanificada: 25, producto: 'Agua Mineral' },
                 { cantidadPlanificada: 150, producto: 'Tenedor de Mesa' },
             ]
@@ -86,7 +86,7 @@ export const initialData: SeedData = {
             // fecha: '2024-10-2',
             detalles: [
                 { cantidadPlanificada: 15, producto: 'Arroz Largo Fino' },
-                { cantidadPlanificada: 88, producto: 'Sanwich' },
+                { cantidadPlanificada: 88, producto: 'Sandwich' },
                 { cantidadPlanificada: 25, producto: 'Jugo de Naranja' },
                 { cantidadPlanificada: 150, producto: 'Tenedor de Mesa' },
             ]

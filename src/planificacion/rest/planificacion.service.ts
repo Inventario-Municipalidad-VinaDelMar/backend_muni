@@ -61,7 +61,7 @@ export class PlanificacionService {
 
       if (aceptada) {
         //*Notificar por socket envio autorizado en planificacion actual
-        const envio = await this.enviosService.create(solicitud);
+        const envio = await this.enviosService.createNewEnvio(solicitud, user);
         solicitud.envioAsociado = envio;
         await this.planificacionSocketService.notifyEnvioUpdate();
       }
@@ -140,7 +140,6 @@ export class PlanificacionService {
   async create(createPlanificacionDto: CreatePlanificacionDto) {
     try {
       const { fecha, detalles } = createPlanificacionDto;
-
       //Crear la planificacion
       const planificacionCreated = this.planificacionRepository.create({
         fecha,

@@ -28,15 +28,19 @@ export class SeedService {
 
     ) { }
     async runSeed() {
-        await this.deleteTables();
-        await this.insertNewUsers();
-        const bodega = await this.insertNewBodegas();
-        // await this.insertNewCategorias();
-        await this.insertNewProductos();
-        await this.insertNewUbicaciones(bodega.id);
-        await this.insertNewTandas();
-        await this.insertNewPlanificaciones();
-        return 'Seed Executed';
+        try {
+            await this.deleteTables();
+            await this.insertNewUsers();
+            const bodega = await this.insertNewBodegas();
+            // await this.insertNewCategorias();
+            await this.insertNewProductos();
+            await this.insertNewUbicaciones(bodega.id);
+            await this.insertNewTandas();
+            await this.insertNewPlanificaciones();
+            return 'Seed Executed';
+        } catch (error) {
+            throw error;
+        }
     }
 
     private async deleteTables() {

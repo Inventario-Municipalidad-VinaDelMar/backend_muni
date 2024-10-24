@@ -11,6 +11,7 @@ import { Movimiento } from 'src/movimientos/entities/movimiento.entity';
 import { ProductosService } from 'src/inventario/rest/servicios-especificos';
 import { EnviosSocketService } from '../socket/envios.socket.service';
 import { SolicitudEnvio } from 'src/planificacion/entities/solicitud-envio.entity';
+import { User } from 'src/auth/entities/user.entity';
 
 @Injectable()
 export class EnviosService {
@@ -29,7 +30,7 @@ export class EnviosService {
     @Inject(forwardRef(() => EnviosSocketService))
     private readonly enviosSocketService: EnviosSocketService,
   ) { }
-  async create(solicitud: SolicitudEnvio) {
+  async createNewEnvio(solicitud: SolicitudEnvio, user: User) {
     try {
       const fechaActual = normalizeDates.currentFecha();
       const envios = await this.envioRepository.find({
@@ -64,21 +65,30 @@ export class EnviosService {
       await this.envioProductoRepository.save(detallesData);
       //*Notificar por sockets a planificacion que un envio se inicio
       await this.planificacionSocketService.notifyEnvioUpdate();
-
+      //*Notificar cambio en un envio de la lista de envios del administrador
+      await this.enviosSocketService.notifyListEnviosUpdate(true);
       return envio;
     } catch (error) {
       throw error;
     }
   }
 
-  async getEnviosByFecha(fecha: string) {
+  async getEnviosByFecha(fecha: string, adminView: boolean = false) {
     try {
       const fechaFormatted = normalizeDates.normalize(fecha);
+      const statusAvailables = [EnvioStatus.SIN_CARGAR, EnvioStatus.CARGANDO];
+
+      //El administrador puede ver todos los envios sin importar el status
+      if (adminView) {
+        //Se espera que la lista quede vacia
+        statusAvailables.splice(0, statusAvailables.length);
+      }
+
       const enviosData = await this.envioRepository.find({
         where: {
           isDeleted: false,
           fecha: fechaFormatted,
-          status: Not(In([EnvioStatus.SIN_CARGAR, EnvioStatus.CARGANDO])),
+          status: Not(In(statusAvailables)),
         },
         relations: ['solicitud'],
         //?Activar si es necesaria
@@ -149,14 +159,15 @@ export class EnviosService {
       //*Notificar por sockets a planificacion que un envio termino de cargar en bodega
       await this.planificacionSocketService.notifyEnvioUpdate();
 
+      //*Notificar cambio en un envio de la lista de envios para todos los usuarios
+      await this.enviosSocketService.notifyListEnviosUpdate();
+
       return envioUpdated;
 
     } catch (error) {
       throw error;
     }
   }
-
-  async autorizeNewEnvioToClient() { }
 
   async verifyEnvioByEnvioProducto(idEnvioProducto: string) {
     try {
