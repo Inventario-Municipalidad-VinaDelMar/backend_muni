@@ -90,6 +90,9 @@ export class EnviosService {
           fecha: fechaFormatted,
           status: Not(In(statusAvailables)),
         },
+        order: {
+          horaInicio: 'ASC',
+        },
         relations: ['solicitud'],
         //?Activar si es necesaria
       });
