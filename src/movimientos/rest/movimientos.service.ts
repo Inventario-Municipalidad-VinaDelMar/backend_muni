@@ -157,7 +157,10 @@ export class MovimientosService {
                             id
                         }
                     }
-                }
+                },
+                order: {
+                    hora: 'ASC',  // 'ASC' para ordenar de la más vieja a la más nueva
+                },
             })
 
             const movimientos = movimientosList.map(m => {

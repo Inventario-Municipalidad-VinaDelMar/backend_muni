@@ -139,6 +139,7 @@ export class EntregasService {
       }
       const detalles = entrega.detallesEntrega;
       delete entrega.isDeleted;
+      delete entrega.comedorSolidario.isDeleted;
       delete entrega.envio;
       delete entrega.detallesEntrega;
       // delete entrega.envio.productosPlanificados;
