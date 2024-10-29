@@ -53,8 +53,12 @@ export class EnviosSocketService {
     }
     async getEnvioById(idEnvio: string) {
         if (this.wss) {
-            const envio = await this.enviosService.getEnvioById(idEnvio);
-            return envio;
+            try {
+                const envio = await this.enviosService.getEnvioById(idEnvio);
+                return envio;
+            } catch (error) {
+                throw error;
+            }
         } else {
             console.error('WebSocket server not initialized - To emit envios by fecha');
             throw new BadRequestException();

@@ -46,8 +46,13 @@ export class EnviosSocketGateway {
         if (!idEnvio) {
             throw new BadRequestException('El id del envio es inexistente.')
         }
-        const data =
-            await this.enviosSocketService.getEnvioById(idEnvio);
-        client.emit(`${idEnvio}-loadEnvioById`, data);
+        try {
+            const data =
+                await this.enviosSocketService.getEnvioById(idEnvio);
+            client.emit(`${idEnvio}-loadEnvioById`, data);
+        } catch (error) {
+            client.emit(`${idEnvio}-loadEnvioById`, error.response);
+
+        }
     }
 }
