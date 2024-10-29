@@ -91,7 +91,7 @@ export class EnviosService {
           status: Not(In(statusAvailables)),
         },
         order: {
-          horaInicio: 'ASC',
+          horaInicio: 'DESC',
         },
         relations: ['solicitud'],
         //?Activar si es necesaria
