@@ -8,10 +8,14 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Entrega } from './entities/entrega.entity';
 import { EntregaDetalle } from './entities/entrega-detalle.entity';
 import { ComedorSolidario } from './entities/comedor-solidario.entity';
+import { EnviosModule } from '../envios/envios.module';
+import { InventarioModule } from 'src/inventario/inventario.module';
 
 
 @Module({
   imports: [
+    forwardRef(() => InventarioModule),
+    EnviosModule,
     AuthModule,
     TypeOrmModule.forFeature([Entrega, EntregaDetalle, ComedorSolidario]),
     // forwardRef(() => EnviosModule),

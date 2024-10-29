@@ -1,34 +1,186 @@
-import { forwardRef, Inject, Injectable } from '@nestjs/common';
-import { CreateEntregasDto } from '../dto/create-entregas.dto';
-import { UpdateEntregasDto } from '../dto/update-entregas.dto';
+import { forwardRef, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { EntregasSocketService } from '../socket/entregas.socket.service';
+import { User } from 'src/auth/entities/user.entity';
+import { CreateEntregaDto } from '../dto/rest/create-entregas.dto';
+import { Entrega } from '../entities/entrega.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { EntregaDetalle } from '../entities/entrega-detalle.entity';
+import { ComedorSolidario } from '../entities/comedor-solidario.entity';
+import { EnviosSocketService } from 'src/logistica/envios/socket/envios.socket.service';
+import { EnviosService } from 'src/logistica/envios/rest/envios.service';
+import { ProductosService } from 'src/inventario/rest/servicios-especificos';
+import { CreateComedorDto } from '../dto/rest/create-comedor.dto';
 
 
 @Injectable()
 export class EntregasService {
 
   constructor(
+    private readonly productoService: ProductosService,
+    private readonly envioSocketService: EnviosSocketService,
+    private readonly envioService: EnviosService,
+
     @Inject(forwardRef(() => EntregasSocketService))
     private readonly entregasSocketService: EntregasSocketService,
+
+    @InjectRepository(Entrega)
+    private readonly entregaRepository: Repository<Entrega>,
+
+    @InjectRepository(EntregaDetalle)
+    private readonly entregaDetalleRepository: Repository<EntregaDetalle>,
+
+    @InjectRepository(ComedorSolidario)
+    private readonly comedorSolidarioRepository: Repository<ComedorSolidario>,
   ) { }
 
-  create(createEntregasDto: CreateEntregasDto) {
-    return 'This action adds a new entregas';
+  async createNewEntrega(createEntregaDto: CreateEntregaDto, user: User) {
+    try {
+      const { detalles, ...rest } = createEntregaDto;
+      const entregaData = this.entregaRepository.create({
+        comedorSolidario: this.instanceComedorSolidario(rest.idComedor),
+        envio: this.envioService.instanceEnvio(rest.idEnvio),
+        copiloto: user,
+      });
+
+      const entrega = await this.entregaRepository.save(entregaData);
+      const productosEntregadosData = detalles.map(d => {
+        const producto = this.entregaDetalleRepository.create({
+          cantidadEntregada: d.cantidadEntregada,
+          producto: this.productoService.generateClass(d.productoId),
+          entrega,
+        });
+        return producto;
+      })
+
+      const productosEntregados = await this.entregaDetalleRepository.save(productosEntregadosData);
+      entrega.detallesEntrega = productosEntregados;
+
+      const entregaWithProductos = await this.entregaRepository.save(entrega);
+
+      //*Notificar por sockcet que un envio ha cambiado
+      await this.envioSocketService.notifyEnvioUpdate(rest.idEnvio);
+      //*Notificar por sockcet que un envio de la lista ha cambiado
+      await this.envioSocketService.notifyListEnviosUpdate();
+      return entregaWithProductos;
+    } catch (error) {
+      throw error;
+    }
   }
 
-  findAll() {
-    return `This action returns all entregas`;
+  instanceComedorSolidario(idComedor: string) {
+    return this.comedorSolidarioRepository.create({
+      id: idComedor,
+    })
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} entregas`;
+  async createNewComedor(createComedorDto: CreateComedorDto) {
+    try {
+      const comedorData = this.comedorSolidarioRepository.create({
+        ...createComedorDto,
+      });
+      const comedor = await this.comedorSolidarioRepository.save(comedorData)
+      return comedor;
+    } catch (error) {
+      throw error;
+    }
   }
 
-  update(id: number, updateEntregasDto: UpdateEntregasDto) {
-    return `This action updates a #${id} entregas`;
+  async getEntregasByEnvio(idEnvio: string) {
+    try {
+      const entregasData = await this.entregaRepository.find({
+        where: {
+          envio: {
+            id: idEnvio
+          }
+        },
+        relations: ['detallesEntrega'],
+      })
+      const entregas = entregasData.map(e => {
+        const detalles = e.detallesEntrega;
+        delete e.envio;
+        delete e.isDeleted;
+        delete e.comedorSolidario.isDeleted
+        delete e.detallesEntrega;
+        const productosEntregados = detalles.map(ed => {
+          const producto = ed.producto;
+          delete ed.entrega;
+          delete ed.isDeleted;
+          delete ed.producto;
+          //No es necesario que el frontend sepa el id de un "detalleEntrega"
+          delete ed.id;
+          return {
+            ...ed,
+            producto: producto.nombre,
+            productoId: producto.id,
+            urlImage: producto.urlImagen,
+          };
+        })
+        return {
+          ...e,
+          detallesEntrega: productosEntregados,
+        };
+      })
+      return entregas;
+    } catch (error) {
+      throw error;
+    }
+  }
+  async getEntregaById(idEntrega: string) {
+    try {
+      const entrega = await this.entregaRepository.findOne({
+        where: {
+          id: idEntrega
+        },
+        relations: ['detallesEntrega'],
+      })
+      if (!entrega) {
+        throw new NotFoundException(`La entrega con id ${idEntrega} no existe.`)
+      }
+      const detalles = entrega.detallesEntrega;
+      delete entrega.isDeleted;
+      delete entrega.envio;
+      delete entrega.detallesEntrega;
+      // delete entrega.envio.productosPlanificados;
+      // delete entrega.envio.isDeleted;
+      const productosEntregados = detalles.map(ed => {
+        const producto = ed.producto;
+        delete ed.entrega;
+        delete ed.isDeleted;
+        delete ed.producto;
+        //No es necesario que el frontend sepa el id de un "detalleEntrega"
+        delete ed.id;
+        return {
+          ...ed,
+          producto: producto.nombre,
+          productoId: producto.id,
+          urlImage: producto.urlImagen,
+        };
+      })
+
+
+      return {
+        ...entrega,
+        detallesEntrega: productosEntregados,
+      };
+    } catch (error) {
+      throw error;
+    }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} entregas`;
+  async deleteAll() {
+    const query1 = this.entregaRepository.createQueryBuilder('entregas');
+    const query2 = this.entregaDetalleRepository.createQueryBuilder('entregasDetalles');
+    const query3 = this.comedorSolidarioRepository.createQueryBuilder('comedores');
+    try {
+      await query2.delete().where({}).execute();
+      await query1.delete().where({}).execute();
+      await query3.delete().where({}).execute();
+      return;
+    } catch (error) {
+      throw error;
+    }
   }
+
+
 }

@@ -8,11 +8,12 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { PlanificacionModule } from 'src/planificacion/planificacion.module';
+import { MiddleWareWs } from './guards/socket/middleware-socket.guard';
 
 @Module({
   controllers: [AuthController],
-  providers: [AuthService, JwtSrategy],
-  exports: [TypeOrmModule, AuthService, JwtSrategy, PassportModule, JwtModule],
+  providers: [AuthService, JwtSrategy, MiddleWareWs],
+  exports: [TypeOrmModule, AuthService, JwtSrategy, PassportModule, JwtModule, MiddleWareWs],
   imports: [
     forwardRef(() => PlanificacionModule),
     TypeOrmModule.forFeature([User]),

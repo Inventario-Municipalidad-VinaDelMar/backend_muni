@@ -127,7 +127,7 @@ export class EnviosService {
           isDeleted: false,
           id: idEnvio,
         },
-        relations: ['entregas', 'solicitud']
+        relations: ['entregas', 'entregas.detallesEntrega', 'solicitud']
       })
       if (!envioData) {
         throw new BadRequestException(`El envio con id ${idEnvio} no existe`)
@@ -162,7 +162,8 @@ export class EnviosService {
         comedorSolidario: e.comedorSolidario.nombre,
         comedorSolidarioId: e.comedorSolidario.id,
         copiloto: e.copiloto,
-        fecha: normalizeDates.dateToString(e.fecha),
+        fecha: e.fecha as unknown as string,
+        // fecha: normalizeDates.normalize(e.fecha as unknown as string),
         hora: e.hora,
         urlActaLegal: e.url_acta_legal,
         productosEntregados: e.detallesEntrega.map(ed => ({
@@ -179,7 +180,7 @@ export class EnviosService {
 
       envio.cargaInicial = envioData.productosPlanificados
         .filter(pp => pp.movimiento).map(p => ({
-          cantidad: p.cantidadPlanificada,
+          cantidad: p.movimiento.cantidadRetirada,
 
           producto: p.producto.nombre,
           productoId: p.producto.id,
@@ -189,7 +190,7 @@ export class EnviosService {
       envio.cargaActual = envioData.productosPlanificados
         .filter(pp => pp.movimiento).map(p => {
           const carga: ProductoOnEnvio = {
-            cantidad: p.cantidadPlanificada,
+            cantidad: p.movimiento.cantidadRetirada,
             producto: p.producto.nombre,
             productoId: p.producto.id,
             urlImagen: p.producto.urlImagen,
@@ -353,6 +354,11 @@ export class EnviosService {
   instanceEnvioProducto(idEnvioProducto: string) {
     return this.envioProductoRepository.create({
       id: idEnvioProducto,
+    })
+  }
+  instanceEnvio(idEnvio: string) {
+    return this.envioRepository.create({
+      id: idEnvio,
     })
   }
   async findOneEnvioProducto(id: string) {

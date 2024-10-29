@@ -7,7 +7,7 @@ import { AuthSocket, GetUser } from 'src/auth/decorators';
 import { ValidRoles } from 'src/auth/interfaces';
 import { SetDetalleAsTaken } from '../dto/rest/planificacion/set-detalles-as-taken.dto';
 import { User } from 'src/auth/entities/user.entity';
-import { middleWareSocketAuth } from 'src/auth/guards/socket/middleware-socket.guard';
+import { MiddleWareWs } from 'src/auth/guards/socket/middleware-socket.guard';
 import { JwtService } from '@nestjs/jwt';
 import { GetUserWs } from 'src/auth/decorators/get-user-ws.decorator';
 import { DetalleTaken } from '../interface/detalleTaken.interface';
@@ -18,15 +18,14 @@ export class PlanificacionSocketGateway {
 
   detallesTaken: DetalleTaken[] = [];
   constructor(private readonly planificacionSocketService: PlanificacionSocketService,
-    private readonly jwtService: JwtService,
-
+    private readonly middleWareWs: MiddleWareWs,
   ) { }
 
   @WebSocketServer()
   wss: Server;
   afterInit(server: Server) {
     this.planificacionSocketService.setServer(server);
-    server.use((socket: Socket, next) => middleWareSocketAuth(socket, next, this.jwtService));
+    server.use((socket: Socket, next) => this.middleWareWs.socketAuth(socket, next));
   }
 
 

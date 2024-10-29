@@ -11,11 +11,13 @@ import { weekDates } from 'src/utils';
 import { AuthService } from 'src/auth/auth.service';
 import { User } from 'src/auth/entities/user.entity';
 import { CreateUserDto } from 'src/auth/dto/create-user.dto';
+import { EntregasService } from 'src/logistica/entregas/rest/entregas.service';
 // import { MovimientosService } from 'src/movimientos/rest/movimientos.service';
 
 @Injectable()
 export class SeedService {
     constructor(
+        private readonly entregasService: EntregasService,
         private readonly enviosService: EnviosService,
         // private readonly movimientoService: MovimientosService,
         private readonly planificacionService: PlanificacionService,
@@ -37,6 +39,7 @@ export class SeedService {
             await this.insertNewUbicaciones(bodega.id);
             await this.insertNewTandas();
             await this.insertNewPlanificaciones();
+            await this.insertNewComedores();
             return 'Seed Executed';
         } catch (error) {
             throw error;
@@ -45,6 +48,7 @@ export class SeedService {
 
     private async deleteTables() {
         // await this.movimientoService.deleteAll(); --> Se borra con cascade
+        await this.entregasService.deleteAll();
         await this.enviosService.deleteAll();
         await this.planificacionService.deleteAll();
         await this.tandasService.deleteAll();
@@ -70,7 +74,16 @@ export class SeedService {
 
         await Promise.all(usersPromises);
     }
-
+    private async insertNewComedores() {
+        const seedComedores = initialData.comedores;
+        const comedoresPromises = [];
+        seedComedores.map((comedor) => {
+            comedoresPromises.push(this.entregasService.createNewComedor({
+                ...comedor
+            }))
+        })
+        await Promise.all(comedoresPromises);
+    }
     private async insertNewPlanificaciones() {
         try {
             const datesSemana = weekDates.getCurrentWeekDates();

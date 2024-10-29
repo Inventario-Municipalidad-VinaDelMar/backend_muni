@@ -4,8 +4,7 @@ import { Server, Socket } from 'socket.io';
 import { GetTandaDto } from '../dto/socket-dto';
 import { GetUbicacionByBodegaDto, } from '../dto/rest-dto';
 import { AuthSocket } from 'src/auth/decorators';
-import { JwtService } from '@nestjs/jwt';
-import { middleWareSocketAuth } from 'src/auth/guards/socket/middleware-socket.guard';
+import { MiddleWareWs } from 'src/auth/guards/socket/middleware-socket.guard';
 import { ValidRoles } from 'src/auth/interfaces';
 import { UseFilters } from '@nestjs/common';
 import { WsExceptionLoggerFilter } from 'src/common/handle-exceptions/socket-logger-filter.exception';
@@ -17,7 +16,7 @@ import { WsExceptionLoggerFilter } from 'src/common/handle-exceptions/socket-log
 @AuthSocket()
 export class InventarioSocketGateway {
   constructor(private readonly inventarioSocketService: InventarioSocketService,
-    private readonly jwtService: JwtService,
+    private readonly middleWareWs: MiddleWareWs,
   ) { }
 
   @WebSocketServer()
@@ -25,7 +24,7 @@ export class InventarioSocketGateway {
 
   afterInit(server: Server) {
     this.inventarioSocketService.setServer(server);
-    server.use((socket: Socket, next) => middleWareSocketAuth(socket, next, this.jwtService));
+    server.use((socket: Socket, next) => this.middleWareWs.socketAuth(socket, next));
   }
 
 

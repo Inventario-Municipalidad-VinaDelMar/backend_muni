@@ -43,7 +43,13 @@ export interface SeedPlanificacion {
     detalles: SeedPlanificacionDetalle[];
 }
 
+export interface SeedComedorSolidario {
+    nombre: string;
+    direccion: string;
+}
+
 interface SeedData {
+    comedores: SeedComedorSolidario[];
     users: SeedUser[];
     planificaciones: SeedPlanificacion[];
     //inventario
@@ -59,6 +65,14 @@ export const initialData: SeedData = {
         { email: 'mangini@gmail.com', password: 'Abc12345', nombre: 'Franco', apellidoPaterno: 'Mangini', apellidoMaterno: 'Tapia', rut: '20175289-2', roles: ['administrador'] },
         { email: 'diego@gmail.com', password: 'Abc12345', nombre: 'Diego', apellidoPaterno: 'Hidalgo', apellidoMaterno: 'Carvajal', rut: '21069070-0', roles: ['administrador'] },
         { email: 'renato@gmail.com', password: 'Abc12345', nombre: 'Renato', apellidoPaterno: 'Plaza', apellidoMaterno: 'Diaz', rut: '20482871-7' },
+    ],
+    comedores: [
+        { nombre: 'Comedor A', direccion: 'Viña del Mar, direccion A1' },
+        { nombre: 'Comedor B', direccion: 'Viña del Mar, direccion B1' },
+        { nombre: 'Comedor C', direccion: 'Viña del Mar, direccion C1' },
+        { nombre: 'Comedor D', direccion: 'Viña del Mar, direccion D1' },
+        { nombre: 'Comedor E', direccion: 'Viña del Mar, direccion E1' },
+        { nombre: 'Comedor F', direccion: 'Viña del Mar, direccion F1' },
     ],
     planificaciones: [
         {
@@ -134,7 +148,7 @@ export const initialData: SeedData = {
         {
             nombre: 'Fideos Corbatas Carozzi',
             descripcion: 'Fideos en forma de corbata, ideales para ensaladas y platos frios.',
-            urlImagen: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQhWSwLF3tf5H44P_3ncSzPV6Vou4nW4yGPEg&s',
+            urlImagen: 'https://carozziexport.com/assets/img/products/_large/101302_CAROZZI_CORBATA_80_25X400_GR.jpg',
 
         },
         {
@@ -162,13 +176,13 @@ export const initialData: SeedData = {
         {
             nombre: 'Lentejas',
             descripcion: 'Legumbres ricas en proteinas y fibra, ideales para sopas y guisos.',
-            urlImagen: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTsqTDVZEVxuc-4gmSXtpCZlbV7n1jxpmV47w&s',
+            urlImagen: 'https://t1.uc.ltmcdn.com/es/posts/0/2/7/como_cocinar_lentejas_23720_600.jpg',
 
         },
         {
             nombre: 'Garbanzos',
             descripcion: 'Legumbres versatiles para hummus, ensaladas y guisos.',
-            urlImagen: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSjzteU5TuAxa2c8jJ_xjYqn5F5WawQkAQFoA&s',
+            urlImagen: 'https://content.cuerpomente.com/medio/2022/08/30/garbanzos-al-horno-receta-clasica_bdd177fa_1200x1200.jpg',
 
         },
 
@@ -196,7 +210,7 @@ export const initialData: SeedData = {
         {
             nombre: 'Papas',
             descripcion: 'Tuberculos versatiles para pure, fritas o cocidas.',
-            urlImagen: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRrSkZPW6XLWrKft-iwB5D7Ime-3pxRPixuXg&s',
+            urlImagen: 'https://feriaadomicilio.cl/wp-content/uploads/2019/11/papas-5-k.jpg',
 
         },
 

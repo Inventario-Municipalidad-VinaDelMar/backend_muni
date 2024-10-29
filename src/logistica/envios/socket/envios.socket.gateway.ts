@@ -7,21 +7,23 @@ import { AuthSocket } from "src/auth/decorators";
 import { ValidRoles } from "src/auth/interfaces";
 import { GetUserWs } from "src/auth/decorators/get-user-ws.decorator";
 import { User } from "src/auth/entities/user.entity";
-import { JwtService } from "@nestjs/jwt";
-import { middleWareSocketAuth } from "src/auth/guards/socket/middleware-socket.guard";
+import { MiddleWareWs } from "src/auth/guards/socket/middleware-socket.guard";
 import { GetEnvioByIdDto } from "../dto/get-envio-by-id.dto";
 
 @WebSocketGateway({ cors: true, namespace: 'logistica/envios' })
 @AuthSocket()
 export class EnviosSocketGateway {
-    constructor(private readonly enviosSocketService: EnviosSocketService, private readonly jwtService: JwtService,) { }
+    constructor(
+        private readonly enviosSocketService: EnviosSocketService,
+        private readonly middleWareWs: MiddleWareWs,
+    ) { }
 
     @WebSocketServer()
     wss: Server;
 
     afterInit(server: Server) {
         this.enviosSocketService.setServer(server);
-        server.use((socket: Socket, next) => middleWareSocketAuth(socket, next, this.jwtService));
+        server.use((socket: Socket, next) => this.middleWareWs.socketAuth(socket, next));
     }
 
     @SubscribeMessage('getEnviosByFecha')

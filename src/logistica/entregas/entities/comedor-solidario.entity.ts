@@ -2,7 +2,7 @@
 
 import { User } from "src/auth/entities/user.entity";
 import { Envio } from "src/logistica/envios/entities/envio.entity";
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { Entrega } from "./entrega.entity";
 
 
@@ -20,7 +20,7 @@ export class ComedorSolidario {
     @Column({ default: false })
     isDeleted: boolean;
 
-    @ManyToOne(() => Entrega, (entrega) => entrega.comedorSolidario)
+    @OneToMany(() => Entrega, (entrega) => entrega.comedorSolidario)
     entregas: Entrega[];
 
 }
