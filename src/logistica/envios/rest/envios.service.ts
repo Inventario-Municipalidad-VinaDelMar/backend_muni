@@ -103,7 +103,7 @@ export class EnviosService {
             productoId: p.producto.id,
             urlImagen: p.producto.urlImagen,
             //TODO: Hacer esta de lo que va quedando
-            cantidad: p.movimiento?.cantidadRetirada,
+            cantidad: p.movimiento?.cantidadRetirada ?? 0,
           }
         })
 
