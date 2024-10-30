@@ -89,28 +89,45 @@ export class EnviosService {
           isDeleted: false,
           fecha: fechaFormatted,
           status: Not(In(statusAvailables)),
+
         },
         order: {
           horaInicio: 'DESC',
         },
-        relations: ['solicitud'],
+        relations: ['solicitud', 'entregas', 'entregas.detallesEntrega'],
         //?Activar si es necesaria
       });
       const envios = enviosData.map(e => {
         delete e.isDeleted;
         const productosData = e.productosPlanificados;
-        const productos = productosData.map(p => {
-          delete p.isDeleted;
-          return {
-            producto: p.producto.nombre,
-            productoId: p.producto.id,
-            urlImagen: p.producto.urlImagen,
-            //TODO: Hacer esta de lo que va quedando
-            cantidad: p.movimiento?.cantidadRetirada ?? 0,
-          }
-        })
+        const productos = productosData
+          .filter(pp => pp.movimiento)
+          .map(p => {
+            const carga: ProductoOnEnvio = {
+              cantidad: p.movimiento.cantidadRetirada,
+              producto: p.producto.nombre,
+              productoId: p.producto.id,
+              urlImagen: p.producto.urlImagen,
+            }
+            //Restar carga inicial con productos entregados
+            e.entregas.map(e => {
+              e.detallesEntrega.map(detalle => {
+                if (detalle.producto.id === carga.productoId) {
+                  carga.cantidad -= detalle.cantidadEntregada;
+                  if (carga.cantidad < 0) {
+                    throw new BadRequestException(`El producto ${carga.producto} a quedado con carga negativa: ${carga.cantidad}`);
+                  }
+                }
+              })
+            });
+            //TODO: añadir la resta de incidente envio
+            return {
+              ...carga,
+            }
+          })
 
         delete e.productosPlanificados;
+        delete e.entregas;
         return {
           ...e,
           productos,
@@ -191,7 +208,8 @@ export class EnviosService {
         }));
 
       envio.cargaActual = envioData.productosPlanificados
-        .filter(pp => pp.movimiento).map(p => {
+        .filter(pp => pp.movimiento)
+        .map(p => {
           const carga: ProductoOnEnvio = {
             cantidad: p.movimiento.cantidadRetirada,
             producto: p.producto.nombre,
