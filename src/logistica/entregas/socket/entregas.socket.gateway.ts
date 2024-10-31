@@ -28,6 +28,14 @@ export class EntregasSocketGateway {
         server.use((socket: Socket, next) => this.middleWareWs.socketAuth(socket, next));
     }
 
+    @SubscribeMessage('getAllComedores')
+    @AuthSocket(ValidRoles.admin, ValidRoles.bodeguero)
+    async findAllComedores(client: Socket) {
+
+        const data =
+            await this.entregasSocketService.findAllComedores();
+        client.emit('loadAllComedores', data);
+    }
     @SubscribeMessage('getEntregasByEnvio')
     @AuthSocket(ValidRoles.admin, ValidRoles.bodeguero)
     async findEntregasByEnvio(@ConnectedSocket() client: Socket, @MessageBody() payload: GetEntregasByEnvioDto, @GetUserWs() user: User,) {

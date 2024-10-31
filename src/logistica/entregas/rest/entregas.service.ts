@@ -11,6 +11,7 @@ import { EnviosSocketService } from 'src/logistica/envios/socket/envios.socket.s
 import { EnviosService } from 'src/logistica/envios/rest/envios.service';
 import { ProductosService } from 'src/inventario/rest/servicios-especificos';
 import { CreateComedorDto } from '../dto/rest/create-comedor.dto';
+import e from 'express';
 
 
 @Injectable()
@@ -68,6 +69,22 @@ export class EntregasService {
     }
   }
 
+  async findAllComedores() {
+    try {
+      const comedoresData = await this.comedorSolidarioRepository.find({
+        where: {
+          isDeleted: false,
+        }
+      });
+      const comedores = comedoresData.map(c => {
+        delete c.isDeleted;
+        return { ...c };
+      })
+      return comedores;
+    } catch (error) {
+      throw error;
+    }
+  }
   instanceComedorSolidario(idComedor: string) {
     return this.comedorSolidarioRepository.create({
       id: idComedor,

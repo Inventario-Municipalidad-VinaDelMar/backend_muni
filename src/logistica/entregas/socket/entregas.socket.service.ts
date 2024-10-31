@@ -37,6 +37,15 @@ export class EntregasSocketService {
             throw new BadRequestException();
         }
     }
+    async findAllComedores() {
+        if (this.wss) {
+            const comedores = await this.entregasService.findAllComedores();
+            return comedores;
+        } else {
+            console.error('WebSocket server not initialized - To emit all comedores');
+            throw new BadRequestException();
+        }
+    }
     async getEntregaById(idEntrega: string) {
         if (this.wss) {
             const entrega = await this.entregasService.getEntregaById(idEntrega);
