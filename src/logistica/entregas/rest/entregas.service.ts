@@ -74,6 +74,9 @@ export class EntregasService {
       const comedoresData = await this.comedorSolidarioRepository.find({
         where: {
           isDeleted: false,
+        },
+        order: {
+          nombre: 'ASC',
         }
       });
       const comedores = comedoresData.map(c => {
