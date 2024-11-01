@@ -97,6 +97,21 @@ export class EnviosService {
         relations: ['solicitud', 'entregas', 'entregas.detallesEntrega'],
         //?Activar si es necesaria
       });
+      enviosData.forEach(envio => {
+        envio.entregas = envio.entregas.sort((a, b) => {
+          // Extrae horas, minutos y segundos como números
+          const [hoursA, minutesA, secondsA] = a.hora.split(':').map(Number);
+          const [hoursB, minutesB, secondsB] = b.hora.split(':').map(Number);
+
+          // Crea un timestamp solo con horas, minutos y segundos
+          const timeA = new Date(1970, 0, 1, hoursA, minutesA, secondsA).getTime();
+          const timeB = new Date(1970, 0, 1, hoursB, minutesB, secondsB).getTime();
+          return timeA - timeB;
+        });
+      });
+
+
+
       const envios = enviosData.map(e => {
         delete e.isDeleted;
         const productosData = e.productosPlanificados;
@@ -127,10 +142,33 @@ export class EnviosService {
           })
 
         delete e.productosPlanificados;
+        const solicitud = e.solicitud;
+        delete e.solicitud;
+        const entregas = e.entregas.map(e => {
+          const copiloto = e.copiloto;
+          const comedor = e.comedorSolidario;
+          delete e.copiloto;
+          delete e.comedorSolidario;
+          delete e.isDeleted;
+          delete e.detallesEntrega;
+          delete e.envio;
+          //El cliente no se necesita saber el id de la entrega
+          delete e.id;
+          return {
+            ...e,
+            comedorSolidario: comedor.nombre,
+            realizador: `${copiloto.nombre} ${copiloto.apellidoPaterno} ${copiloto.apellidoMaterno}`,
+            realizadorId: copiloto.id,
+          };
+        });
         delete e.entregas;
+
         return {
           ...e,
+          autorizante: `${solicitud.administrador.nombre} ${solicitud.administrador.apellidoPaterno} ${solicitud.administrador.apellidoMaterno}`,
+          solicitante: `${solicitud.solicitante.nombre} ${solicitud.solicitante.apellidoPaterno} ${solicitud.solicitante.apellidoMaterno}`,
           productos,
+          entregas,
         };
       });
       return envios;

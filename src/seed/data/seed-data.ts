@@ -280,7 +280,7 @@ export const initialData: SeedData = {
         {
             nombre: 'Pan de Molde',
             descripcion: 'Pan suave y esponjoso, perfecto para tostadas y sandwiches.',
-            urlImagen: 'https://jumbo.vtexassets.com/arquivos/ids/682957/Pan-de-molde-blanco-sandwich-700-g.jpg?v=638236666659500000',
+            urlImagen: 'https://metroio.vtexassets.com/arquivos/ids/251368-800-auto',
 
         },
         {
