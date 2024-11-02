@@ -10,10 +10,12 @@ import { EntregaDetalle } from './entities/entrega-detalle.entity';
 import { ComedorSolidario } from './entities/comedor-solidario.entity';
 import { EnviosModule } from '../envios/envios.module';
 import { InventarioModule } from 'src/inventario/inventario.module';
+import { CloudinaryModule } from 'src/cloudinary/cloudinary.module';
 
 
 @Module({
   imports: [
+    CloudinaryModule,
     forwardRef(() => InventarioModule),
     EnviosModule,
     AuthModule,

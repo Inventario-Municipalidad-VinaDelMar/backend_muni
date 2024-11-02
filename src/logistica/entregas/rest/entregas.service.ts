@@ -1,4 +1,4 @@
-import { forwardRef, Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, forwardRef, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { EntregasSocketService } from '../socket/entregas.socket.service';
 import { User } from 'src/auth/entities/user.entity';
 import { CreateEntregaDto } from '../dto/rest/create-entregas.dto';
@@ -12,12 +12,15 @@ import { EnviosService } from 'src/logistica/envios/rest/envios.service';
 import { ProductosService } from 'src/inventario/rest/servicios-especificos';
 import { CreateComedorDto } from '../dto/rest/create-comedor.dto';
 import e from 'express';
+import { UpdateEntregaDto } from '../dto/rest/update-entrega.dto';
+import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 
 
 @Injectable()
 export class EntregasService {
 
   constructor(
+    private readonly cloudinaryService: CloudinaryService,
     private readonly productoService: ProductosService,
     private readonly envioSocketService: EnviosSocketService,
     private readonly envioService: EnviosService,
@@ -34,6 +37,32 @@ export class EntregasService {
     @InjectRepository(ComedorSolidario)
     private readonly comedorSolidarioRepository: Repository<ComedorSolidario>,
   ) { }
+
+  async updateEntregaFile(file: Express.Multer.File, updateEntregaDto: UpdateEntregaDto) {
+    try {
+      const { idEntrega } = updateEntregaDto;
+      const entregaData = await this.entregaRepository.findOneBy({ id: idEntrega })
+      if (!entregaData) {
+        throw new NotFoundException(`La entrega con id ${idEntrega} no existe.`);
+      }
+      const previousFileUrl = entregaData.url_acta_legal;
+      if (previousFileUrl) {
+        // 2. Extraer el ID del archivo de la URL
+        const fileId = previousFileUrl.split('/').pop()?.split('.')[0];
+        if (fileId) {
+          await this.cloudinaryService.deleteFile(fileId);
+        }
+      }
+      const result = await this.cloudinaryService.uploadFile(file);
+      entregaData.url_acta_legal = result.secure_url;
+      const entrega = await this.entregaRepository.save(entregaData);
+      delete entrega.envio;
+      delete entrega.isDeleted;
+      return entrega;
+    } catch (error) {
+      throw error;
+    }
+  }
 
   async createNewEntrega(createEntregaDto: CreateEntregaDto, user: User) {
     try {

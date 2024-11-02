@@ -8,6 +8,7 @@ import { MovimientosModule } from './movimientos/movimientos.module';
 import { LogisticaModule } from './logistica/logistica.module';
 import { PlanificacionModule } from './planificacion/planificacion.module';
 import { AuthModule } from './auth/auth.module';
+import { CloudinaryModule } from './cloudinary/cloudinary.module';
 
 
 @Module({
@@ -16,8 +17,9 @@ import { AuthModule } from './auth/auth.module';
 
   ],
   imports: [
+    CloudinaryModule,
     ScheduleModule.forRoot(),
-    ConfigModule.forRoot(),
+    ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: process.env.POSTGRES_HOST,
@@ -34,6 +36,7 @@ import { AuthModule } from './auth/auth.module';
     LogisticaModule,
     PlanificacionModule,
     AuthModule,
+
   ],
 })
 export class AppModule { }
