@@ -1,9 +1,10 @@
-import { Controller, Post, } from '@nestjs/common';
+import { Body, Controller, Get, Post, } from '@nestjs/common';
 import { EnviosService } from './envios.service';
 import { Auth } from 'src/auth/decorators';
 import { ValidRoles } from 'src/auth/interfaces';
+import { GetEnviosDto } from '../dto/get-envios.dto';
 
-@Auth()
+// @Auth()
 @Controller('envios')
 export class EnviosController {
   constructor(private readonly enviosService: EnviosService) { }
@@ -19,6 +20,12 @@ export class EnviosController {
   @Auth(ValidRoles.admin, ValidRoles.bodeguero, ValidRoles.cargador)
   completeNewEnvio() {
     return this.enviosService.completeNewEnvio();
+  }
+  @Get('')
+  // @Auth(ValidRoles.admin, ValidRoles.bodeguero, ValidRoles.cargador)
+  getEnvios(@Body() getEnviosDto: GetEnviosDto) {
+    const { fecha } = getEnviosDto;
+    return this.enviosService.getEnviosByFecha(fecha);
   }
 
 }
