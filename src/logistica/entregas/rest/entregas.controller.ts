@@ -1,4 +1,4 @@
-import { Controller, Post, Body, UseInterceptors, UploadedFile, ParseFilePipe, MaxFileSizeValidator, FileTypeValidator, ValidationPipe, UsePipes, } from '@nestjs/common';
+import { Controller, Post, Body, UseInterceptors, UploadedFile, ParseFilePipe, MaxFileSizeValidator, FileTypeValidator, ValidationPipe, UsePipes, Get, } from '@nestjs/common';
 import { EntregasService } from './entregas.service';
 import { CreateEntregaDto } from '../dto/rest/create-entregas.dto';
 import { Auth, GetUser } from 'src/auth/decorators';
@@ -9,7 +9,7 @@ import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { UpdateEntregaDto } from '../dto/rest/update-entrega.dto';
 
 @Controller('entregas')
-@Auth()
+// @Auth()
 export class EntregasController {
   constructor(private readonly entregasService: EntregasService,
 
@@ -19,6 +19,10 @@ export class EntregasController {
   @Auth(ValidRoles.admin, ValidRoles.bodeguero)
   createNewEntrega(@Body() createEntregaDto: CreateEntregaDto, @GetUser() user: User) {
     return this.entregasService.createNewEntrega(createEntregaDto, user);
+  }
+  @Get('comedores')
+  findlAllComedores() {
+    return this.entregasService.findAllComedores();
   }
 
   @Post('upload')

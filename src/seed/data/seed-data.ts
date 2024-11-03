@@ -33,9 +33,6 @@ interface SeedTanda {
     bodegaNombre: string;
     ubicacionNombre: string;
 }
-interface SeedEnvio {
-    fecha: string;
-}
 
 interface SeedPlanificacionDetalle {
     cantidadPlanificada: number;
@@ -49,6 +46,9 @@ export interface SeedPlanificacion {
 export interface SeedComedorSolidario {
     nombre: string;
     direccion: string;
+    latitud: string;
+    longitud: string;
+    sector: string;
 }
 
 interface SeedData {
@@ -71,12 +71,304 @@ export const initialData: SeedData = {
         { email: 'renato@gmail.com', password: 'Abc12345', nombre: 'Renato', apellidoPaterno: 'Plaza', apellidoMaterno: 'Diaz', rut: '20482871-7' },
     ],
     comedores: [
-        { nombre: 'Comedor A', direccion: 'Viña del Mar, direccion A1' },
-        { nombre: 'Comedor B', direccion: 'Viña del Mar, direccion B1' },
-        { nombre: 'Comedor C', direccion: 'Viña del Mar, direccion C1' },
-        { nombre: 'Comedor D', direccion: 'Viña del Mar, direccion D1' },
-        { nombre: 'Comedor E', direccion: 'Viña del Mar, direccion E1' },
-        { nombre: 'Comedor F', direccion: 'Viña del Mar, direccion F1' },
+        //Comedor 1
+        {
+            nombre: 'OLLITA DORADA',
+            direccion: 'LUIS HURTADO LÓPEZ #115 LOS ALMENDROS',
+            sector: 'ACHUPALLAS',
+            latitud: '-33.018921',
+            longitud: '-71.499817',
+        },
+        //Comedor 2
+        {
+            nombre: 'JV FLORECER DE LOS ALMENDROS',
+            direccion: 'PLAZA AL COSTADO DE PABLO DE ROCA 137, V INDEPENDENCIA',
+            sector: 'ACHUPALLAS',
+            latitud: '-33.02013020471302',
+            longitud: '-71.49845982883564',
+        },
+        //Comedor 3
+        {
+            nombre: 'LAS ALMENDRITAS',
+            direccion: 'LUIS HURTADO LOPEZ 381',
+            sector: 'ACHUPALLAS',
+            latitud: '-33.01797457573182',
+            longitud: '-71.49349471534256',
+        },
+        //Comedor 4
+
+        {
+            nombre: 'JV VILLA ROGIERS',
+            direccion: 'CALLE L1-SEDE JV',
+            sector: 'ACHUPALLAS',
+            latitud: '-33.01820772718678,',
+            longitud: '-71.49206319999999',
+        },
+        //Comedor 5
+        {
+            nombre: 'FE Y ESPERANZA-PUNTO Y COMA',
+            direccion: 'PANORAMA 322',
+            sector: 'ACHUPALLAS',
+            latitud: '-33.01417180325375',
+            longitud: '-71.49632219260211',
+        },
+        // Comedor 6
+        {
+            nombre: 'JV LOMAS CHORRILLOS',
+            direccion: 'AV.VALDIVIA 214',
+            sector: 'CHORRILLOS',
+            latitud: '-33.04118372192504',
+            longitud: '-71.52837'
+        },
+        // Comedor 7
+        {
+            nombre: 'VICTOR JARA',
+            direccion: 'CARLOS PEZOA VÉLIZ 177. ACHUPALLAS.',
+            sector: 'ACHUPALLAS',
+            latitud: '-33.01802627973306',
+            longitud: '-71.49852568650694'
+        },
+        // Comedor 8
+        {
+            nombre: 'LAS MAMASITAS(VICENTE HUIDOBRO)',
+            direccion: 'VICENTE HUIDOBRO 201, ACHUPALLAS, PARADERO 10, ACHUPALLAS',
+            sector: 'ACHUPALLAS',
+            latitud: '-33.02031873418742',
+            longitud: '-71.4971350883564'
+        },
+        // Comedor 9
+        {
+            nombre: 'PREVENCIÓN VIÑA',
+            direccion: 'SAN ANTONIO 945',
+            sector: 'PLAN',
+            latitud: '-33.012669',
+            longitud: '-71.5430749'
+        },
+        // Comedor 10
+        {
+            nombre: 'COMITÉ NUEVO REENCUENTRO (ES UNA SEDE)',
+            direccion: 'BELLAVISTA NORTE, AVENIDA LA PRADERA',
+            sector: 'ACHUPALLAS',
+            latitud: '-33.014976573354176',
+            longitud: '-71.49162091534254'
+        },
+        // Comedor 11
+        {
+            nombre: 'VILLA LA PRADERA',
+            direccion: 'VILLA LA PRADERA SN',
+            sector: 'ACHUPALLAS-CAMPAMENTO MANUEL BUSTOS',
+            latitud: '-33.022119',
+            longitud: '-71.488827'
+        },
+        // Comedor 12
+        {
+            nombre: 'VILLA LAS AMERICAS',
+            direccion: 'PASAJE CHILE SIN NUMERO ESQUINA CALLE LA LUNA',
+            sector: 'ACHUPALLAS-CAMPAMENTO MANUEL BUSTOS',
+            latitud: '-33.01779845669651',
+            longitud: '-71.49389261726698'
+        },
+        // Comedor 13
+        {
+            nombre: 'ESPERANZA NUEVA',
+            direccion: 'RIO MAULE 84, MANUEL BUSTOS',
+            sector: 'ACHUPALLAS-CAMPAMENTO MANUEL BUSTOS',
+            latitud: '-33.0208594605485',
+            longitud: '-71.48629675767128'
+        },
+        // Comedor 14
+        {
+            nombre: 'CASA ANITA AGUAYO',
+            direccion: 'CALLE HUASCO CASA 65',
+            sector: 'ACHUPALLAS-M BUSTOS',
+            latitud: '-33.01684859995823',
+            longitud: '-71.4922381865069'
+        },
+        // Comedor 15
+
+        {
+            nombre: 'COMEDOR SOLIDARIO MARIA MEDINA',
+            direccion: 'CALLE ESPERNZA SN (FINAL DE VILLA ROGIERS)',
+            sector: 'ACHUPALLAS-MANUEL BUSTOS',
+            latitud: '-33.01779828168736',
+            longitud: '-71.48888777301383'
+        },
+        // Comedor 16
+        {
+            nombre: 'MUJERES DE BARRIO',
+            direccion: 'AV.LA LUNA ESQUINA CALLE LOS MANANTIALES N74,CAMPAMENTO MANUEL BUSTOS',
+            sector: 'ACHUPALLAS-MANUEL BUSTOS',
+            latitud: '-33.02755765375387',
+            longitud: '-71.51308897493789'
+        },
+        // Comedor 17
+        {
+            nombre: 'LOMAS LAS PALMAS',
+            direccion: 'AV.MANUEL VIDAL 1000,CASA 1, POB.LOMAS LAS PALMAS,CHORRILLOS',
+            sector: 'CHORRILLOS',
+            latitud: '-33.04683362633646',
+            longitud: '-71.52692547301383'
+        },
+        // Comedor 18
+        {
+            nombre: 'FUNDACIÓN CHILENOS POR LA FRATERNIDAD',
+            direccion: 'PASAJE LAJA SN',
+            sector: 'FORESTAL',
+            latitud: '-33.04600849777212',
+            longitud: '-71.5450043865069'
+        },
+        // Comedor 19
+        {
+            nombre: 'RIO SAN PEDRO',
+            direccion: 'RIO SAN PEDRO 155',
+            sector: 'FORESTAL',
+            latitud: '-33.0592217308158',
+            longitud: '-71.55809916931489'
+        },
+        // Comedor 20
+        {
+            nombre: 'OLLA DEL PUEBLO',
+            direccion: 'PLAZA DE PEDRO VALDIVIA',
+            sector: 'MIRAFLORES',
+            latitud: '-33.02755765375387',
+            longitud: '-71.51299241541713'
+        },
+        // Comedor 21
+        {
+            nombre: 'NACIONES UNIDAS',
+            direccion: 'EL MAITEN 6 MIRAFLORES ALTO',
+            sector: 'MIRAFLORES',
+            latitud: '-33.033591524289314',
+            longitud: '-71.51954513260897'
+        },
+        // Comedor 22
+        {
+            nombre: 'JUNTA DE VECINOS VILLA DULCE NORTE- NUEVA OLLA EN LA UV 74',
+            direccion: 'VILLA DULCE, CARDENAL SAMORE, JV 74',
+            sector: 'VIÑA ORIENTE',
+            latitud: '-33.02956596329226',
+            longitud: '-71.5029558693149'
+        },
+        // Comedor 23
+        {
+            nombre: 'COMEDOR CREANDO REDES',
+            direccion: 'CALLE ISLA RIESCO 117/D FORESAL POB PTO AYSEN(DETRAS DE GARITA 404-405) , CASA PARTICULAR.',
+            sector: 'FORESTAL',
+            latitud: '-33.02201023581348',
+            longitud: '-71.56063421911638'
+        },
+        // Comedor 24
+        {
+            nombre: 'VILLAMOUR',
+            direccion: 'LAS MARAVILLAS CASA 20(CAMINO DE TIERRA)',
+            sector: 'REÑACA ALTO',
+            latitud: '-33.00756066771922',
+            longitud: '-71.48533107910902'
+        },
+        // Comedor 25
+        {
+            nombre: 'JUNTA DE VECINOS SANTA JULIA NORTE',
+            direccion: 'CALLE ESTADIO CON LAS FLORES',
+            sector: 'SANTA JULIA',
+            latitud: '-33.000884',
+            longitud: '-71.504869'
+        },
+        // Comedor 26
+        {
+            nombre: 'CLUB DEPORTIVO PASO LOS ANDES',
+            direccion: 'CALLE DIONISIO HERNANDEZ ,SEDE CLUB PASO LOS ANDES',
+            sector: 'SANTA JULIA',
+            latitud: '-33.00404674308334',
+            longitud: '-71.5050486775972'
+        },
+        // Comedor 27
+        {
+            nombre: 'A PURO PULMON',
+            direccion: 'PASAJE LOS ALELIES 14, PARADERO 6 DE SANTA JULIA',
+            sector: 'SANTA JULIA',
+            latitud: '-33.0062694249265',
+            longitud: '-71.50041835530257'
+        },
+        // Comedor 28
+        {
+            nombre: 'BANQUETERIA PASTENES',
+            direccion: 'LOS JAZMINES 23 PARADERO 6 1/2 SANTA JULIA (ENTRE CALLES LAS BANDURRIAS Y LAS AZUCENAS)',
+            sector: 'SANTA JULIA',
+            latitud: '-33.009943380050444',
+            longitud: '-71.501158371164'
+        },
+        // Comedor 29
+        {
+            nombre: 'ELEONOR',
+            direccion: 'VIOLETA PARRA #27. SANTA JULIA.',
+            sector: 'SANTA JULIA',
+            latitud: '-33.00404649264259',
+            longitud: '-71.50170077116428'
+        },
+        // Comedor 30
+        {
+            nombre: 'CHOCOLATERA',
+            direccion: 'CARDENAL SAMORE 46',
+            sector: 'VIÑA ORIENTE',
+            latitud: '-33.024786257601704',
+            longitud: '-71.50273201520854'
+        },
+        // Comedor 31
+        {
+            nombre: 'YABRICOYA',
+            direccion: 'TIMAR SN',
+            sector: 'VIÑA ORIENTE',
+            latitud: '-33.03200899929608',
+            longitud: ' -71.49128545110038'
+        },
+        // Comedor 32
+        {
+            nombre: 'CANTERA 2',
+            direccion: 'ESCALA CONGO 1150 LAS TORRES',
+            sector: 'VIÑA ORIENTE',
+            latitud: '-33.02545652169052',
+            longitud: '-71.47706846082828'
+        },
+        // Comedor 33
+        {
+            nombre: 'REMAR SOS',
+            direccion: 'CALBUCO 395',
+            sector: 'VIÑA ORIENTE',
+            latitud: '33.030694',
+            longitud: '-71.499032'
+        },
+        // Comedor 34
+        {
+            nombre: 'ENTRE CERROS',
+            direccion: 'PASAJE LAS ROCAS 23',
+            sector: 'VIÑA ORIENTE',
+            latitud: '-33.0247954524728',
+            longitud: '-71.5081944669041'
+        },
+        // Comedor 35
+        {
+            nombre: 'EJERCITO DE SALVACIÓN',
+            direccion: 'CLAVE 483',
+            sector: 'VIÑA ORIENTE',
+            latitud: '-33.029726372693844',
+            longitud: '-71.49247163881542'
+        },
+        // Comedor 36
+        {
+            nombre: 'SEDE COMUNITARIA EL OLIVAR',
+            direccion: 'TAMARUGAL SN',
+            sector: 'VIÑA ORIENTE',
+            latitud: '-33.70646137374249',
+            longitud: '-70.55634475677792'
+        },
+        // Comedor 37
+        {
+            nombre: 'CANAL BEAGLE',
+            direccion: 'C. BEAGLE ISLA GUAFO 255',
+            sector: 'VIÑA ORIENTE',
+            latitud: '-33.03825198161875',
+            longitud: '-71.51014080305022'
+        },
     ],
     planificaciones: [
         {

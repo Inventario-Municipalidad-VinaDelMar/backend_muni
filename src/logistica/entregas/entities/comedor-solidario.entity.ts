@@ -17,6 +17,15 @@ export class ComedorSolidario {
     @Column()
     direccion: string;
 
+    @Column()
+    latitud: string;
+
+    @Column()
+    longitud: string;
+
+    @Column()
+    sector: string;
+
     @Column({ default: false })
     isDeleted: boolean;
 
