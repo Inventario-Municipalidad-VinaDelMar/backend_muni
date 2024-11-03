@@ -334,7 +334,7 @@ export const initialData: SeedData = {
             nombre: 'REMAR SOS',
             direccion: 'CALBUCO 395',
             sector: 'VIÑA ORIENTE',
-            latitud: '33.030694',
+            latitud: '-33.030694',
             longitud: '-71.499032'
         },
         // Comedor 34
