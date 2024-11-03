@@ -33,7 +33,9 @@ export class EnviosService {
   ) { }
   async createNewEnvio(solicitud: SolicitudEnvio, user: User) {
     try {
-      const fechaActual = normalizeDates.currentFecha();
+      //!ELIMINAR
+      const fechaActual = '2024-11-01';
+      // const fechaActual = normalizeDates.currentFecha();
       const envios = await this.envioRepository.find({
         where: {
           fecha: normalizeDates.normalize(fechaActual),
@@ -147,6 +149,7 @@ export class EnviosService {
         const entregas = e.entregas.map(e => {
           const copiloto = e.copiloto;
           const comedor = e.comedorSolidario;
+          const numProductos = e.detallesEntrega.length;
           delete e.copiloto;
           delete e.comedorSolidario;
           delete e.isDeleted;
@@ -157,8 +160,10 @@ export class EnviosService {
           return {
             ...e,
             comedorSolidario: comedor.nombre,
+            comedorDireccion: comedor.direccion,
             realizador: `${copiloto.nombre} ${copiloto.apellidoPaterno} ${copiloto.apellidoMaterno}`,
             realizadorId: copiloto.id,
+            productosEntregados: numProductos,
           };
         });
         delete e.entregas;

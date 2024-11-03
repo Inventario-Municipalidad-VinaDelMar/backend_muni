@@ -28,7 +28,7 @@ export class AuthController {
     if (!idToken) {
       throw new UnauthorizedException('Token no proporcionado');
     }
-
+    //
     const user = await this.authService.renewToken(idToken);
     return user;
   }
