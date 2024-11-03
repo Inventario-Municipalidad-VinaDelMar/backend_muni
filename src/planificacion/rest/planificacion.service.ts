@@ -297,7 +297,9 @@ export class PlanificacionService {
       const planificacion = await this.planificacionRepository.findOne({
         where: {
           isDeleted: false,
-          fecha: normalizeDates.normalize(fecha),
+          //!Eliminar
+          fecha: normalizeDates.normalize('2024-11-01'),
+          // fecha: normalizeDates.normalize(fecha),
         }
       })
 
