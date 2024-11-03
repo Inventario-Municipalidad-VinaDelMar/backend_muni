@@ -358,8 +358,8 @@ export const initialData: SeedData = {
             nombre: 'SEDE COMUNITARIA EL OLIVAR',
             direccion: 'TAMARUGAL SN',
             sector: 'VIÑA ORIENTE',
-            latitud: '-33.70646137374249',
-            longitud: '-70.55634475677792'
+            latitud: '-33.022226170372406',
+            longitud: '-71.49352692838035'
         },
         // Comedor 37
         {
