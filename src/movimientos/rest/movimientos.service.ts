@@ -94,13 +94,13 @@ export class MovimientosService {
             return movimiento;
         } catch (error) {
             // Revertir todos los cambios si ocurre un error
-            await queryRunner.rollbackTransaction();
             this.processingMovimiento = false;
+            await queryRunner.rollbackTransaction();
             throw error;
         } finally {
             // Liberar el queryRunner
-            await queryRunner.release();
             this.processingMovimiento = false;
+            await queryRunner.release();
         }
     }
 

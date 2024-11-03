@@ -1,7 +1,8 @@
-import { Column, Entity, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { AfterUpdate, BeforeUpdate, Column, Entity, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { EnvioProducto } from "./envio-producto.entity";
 import { SolicitudEnvio } from "src/planificacion/entities/solicitud-envio.entity";
 import { Entrega } from "src/logistica/entregas/entities/entrega.entity";
+import { normalizeDates } from "src/utils";
 
 export enum EnvioStatus {
     SIN_CARGAR = 'Sin Cargar',
@@ -19,9 +20,14 @@ export class Envio {
     @Column({ type: 'date', default: () => 'CURRENT_DATE' })
     fecha: Date;
 
-    // @Column({ type: 'time', default: normalizeDates.getHoraInicioChile() })
     @Column({ type: 'time', default: () => 'CURRENT_TIME' })
-    horaInicio: string;
+    horaCreacion: string;
+
+    @Column({ type: 'time', nullable: true })
+    horaInicioEnvio?: string;
+
+    @Column({ type: 'time', default: () => 'CURRENT_TIME' })
+    ultimaActualizacion: string;
 
     @Column({ type: 'time', nullable: true })
     horaFinalizacion?: string;
@@ -41,4 +47,17 @@ export class Envio {
     @OneToOne(() => SolicitudEnvio, (solicitud) => solicitud.envioAsociado, { cascade: ['remove'] })
     @JoinColumn()
     solicitud: SolicitudEnvio;
+
+    // Guardar hora de inicio del envío cuando cambia a EN_ENVIO
+    // @AfterUpdate()
+    @BeforeUpdate()
+    setHoraInicioEnvio() {
+        if (this.status === EnvioStatus.EN_ENVIO && !this.horaInicioEnvio) {
+            this.horaInicioEnvio = normalizeDates.getCurrentTime();  // Asignar hora actual
+        }
+    }
+    @BeforeUpdate()
+    setUltimaActualizacion() {
+        this.ultimaActualizacion = normalizeDates.getCurrentTime();  // Asignar hora actual
+    }
 }

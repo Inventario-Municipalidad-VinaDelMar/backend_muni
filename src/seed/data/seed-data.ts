@@ -33,6 +33,9 @@ interface SeedTanda {
     bodegaNombre: string;
     ubicacionNombre: string;
 }
+interface SeedEnvio {
+    fecha: string;
+}
 
 interface SeedPlanificacionDetalle {
     cantidadPlanificada: number;
@@ -49,6 +52,7 @@ export interface SeedComedorSolidario {
 }
 
 interface SeedData {
+    // envios: SeedEnvio[];
     comedores: SeedComedorSolidario[];
     users: SeedUser[];
     planificaciones: SeedPlanificacion[];

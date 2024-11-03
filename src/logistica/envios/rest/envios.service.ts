@@ -31,11 +31,12 @@ export class EnviosService {
     @Inject(forwardRef(() => EnviosSocketService))
     private readonly enviosSocketService: EnviosSocketService,
   ) { }
+
+
+
   async createNewEnvio(solicitud: SolicitudEnvio, user: User) {
     try {
-      //!ELIMINAR
-      const fechaActual = '2024-11-01';
-      // const fechaActual = normalizeDates.currentFecha();
+      const fechaActual = normalizeDates.currentFecha();
       const envios = await this.envioRepository.find({
         where: {
           fecha: normalizeDates.normalize(fechaActual),
@@ -94,7 +95,7 @@ export class EnviosService {
 
         },
         order: {
-          horaInicio: 'DESC',
+          horaCreacion: 'DESC',
         },
         relations: ['solicitud', 'entregas', 'entregas.detallesEntrega'],
         //?Activar si es necesaria
@@ -155,8 +156,7 @@ export class EnviosService {
           delete e.isDeleted;
           delete e.detallesEntrega;
           delete e.envio;
-          //El cliente no se necesita saber el id de la entrega
-          delete e.id;
+          // delete e.id;
           return {
             ...e,
             comedorSolidario: comedor.nombre,
@@ -198,7 +198,8 @@ export class EnviosService {
       const envio: EnvioResponseUnique = {
         id: envioData.id,
         fecha: envioData.fecha,
-        horaInicio: envioData.horaInicio,
+        horaCreacion: envioData.horaInicioEnvio,
+        horaInicioEnvio: envioData.horaInicioEnvio,
         horaFinalizacion: envioData.horaFinalizacion,
         status: envioData.status,
         administrador: envioData.solicitud.administrador,
@@ -286,6 +287,7 @@ export class EnviosService {
 
   async completeNewEnvio() {
     try {
+      // const fechaActual = '2024-11-01';
       const fechaActual = normalizeDates.currentFecha();
       const envios = await this.envioRepository.find({
         where: {
@@ -361,9 +363,9 @@ export class EnviosService {
       // console.log({ fechaActual })
       // console.log({ fechaEnvioString })
 
-      if (fechaEnvio < fechaActual || fechaEnvio > fechaActual) {
-        throw new BadRequestException('Este envio no es de hoy')
-      }
+      // if (fechaEnvio < fechaActual || fechaEnvio > fechaActual) {
+      //   throw new BadRequestException('Este envio no es de hoy')
+      // }
       return {
         fechaEnvio: fechaEnvioString,
         idEnvio: envioProducto.envio.id,

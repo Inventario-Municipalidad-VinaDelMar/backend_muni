@@ -58,6 +58,7 @@ export class EntregasService {
       const entrega = await this.entregaRepository.save(entregaData);
       delete entrega.envio;
       delete entrega.isDeleted;
+      //TODO: Notificar por sockets
       return entrega;
     } catch (error) {
       throw error;

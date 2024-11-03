@@ -18,7 +18,10 @@ export class EnviosSocketService {
 
     async notifyListEnviosUpdate(onlyAdmin: boolean = false) {
         if (this.wss) {
+
             const fecha = normalizeDates.currentFecha();
+
+            // const fecha = '2024-11-01';
             const roomAdmin = `envios-${fecha}-all`;
             const enviosAdmin = await this.enviosService.getEnviosByFecha(fecha, true);
             this.wss.to(roomAdmin).emit('loadEnviosByFecha', enviosAdmin);

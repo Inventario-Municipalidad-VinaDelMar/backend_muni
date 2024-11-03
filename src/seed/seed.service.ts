@@ -12,11 +12,33 @@ import { AuthService } from 'src/auth/auth.service';
 import { User } from 'src/auth/entities/user.entity';
 import { CreateUserDto } from 'src/auth/dto/create-user.dto';
 import { EntregasService } from 'src/logistica/entregas/rest/entregas.service';
+import { Envio, EnvioStatus } from 'src/logistica/envios/entities/envio.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { SolicitudEnvio, SolicitudEnvioStatus } from 'src/planificacion/entities/solicitud-envio.entity';
+import { Repository } from 'typeorm';
+import { Planificacion } from 'src/planificacion/entities/planificacion.entity';
 // import { MovimientosService } from 'src/movimientos/rest/movimientos.service';
+import { PlanificacionDetalle } from '../planificacion/entities/planificacion-detalle.entity';
+import { EnvioProducto } from 'src/logistica/envios/entities/envio-producto.entity';
+import { Movimiento, MovimientoType } from 'src/movimientos/entities/movimiento.entity';
+import { Tanda } from 'src/inventario/entities';
 
 @Injectable()
 export class SeedService {
     constructor(
+        @InjectRepository(Tanda)
+        private readonly tandaRepository: Repository<Tanda>,
+        @InjectRepository(Envio)
+        private readonly envioRepository: Repository<Envio>,
+        @InjectRepository(EnvioProducto)
+        private readonly envioProductoRepository: Repository<EnvioProducto>,
+        @InjectRepository(SolicitudEnvio)
+        private readonly solicitudEnvioRepository: Repository<SolicitudEnvio>,
+        @InjectRepository(PlanificacionDetalle)
+        private readonly planificacionDetalleRepository: Repository<PlanificacionDetalle>,
+        @InjectRepository(Movimiento)
+        private readonly movimientoRepository: Repository<Movimiento>,
+
         private readonly entregasService: EntregasService,
         private readonly enviosService: EnviosService,
         // private readonly movimientoService: MovimientosService,
@@ -32,13 +54,14 @@ export class SeedService {
     async runSeed() {
         try {
             await this.deleteTables();
-            await this.insertNewUsers();
+            const { user1, user2 } = await this.insertNewUsers();
             const bodega = await this.insertNewBodegas();
             // await this.insertNewCategorias();
             await this.insertNewProductos();
             await this.insertNewUbicaciones(bodega.id);
             await this.insertNewTandas();
-            await this.insertNewPlanificaciones();
+            const planificaciones = await this.insertNewPlanificaciones();
+            await this.insertNewEnvios(user1, user2, planificaciones);
             await this.insertNewComedores();
             return 'Seed Executed';
         } catch (error) {
@@ -59,6 +82,68 @@ export class SeedService {
         await this.authService.deleteAll();
 
     }
+    private async insertNewEnvios(userNormal: User, userAdmin: User, planificaciones: Planificacion[]) {
+        const datesSemana = weekDates.getCurrentWeekDates();
+
+        datesSemana.forEach(async (fecha, i) => {
+            const solicitudData = this.solicitudEnvioRepository.create({
+                administrador: userAdmin,
+                solicitante: userNormal,
+                status: SolicitudEnvioStatus.ACEPTADA,
+                fechaSolicitud: planificaciones[i].fecha,
+            });
+            const solicitud = await this.solicitudEnvioRepository.save(solicitudData)
+
+            const envioData = this.envioRepository.create({
+                fecha,
+                solicitud,
+            });
+
+            const envio = await this.envioRepository.save(envioData);
+            solicitud.envioAsociado = envio;
+            await this.solicitudEnvioRepository.save(solicitud)
+            const detalles = await this.planificacionDetalleRepository.find({
+                where: {
+                    planificacionDiaria: {
+                        id: planificaciones[i].id,
+                    }
+                }
+            })
+            const detallesData = detalles.map(d => {
+                return this.envioProductoRepository.create({
+                    cantidadPlanificada: d.cantidadPlanificada,
+                    producto: this.productoService.generateClass(d.producto.id),
+                    envio,
+                })
+            })
+            const productosPlanificados = await this.envioProductoRepository.save(detallesData);
+            productosPlanificados.forEach(async (producto, i) => {
+                const tandas = await this.tandaRepository.find({
+                    where: {
+                        producto: {
+                            id: producto.producto.id,
+                        },
+                    }
+                });
+                const movimientoData = this.movimientoRepository.create({
+                    cantidadRetirada: 10,
+                    envioProducto: producto,
+                    realizador: userNormal,
+                    type: MovimientoType.RETIRO,
+                    tanda: tandas[0],
+                });
+
+                const movimento = await this.movimientoRepository.save(movimientoData);
+                producto.movimiento = movimento;
+                await this.envioProductoRepository.save(producto);
+
+            });
+            envio.status = EnvioStatus.EN_ENVIO;
+            await this.envioRepository.save(envio);
+        });
+
+
+    }
 
     private async insertNewUsers() {
         const seedUsers = initialData.users;
@@ -72,7 +157,11 @@ export class SeedService {
             );
         });
 
-        await Promise.all(usersPromises);
+        const users = await Promise.all(usersPromises);
+        return {
+            user1: users[1],
+            user2: users[2],
+        }
     }
     private async insertNewComedores() {
         const seedComedores = initialData.comedores;
@@ -93,9 +182,7 @@ export class SeedService {
                     plan.fecha = datesSemana[index];  // Asigna la fecha de la semana actual
                 }
             });
-            // Obtener todas las categorías creadas
             const productos = await this.productoService.findAll();
-            // Mapeo de nombre de categoría a ID de categoría
             const productoMap = new Map(productos.map(prod => [prod.nombre.toLowerCase(), prod.id]));
 
             const planificacionPromises = seedPlanificacion.map(async (p) => {
@@ -108,7 +195,7 @@ export class SeedService {
                 return await this.planificacionService.create(p);
             });
 
-            await Promise.all(planificacionPromises);
+            return await Promise.all(planificacionPromises);
         } catch (error) {
             console.log({ error })
         }

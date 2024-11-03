@@ -25,7 +25,8 @@ export interface ProductoOnEnvio {
 export interface EnvioResponseUnique {
     id: string;
     fecha: Date;
-    horaInicio: string;
+    horaCreacion: string;
+    horaInicioEnvio: string;
     horaFinalizacion?: string;
     //Quien inicio la creacion del envio
     solicitante: User,

@@ -5,6 +5,14 @@ const chileTimezone = 'America/Santiago';
 const createDate = (year: number, month: number, day: number): Date => {
     return new Date(year, month - 1, day);
 };
+export const getCurrentTime = (): string => {
+    const now = new Date();
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const seconds = String(now.getSeconds()).padStart(2, '0');
+    const milliseconds = String(now.getMilliseconds()).padStart(3, '0');
+    return `${hours}:${minutes}:${seconds}.${milliseconds}000`;
+}
 
 export const normalize = (date: string) => {
     return createDate(
