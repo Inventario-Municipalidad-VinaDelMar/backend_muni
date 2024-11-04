@@ -4,6 +4,7 @@ import { PlanificacionDetalle } from "src/planificacion/entities/planificacion-d
 import { EnvioProducto } from "src/logistica/envios/entities/envio-producto.entity";
 import { Entrega } from "src/logistica/entregas/entities/entrega.entity";
 import { EntregaDetalle } from "src/logistica/entregas/entities/entrega-detalle.entity";
+import { IncidenteProducto } from "src/logistica/envios/entities/incidente-producto.entity";
 
 @Entity()
 export class Producto {
@@ -38,5 +39,7 @@ export class Producto {
     envios: EnvioProducto[]
 
     @OneToMany(() => EntregaDetalle, (detalleEntrega) => detalleEntrega.producto,)
-    entregas: EntregaDetalle;
+    entregas: EntregaDetalle[];
+    @OneToMany(() => IncidenteProducto, (incidenteProducto) => incidenteProducto.producto,)
+    incidentes: IncidenteProducto[];
 }

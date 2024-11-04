@@ -97,7 +97,7 @@ export class EnviosService {
         order: {
           horaCreacion: 'DESC',
         },
-        relations: ['solicitud', 'entregas', 'entregas.detallesEntrega'],
+        relations: ['solicitud', 'entregas', 'entregas.detallesEntrega', 'incidentes', 'incidentes.productosAfectados'],
         //?Activar si es necesaria
       });
       enviosData.forEach(envio => {
@@ -138,7 +138,17 @@ export class EnviosService {
                 }
               })
             });
-            //TODO: añadir la resta de incidente envio
+            //Restar carga inicial con productos afectados en incidente
+            e.incidentes.map(i => {
+              i.productosAfectados.map(pi => {
+                if (pi.producto.id === carga.productoId) {
+                  carga.cantidad -= pi.cantidadAfectada;
+                  if (carga.cantidad < 0) {
+                    throw new BadRequestException(`El producto ${carga.producto} a quedado con carga negativa: ${carga.cantidad}`);
+                  }
+                }
+              })
+            });
             return {
               ...carga,
             }
@@ -147,6 +157,7 @@ export class EnviosService {
         delete e.productosPlanificados;
         const solicitud = e.solicitud;
         delete e.solicitud;
+        //Modifica la respuesta de entregas
         const entregas = e.entregas.map(e => {
           const copiloto = e.copiloto;
           const comedor = e.comedorSolidario;
@@ -168,6 +179,7 @@ export class EnviosService {
         });
         delete e.entregas;
 
+        //TODO: Modificar la respuesta para incidentes
         return {
           ...e,
           autorizante: `${solicitud.administrador.nombre} ${solicitud.administrador.apellidoPaterno} ${solicitud.administrador.apellidoMaterno}`,

@@ -74,7 +74,7 @@ export const initialData: SeedData = {
         //Comedor 1
         {
             nombre: 'OLLITA DORADA',
-            direccion: 'LUIS HURTADO LÓPEZ #115 LOS ALMENDROS',
+            direccion: 'LUIS HURTADO LOPEZ #115 LOS ALMENDROS',
             sector: 'ACHUPALLAS',
             latitud: '-33.018921',
             longitud: '-71.499817',
@@ -123,7 +123,7 @@ export const initialData: SeedData = {
         // Comedor 7
         {
             nombre: 'VICTOR JARA',
-            direccion: 'CARLOS PEZOA VÉLIZ 177. ACHUPALLAS.',
+            direccion: 'CARLOS PEZOA VELIZ 177. ACHUPALLAS.',
             sector: 'ACHUPALLAS',
             latitud: '-33.01802627973306',
             longitud: '-71.49852568650694'
@@ -138,7 +138,7 @@ export const initialData: SeedData = {
         },
         // Comedor 9
         {
-            nombre: 'PREVENCIÓN VIÑA',
+            nombre: 'PREVENCION VIÑA',
             direccion: 'SAN ANTONIO 945',
             sector: 'PLAN',
             latitud: '-33.012669',
@@ -146,7 +146,7 @@ export const initialData: SeedData = {
         },
         // Comedor 10
         {
-            nombre: 'COMITÉ NUEVO REENCUENTRO (ES UNA SEDE)',
+            nombre: 'SEDE COMITE NUEVO REENCUENTRO ',
             direccion: 'BELLAVISTA NORTE, AVENIDA LA PRADERA',
             sector: 'ACHUPALLAS',
             latitud: '-33.014976573354176',
@@ -187,7 +187,7 @@ export const initialData: SeedData = {
         // Comedor 15
 
         {
-            nombre: 'COMEDOR SOLIDARIO MARIA MEDINA',
+            nombre: 'MARIA MEDINA',
             direccion: 'CALLE ESPERNZA SN (FINAL DE VILLA ROGIERS)',
             sector: 'ACHUPALLAS-MANUEL BUSTOS',
             latitud: '-33.01779828168736',
@@ -211,7 +211,7 @@ export const initialData: SeedData = {
         },
         // Comedor 18
         {
-            nombre: 'FUNDACIÓN CHILENOS POR LA FRATERNIDAD',
+            nombre: 'FUNDACION CHILENOS POR LA FRATERNIDAD',
             direccion: 'PASAJE LAJA SN',
             sector: 'FORESTAL',
             latitud: '-33.04600849777212',
@@ -251,7 +251,7 @@ export const initialData: SeedData = {
         },
         // Comedor 23
         {
-            nombre: 'COMEDOR CREANDO REDES',
+            nombre: 'CREANDO REDES',
             direccion: 'CALLE ISLA RIESCO 117/D FORESAL POB PTO AYSEN(DETRAS DE GARITA 404-405) , CASA PARTICULAR.',
             sector: 'FORESTAL',
             latitud: '-33.02201023581348',
@@ -347,7 +347,7 @@ export const initialData: SeedData = {
         },
         // Comedor 35
         {
-            nombre: 'EJERCITO DE SALVACIÓN',
+            nombre: 'EJERCITO DE SALVACION',
             direccion: 'CLAVE 483',
             sector: 'VIÑA ORIENTE',
             latitud: '-33.029726372693844',
@@ -463,7 +463,7 @@ export const initialData: SeedData = {
         },
         {
             nombre: 'Arroz Integral',
-            descripcion: 'Arroz con cáscara conservada, rico en fibra y nutrientes.',
+            descripcion: 'Arroz con cascara conservada, rico en fibra y nutrientes.',
             urlImagen: 'https://assets.tmecosys.com/image/upload/t_web767x639/img/recipe/ras/Assets/a0426521-e822-4653-b77e-a83670388cd9/Derivates/2ee94377-3c62-42a7-b36f-b40e587e6bd3.jpg',
 
         },
@@ -513,13 +513,13 @@ export const initialData: SeedData = {
         // Cubiertos
         {
             nombre: 'Cuchillo de Mesa',
-            descripcion: 'Cuchillo básico para cortar alimentos en la mesa.',
+            descripcion: 'Cuchillo basico para cortar alimentos en la mesa.',
             urlImagen: 'https://steward.cl/10311-large_default/set-12-cuchillo-mesa-celebration-inox-180.jpg',
 
         },
         {
             nombre: 'Tenedor de Mesa',
-            descripcion: 'Tenedor estándar para comidas.',
+            descripcion: 'Tenedor estandar para comidas.',
             urlImagen: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRtYbvKbAjm3n8-1l_RAcddQ17MxWm5qU1kMA&s',
 
         },
@@ -533,7 +533,7 @@ export const initialData: SeedData = {
         // Limpiezas
         {
             nombre: 'Detergente Liquido',
-            descripcion: 'Detergente líquido para lavar ropa y vajilla.',
+            descripcion: 'Detergente liquido para lavar ropa y vajilla.',
             urlImagen: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTpsY5OeGT095gGI7r6fy81Uk1rX9GxkSnJJQ&s',
 
         },
@@ -544,7 +544,7 @@ export const initialData: SeedData = {
 
         },
 
-        // Lácteos
+        // Lacteos
         {
             nombre: 'Leche Entera',
             descripcion: 'Leche fresca y entera, rica en calcio y vitaminas.',
@@ -572,7 +572,7 @@ export const initialData: SeedData = {
 
         },
 
-        // Panadería
+        // Panaderia
         {
             nombre: 'Pan de Molde',
             descripcion: 'Pan suave y esponjoso, perfecto para tostadas y sandwiches.',
@@ -679,7 +679,7 @@ export const initialData: SeedData = {
         { cantidadIngresada: 100, fechaVencimiento: null, productoNombre: 'Esponja de Cocina', bodegaNombre: 'Bodega A', ubicacionNombre: 'Rack Azul, Piso 1' },
         { cantidadIngresada: 250, fechaVencimiento: null, productoNombre: 'Esponja de Cocina', bodegaNombre: 'Bodega A', ubicacionNombre: 'Almacenaje Centro bodega' },
         { cantidadIngresada: 180, fechaVencimiento: null, productoNombre: 'Esponja de Cocina', bodegaNombre: 'Bodega A', ubicacionNombre: 'Sector A' },
-        // Lácteos
+        // Lacteos
         { cantidadIngresada: 200, fechaVencimiento: '2024-11-01', productoNombre: 'Leche Entera', bodegaNombre: 'Bodega A', ubicacionNombre: 'Rack Rojo, Piso 1' },
         { cantidadIngresada: 150, fechaVencimiento: '2024-11-05', productoNombre: 'Leche Entera', bodegaNombre: 'Bodega A', ubicacionNombre: 'Rack Rojo, Piso 2' },
         { cantidadIngresada: 100, fechaVencimiento: '2024-11-10', productoNombre: 'Leche Entera', bodegaNombre: 'Bodega A', ubicacionNombre: 'Rack Azul, Piso 1' },
@@ -703,7 +703,7 @@ export const initialData: SeedData = {
         { cantidadIngresada: 100, fechaVencimiento: '2024-11-10', productoNombre: 'Agua Mineral', bodegaNombre: 'Bodega A', ubicacionNombre: 'Rack Azul, Piso 1' },
         { cantidadIngresada: 250, fechaVencimiento: '2024-11-15', productoNombre: 'Agua Mineral', bodegaNombre: 'Bodega A', ubicacionNombre: 'Almacenaje Centro bodega' },
         { cantidadIngresada: 180, fechaVencimiento: '2024-11-20', productoNombre: 'Agua Mineral', bodegaNombre: 'Bodega A', ubicacionNombre: 'Sector A' },
-        // Panadería
+        // Panaderia
 
         { cantidadIngresada: 200, fechaVencimiento: '2024-11-01', productoNombre: 'Pan de Molde', bodegaNombre: 'Bodega A', ubicacionNombre: 'Rack Rojo, Piso 1' },
         { cantidadIngresada: 150, fechaVencimiento: '2024-11-05', productoNombre: 'Pan de Molde', bodegaNombre: 'Bodega A', ubicacionNombre: 'Rack Rojo, Piso 2' },

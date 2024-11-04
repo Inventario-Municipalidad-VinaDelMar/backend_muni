@@ -10,6 +10,8 @@ import { MovimientosModule } from 'src/movimientos/movimientos.module';
 import { AuthModule } from 'src/auth/auth.module';
 import { EnviosSocketService } from './socket/envios.socket.service';
 import { EnviosSocketGateway } from './socket/envios.socket.gateway';
+import { IncidenteEnvio } from './entities/incidente-envio.entity';
+import { IncidenteProducto } from './entities/incidente-producto.entity';
 
 @Module({
   imports: [
@@ -18,7 +20,7 @@ import { EnviosSocketGateway } from './socket/envios.socket.gateway';
     forwardRef(() => MovimientosModule),
     PlanificacionModule,
     forwardRef(() => InventarioModule),
-    TypeOrmModule.forFeature([Envio, EnvioProducto]),
+    TypeOrmModule.forFeature([Envio, EnvioProducto, IncidenteEnvio, IncidenteProducto]),
 
     //to allow circular import between socket and rest in this module
     forwardRef(() => EnviosModule),

@@ -22,11 +22,12 @@ export class EntregasService {
   constructor(
     private readonly cloudinaryService: CloudinaryService,
     private readonly productoService: ProductosService,
-    private readonly envioSocketService: EnviosSocketService,
+    private readonly enviosSocketService: EnviosSocketService,
     private readonly envioService: EnviosService,
 
     @Inject(forwardRef(() => EntregasSocketService))
     private readonly entregasSocketService: EntregasSocketService,
+
 
     @InjectRepository(Entrega)
     private readonly entregaRepository: Repository<Entrega>,
@@ -56,9 +57,13 @@ export class EntregasService {
       const result = await this.cloudinaryService.uploadFile(file);
       entregaData.url_acta_legal = result.secure_url;
       const entrega = await this.entregaRepository.save(entregaData);
+      //TODO: Notificar por sockets
+      //*Notificar por sockcet que un envio ha cambiado
+      await this.enviosSocketService.notifyEnvioUpdate(entrega.envio.id);
+      //*Notificar por sockcet que un envio de la lista ha cambiado
+      await this.enviosSocketService.notifyListEnviosUpdate();
       delete entrega.envio;
       delete entrega.isDeleted;
-      //TODO: Notificar por sockets
       return entrega;
     } catch (error) {
       throw error;
@@ -90,9 +95,9 @@ export class EntregasService {
       const entregaWithProductos = await this.entregaRepository.save(entrega);
 
       //*Notificar por sockcet que un envio ha cambiado
-      await this.envioSocketService.notifyEnvioUpdate(rest.idEnvio);
+      await this.enviosSocketService.notifyEnvioUpdate(rest.idEnvio);
       //*Notificar por sockcet que un envio de la lista ha cambiado
-      await this.envioSocketService.notifyListEnviosUpdate();
+      await this.enviosSocketService.notifyListEnviosUpdate();
       return entregaWithProductos;
     } catch (error) {
       throw error;
