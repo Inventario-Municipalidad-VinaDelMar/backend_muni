@@ -63,11 +63,14 @@ export class PlanificacionService {
         //*Notificar por socket envio autorizado en planificacion actual
         const envio = await this.enviosService.createNewEnvio(solicitud, user);
         solicitud.envioAsociado = envio;
-        await this.planificacionSocketService.notifyEnvioUpdate();
       }
 
       const solicitudUpdated = await this.solicitudEnvioRepository.save(solicitud);
       delete solicitudUpdated.isDeleted;
+
+      if (aceptada) {
+        await this.planificacionSocketService.notifyEnvioUpdate();
+      }
 
       //*Notificar por socket solicitud actualizada
       await this.planificacionSocketService.notifySolicitudEnvio(solicitudUpdated)
