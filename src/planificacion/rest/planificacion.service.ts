@@ -47,30 +47,30 @@ export class PlanificacionService {
     try {
       this.processingAutorizacion = true;
       const { idSolicitud, aceptada } = autorizeSolicitudEnvioDto;
-      const solicitud = await this.solicitudEnvioRepository.findOneBy({ id: idSolicitud });
-      if (!solicitud) {
+      const solicitudBd = await this.solicitudEnvioRepository.findOneBy({ id: idSolicitud });
+      if (!solicitudBd) {
         throw new BadRequestException(`La solicitud ${idSolicitud} no existe.`)
       }
-      if (solicitud.horaResolucion) {
+      if (solicitudBd.horaResolucion) {
         throw new BadRequestException(`La solicitud ya se resolvio.`)
 
       }
 
-      solicitud.status = aceptada ? SolicitudEnvioStatus.ACEPTADA : SolicitudEnvioStatus.RECHAZADA;
-      solicitud.administrador = user;
+      solicitudBd.status = aceptada ? SolicitudEnvioStatus.ACEPTADA : SolicitudEnvioStatus.RECHAZADA;
+      solicitudBd.administrador = user;
+      //Actualiza status y administrador primero
+      const solicitud = await this.solicitudEnvioRepository.save(solicitudBd);
 
       if (aceptada) {
         //*Notificar por socket envio autorizado en planificacion actual
         const envio = await this.enviosService.createNewEnvio(solicitud, user);
         solicitud.envioAsociado = envio;
+        await this.planificacionSocketService.notifyEnvioUpdate();
       }
 
       const solicitudUpdated = await this.solicitudEnvioRepository.save(solicitud);
       delete solicitudUpdated.isDeleted;
 
-      if (aceptada) {
-        await this.planificacionSocketService.notifyEnvioUpdate();
-      }
 
       //*Notificar por socket solicitud actualizada
       await this.planificacionSocketService.notifySolicitudEnvio(solicitudUpdated)
