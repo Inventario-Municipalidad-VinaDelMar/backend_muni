@@ -27,7 +27,6 @@ export class EntregasController {
 
   @Post('upload')
   @UseInterceptors(FileInterceptor('file'))
-  @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
   async uploadFile(@UploadedFile(new ParseFilePipe({
     validators: [
       //2MB

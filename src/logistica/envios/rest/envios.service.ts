@@ -13,25 +13,70 @@ import { EnviosSocketService } from '../socket/envios.socket.service';
 import { SolicitudEnvio } from 'src/planificacion/entities/solicitud-envio.entity';
 import { User } from 'src/auth/entities/user.entity';
 import { EnvioResponseUnique, ProductoOnEnvio } from '../interfaces/envio-response-unique.interface';
+import { IncidenteEnvio } from '../entities/incidente-envio.entity';
+import { IncidenteProducto } from '../entities/incidente-producto.entity';
+import { CreateIncidenteDto } from '../dto/create-incidente.dto';
 
 @Injectable()
 export class EnviosService {
   constructor(
-    private readonly productosService: ProductosService,
-    private readonly planificacionSocketService: PlanificacionSocketService,
-    @Inject(forwardRef(() => PlanificacionService))
-    private readonly planificacionService: PlanificacionService,
+    //Incidentes
+    @InjectRepository(IncidenteEnvio)
+    private readonly incidenteEnvioRepository: Repository<IncidenteEnvio>,
+    @InjectRepository(IncidenteProducto)
+    private readonly incidenteProductoRepository: Repository<IncidenteProducto>,
+
+    //Envios
     @InjectRepository(Envio)
     private readonly envioRepository: Repository<Envio>,
-
-
     @InjectRepository(EnvioProducto)
     private readonly envioProductoRepository: Repository<EnvioProducto>,
 
+    //Servicios externos
+    @Inject(forwardRef(() => PlanificacionService))
+    private readonly planificacionService: PlanificacionService,
+
     @Inject(forwardRef(() => EnviosSocketService))
     private readonly enviosSocketService: EnviosSocketService,
+
+    private readonly productosService: ProductosService,
+    private readonly planificacionSocketService: PlanificacionSocketService,
   ) { }
 
+  async createNewIncidente(file: Express.Multer.File | null, createIncidenteDto: CreateIncidenteDto, user: User) {
+
+    try {
+      const { idEnvio, productosAfectados, ...rest } = createIncidenteDto;
+      const incidenteData = this.incidenteEnvioRepository.create({
+        ...rest,
+        envio: this.envioRepository.create({ id: idEnvio }),
+
+
+      })
+      const incidente = await this.incidenteEnvioRepository.save(incidenteData);
+      const productosPromises = productosAfectados.map(p => {
+        const productoData = this.incidenteProductoRepository.create({
+          cantidadAfectada: p.cantidadAfectada,
+          producto: this.productosService.generateClass(p.productoId),
+          incidente,
+        });
+        return this.incidenteProductoRepository.save(productoData);
+      })
+
+      const productos = await Promise.all(productosPromises);
+
+      //*Notificar cambio en un envio de la lista de envios del administrador
+      await this.enviosSocketService.notifyListEnviosUpdate();
+      //*Notificar por sockcet que un envio ha cambiado
+      await this.enviosSocketService.notifyEnvioUpdate(idEnvio);
+      return {
+        ...incidente,
+        productosAfectados: productos,
+      }
+    } catch (error) {
+      throw error;
+    }
+  }
 
 
   async createNewEnvio(solicitud: SolicitudEnvio, user: User) {
@@ -482,7 +527,11 @@ export class EnviosService {
   async deleteAll() {
     const query1 = this.envioProductoRepository.createQueryBuilder('enviosProductos');
     const query2 = this.envioRepository.createQueryBuilder('envios');
+    const query3 = this.incidenteEnvioRepository.createQueryBuilder('incidenteEnvios');
+    const query4 = this.incidenteProductoRepository.createQueryBuilder('incidenteProducto');
     try {
+      await query4.delete().where({}).execute();
+      await query3.delete().where({}).execute();
       await query1.delete().where({}).execute();
       await query2.delete().where({}).execute();
       return;

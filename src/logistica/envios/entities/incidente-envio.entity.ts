@@ -1,5 +1,4 @@
 import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
-import { EnvioProducto } from "./envio-producto.entity";
 import { IncidenteProducto } from "./incidente-producto.entity";
 import { Envio } from "./envio.entity";
 
@@ -7,8 +6,9 @@ export enum IncidenteType {
     CHOQUE = 'Choque',
     ROBO = 'Robo',
     EXTRAVIO = 'Extravio',
+    DANIO = 'Daño',
+    CONTAMINACION = 'Contaminacion',
 }
-
 
 @Entity()
 export class IncidenteEnvio {
@@ -27,8 +27,8 @@ export class IncidenteEnvio {
     @Column({ type: 'enum', enum: IncidenteType })
     type: IncidenteType;
 
-    @Column()
-    evidenciaFotograficaUrl: string;
+    @Column({ nullable: true })
+    evidenciaFotograficaUrl?: string;
 
     @Column({ default: false })
     isDeleted: boolean;

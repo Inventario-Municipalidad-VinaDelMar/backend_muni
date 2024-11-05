@@ -3,11 +3,6 @@ import { EnvioProducto } from "./envio-producto.entity";
 import { IncidenteEnvio } from "./incidente-envio.entity";
 import { Producto } from "src/inventario/entities";
 
-export enum IncidenteType {
-    CHOQUE = 'Choque',
-    ROBO = 'Robo',
-    EXTRAVIO = 'Extravio',
-}
 
 
 @Entity()
