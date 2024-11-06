@@ -86,6 +86,7 @@ export class EnviosService {
       }
 
       if (closeEnvio) {
+        console.log(`El envio ${idEnvio} se va a cerrar?: ${closeEnvio}`)
         envio.status = EnvioStatus.FINALIZADO;
         await this.envioRepository.save(envio)
       }
@@ -221,7 +222,7 @@ export class EnviosService {
             return {
               ...carga,
             }
-          })
+          }).sort((a, b) => b.cantidad - a.cantidad);
 
         delete e.productosPlanificados;
         const solicitud = e.solicitud;

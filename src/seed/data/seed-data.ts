@@ -68,7 +68,7 @@ export const initialData: SeedData = {
         { email: 'cristobal@gmail.com', password: 'Abc12345', nombre: 'Cristobal', apellidoPaterno: 'Herrera', apellidoMaterno: 'Rojas', rut: '20440649-9', roles: ['administrador'] },
         { email: 'mangini@gmail.com', password: 'Abc12345', nombre: 'Franco', apellidoPaterno: 'Mangini', apellidoMaterno: 'Tapia', rut: '20175289-2', roles: ['administrador'] },
         { email: 'diego@gmail.com', password: 'Abc12345', nombre: 'Diego', apellidoPaterno: 'Hidalgo', apellidoMaterno: 'Carvajal', rut: '21069070-0', roles: ['administrador'] },
-        { email: 'renato@gmail.com', password: 'Abc12345', nombre: 'Renato', apellidoPaterno: 'Plaza', apellidoMaterno: 'Diaz', rut: '20482871-7' },
+        { email: 'renato@gmail.com', password: 'Abc12345', nombre: 'Renato', apellidoPaterno: 'Plaza', apellidoMaterno: 'Diaz', rut: '20482871-7', roles: ['administrador'] },
     ],
     comedores: [
         //Comedor 1
