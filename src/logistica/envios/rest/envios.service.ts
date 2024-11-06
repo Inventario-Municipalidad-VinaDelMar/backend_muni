@@ -16,6 +16,7 @@ import { EnvioResponseUnique, ProductoOnEnvio } from '../interfaces/envio-respon
 import { IncidenteEnvio } from '../entities/incidente-envio.entity';
 import { IncidenteProducto } from '../entities/incidente-producto.entity';
 import { CreateIncidenteDto } from '../dto/create-incidente.dto';
+import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 
 @Injectable()
 export class EnviosService {
@@ -41,12 +42,25 @@ export class EnviosService {
 
     private readonly productosService: ProductosService,
     private readonly planificacionSocketService: PlanificacionSocketService,
+    private readonly cloudinaryService: CloudinaryService,
   ) { }
 
   async createNewIncidente(file: Express.Multer.File | null, createIncidenteDto: CreateIncidenteDto, user: User) {
 
     try {
-      const { idEnvio, productosAfectados, ...rest } = createIncidenteDto;
+      const { idEnvio, productosAfectados, closeEnvio, ...rest } = createIncidenteDto;
+      const envio = await this.envioRepository.findOne({
+        where: {
+          id: idEnvio,
+        },
+      })
+
+      if (!envio) {
+        throw new NotFoundException(`El envio con id ${idEnvio} no existe.`);
+      }
+      if (envio.status == EnvioStatus.FINALIZADO) {
+        throw new BadRequestException('Este envio ya ha finalizado.');
+      }
       const incidenteData = this.incidenteEnvioRepository.create({
         ...rest,
         envio: this.envioRepository.create({ id: idEnvio }),
@@ -64,13 +78,23 @@ export class EnviosService {
       })
 
       const productos = await Promise.all(productosPromises);
+      let incidenteWithEvidencia = incidente;
+      if (file) {
+        const result = await this.cloudinaryService.uploadFile(file, 'imagenes_incidentes');
+        incidente.evidenciaFotograficaUrl = result.secure_url;
+        incidenteWithEvidencia = await this.incidenteEnvioRepository.save(incidenteWithEvidencia);
+      }
 
+      if (closeEnvio) {
+        envio.status = EnvioStatus.FINALIZADO;
+        await this.envioRepository.save(envio)
+      }
       //*Notificar cambio en un envio de la lista de envios del administrador
       await this.enviosSocketService.notifyListEnviosUpdate();
       //*Notificar por sockcet que un envio ha cambiado
       await this.enviosSocketService.notifyEnvioUpdate(idEnvio);
       return {
-        ...incidente,
+        ...incidenteWithEvidencia,
         productosAfectados: productos,
       }
     } catch (error) {
@@ -223,6 +247,24 @@ export class EnviosService {
           };
         });
         delete e.entregas;
+        const incidentes = e.incidentes.map(i => {
+          const productos = i.productosAfectados;
+          delete i.isDeleted;
+          delete i.envio;
+          return {
+            ...i,
+            productosAfectados: productos.map(p => {
+              delete p.incidente;
+              return {
+                cantidad: p.cantidadAfectada,
+                producto: p.producto.nombre,
+                productoId: p.producto.id,
+                urlImagen: p.producto.urlImagen,
+              }
+            })
+          };
+        });
+        delete e.incidentes;
 
         //TODO: Modificar la respuesta para incidentes
         return {
@@ -231,6 +273,7 @@ export class EnviosService {
           solicitante: `${solicitud.solicitante.nombre} ${solicitud.solicitante.apellidoPaterno} ${solicitud.solicitante.apellidoMaterno}`,
           productos,
           entregas,
+          incidentes,
         };
       });
       return envios;
@@ -363,7 +406,9 @@ export class EnviosService {
       if (!envioEnCurso) {
         throw new BadRequestException('No hay ningun envio en curso');
       }
-
+      if (envioEnCurso.status == EnvioStatus.FINALIZADO) {
+        throw new BadRequestException('Este envio ya ha finalizado.');
+      }
       let completeAllProducto = true;
 
       envioEnCurso.productosPlanificados.map(p => {
@@ -420,9 +465,9 @@ export class EnviosService {
       // console.log({ fechaActual })
       // console.log({ fechaEnvioString })
 
-      // if (fechaEnvio < fechaActual || fechaEnvio > fechaActual) {
-      //   throw new BadRequestException('Este envio no es de hoy')
-      // }
+      if (fechaEnvio < fechaActual || fechaEnvio > fechaActual) {
+        throw new BadRequestException('Este envio no es de hoy')
+      }
       return {
         fechaEnvio: fechaEnvioString,
         idEnvio: envioProducto.envio.id,

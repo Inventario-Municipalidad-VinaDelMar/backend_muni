@@ -51,10 +51,10 @@ export class EntregasService {
         // 2. Extraer el ID del archivo de la URL
         const fileId = previousFileUrl.split('/').pop()?.split('.')[0];
         if (fileId) {
-          await this.cloudinaryService.deleteFile(fileId);
+          await this.cloudinaryService.deleteFile(fileId, 'actas_legales');
         }
       }
-      const result = await this.cloudinaryService.uploadFile(file);
+      const result = await this.cloudinaryService.uploadFile(file, 'actas_legales');
       entregaData.url_acta_legal = result.secure_url;
       const entrega = await this.entregaRepository.save(entregaData);
       //TODO: Notificar por sockets

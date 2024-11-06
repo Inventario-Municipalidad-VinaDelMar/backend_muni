@@ -1,5 +1,5 @@
 
-import { IsDateString, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString, IsUUID, ValidateNested } from 'class-validator';
+import { IsBoolean, IsDateString, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString, IsUUID, ValidateNested } from 'class-validator';
 import { Transform, Type } from 'class-transformer';
 import { IncidenteType } from '../entities/incidente-envio.entity';
 import { BadRequestException } from '@nestjs/common';
@@ -7,6 +7,16 @@ import { BadRequestException } from '@nestjs/common';
 export class CreateIncidenteProductoDto {
     @IsNotEmpty()
     @IsNumber()
+    @Transform(({ value }) => {
+        if (typeof value === 'string') {
+            try {
+                return Number.parseInt(value)
+            } catch {
+                throw new BadRequestException('El campo cantidadAfectada debe ser un numero valido.');
+            }
+        }
+        return value;
+    })
     cantidadAfectada: number;
 
     @IsNotEmpty()
@@ -17,6 +27,11 @@ export class CreateIncidenteProductoDto {
 
 
 export class CreateIncidenteDto {
+    @IsNotEmpty()
+    @IsBoolean()
+    @Transform(({ value }) => value === 'true' || value === true)
+    closeEnvio: boolean;
+
     @IsNotEmpty()
     @IsString()
     descripcion: string;

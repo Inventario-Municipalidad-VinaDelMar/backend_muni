@@ -12,10 +12,12 @@ import { EnviosSocketService } from './socket/envios.socket.service';
 import { EnviosSocketGateway } from './socket/envios.socket.gateway';
 import { IncidenteEnvio } from './entities/incidente-envio.entity';
 import { IncidenteProducto } from './entities/incidente-producto.entity';
+import { CloudinaryModule } from 'src/cloudinary/cloudinary.module';
 
 @Module({
   imports: [
     AuthModule,
+    CloudinaryModule,
     // forwardRef(() => EntregasModule),
     forwardRef(() => MovimientosModule),
     PlanificacionModule,
