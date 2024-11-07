@@ -440,7 +440,7 @@ export const initialData: SeedData = {
         { descripcion: 'Sector C' },
     ],
     productos: [
-        // Fideos
+        // Fideoss
         {
             nombre: 'Fideos Corbatas Carozzi',
             descripcion: 'Fideos en forma de corbata, ideales para ensaladas y platos frios.',
