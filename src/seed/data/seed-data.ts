@@ -449,7 +449,7 @@ export const initialData: SeedData = {
         },
         {
             nombre: 'Fideos Spaghetti Carozzi',
-            descripcion: 'Fideos largos y delgados, perfectos para acompañar con salsas.',
+            descripcion: 'Fideos largos y delgados, perfectos para cocinar con salsa.',
             urlImagen: 'https://cdnx.jumpseller.com/serviceshop/image/7953630/Fideos_Spaguetti_N__5__1_Kg_Carozzi.jpg?1655730359',
 
         },

@@ -69,12 +69,13 @@ export class BaseService<T> {
 
 
     protected handleDbExceptions(error: any): void {
-        this.logger.error(error);
-        if (error.code === '23505') {
-            throw new BadRequestException(error.detail);
-        }
-        throw new InternalServerErrorException(
-            'Error inesperado, check logs del server.',
-        );
+        throw error;
+        // this.logger.error(error);
+        // if (error.code === '23505') {
+        //     throw new BadRequestException(error.detail);
+        // }
+        // throw new InternalServerErrorException(
+        //     'Error inesperado, check logs del server.',
+        // );
     }
 }

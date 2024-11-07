@@ -7,7 +7,8 @@ export interface EntregaEnvio {
     fecha: string;
     hora: string;
     comedorSolidario: string;
-    comedorSolidarioId: string;
+    comedorSolidarioId: number;
+    // comedorSolidarioId: string;
     urlActaLegal?: string;
     copiloto: User;
     productosEntregados: ProductoOnEnvio[];

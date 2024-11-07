@@ -21,6 +21,7 @@ export class ProductosService extends BaseService<Producto> {
             const producto = await this.productoRepository.save(productoCreated);
             return producto;
         } catch (error) {
+            console.log({ createProductoDto })
             this.handleDbExceptions(error);
         }
     }

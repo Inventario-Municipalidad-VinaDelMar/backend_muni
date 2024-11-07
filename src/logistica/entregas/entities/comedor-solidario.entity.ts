@@ -8,8 +8,10 @@ import { Entrega } from "./entrega.entity";
 
 @Entity()
 export class ComedorSolidario {
-    @PrimaryGeneratedColumn('uuid')
-    id: string;
+    @PrimaryGeneratedColumn()
+    // @PrimaryGeneratedColumn('uuid')
+    // id: string;
+    id: number;
 
     @Column()
     nombre: string;

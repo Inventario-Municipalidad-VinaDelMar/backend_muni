@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { BodegasService } from 'src/inventario/rest/servicios-especificos/bodegas/bodegas.service';
-// import { CategoriasService } from 'src/inventario/rest/servicios-especificos/categorias/categorias.service';
 import { ProductosService } from 'src/inventario/rest/servicios-especificos/productos/productos.service';
 import { TandasService } from 'src/inventario/rest/servicios-especificos/tandas/tandas.service';
 import { UbicacionesService } from 'src/inventario/rest/servicios-especificos/ubicaciones/ubicaciones.service';
@@ -17,12 +16,13 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { SolicitudEnvio, SolicitudEnvioStatus } from 'src/planificacion/entities/solicitud-envio.entity';
 import { Repository } from 'typeorm';
 import { Planificacion } from 'src/planificacion/entities/planificacion.entity';
-// import { MovimientosService } from 'src/movimientos/rest/movimientos.service';
+import { HttpService } from '@nestjs/axios';
 import { PlanificacionDetalle } from '../planificacion/entities/planificacion-detalle.entity';
 import { EnvioProducto } from 'src/logistica/envios/entities/envio-producto.entity';
 import { Movimiento, MovimientoType } from 'src/movimientos/entities/movimiento.entity';
 import { Tanda } from 'src/inventario/entities';
-
+import { CreateComedorDto } from 'src/logistica/entregas/dto/rest/create-comedor.dto';
+import * as iconv from 'iconv-lite';
 @Injectable()
 export class SeedService {
     constructor(
@@ -38,7 +38,7 @@ export class SeedService {
         private readonly planificacionDetalleRepository: Repository<PlanificacionDetalle>,
         @InjectRepository(Movimiento)
         private readonly movimientoRepository: Repository<Movimiento>,
-
+        private readonly httpService: HttpService,
         private readonly entregasService: EntregasService,
         private readonly enviosService: EnviosService,
         // private readonly movimientoService: MovimientosService,
@@ -163,15 +163,124 @@ export class SeedService {
             user2: users[2],
         }
     }
+    // private async insertNewComedores() {
+    //     try {
+    //         // Paso 1: Obtener la lista de comedores desde el otro backend
+    //         const response = await this.httpService.axiosRef.get('http://34.176.220.122/api/comedores', {
+    //             responseType: 'arraybuffer' // Fuerza la respuesta en buffer
+    //         });
+    //         const comedores = JSON.parse(Buffer.from(response.data, 'latin1').toString('utf-8'));
+    //         // Suponiendo que esto devuelve un array de comedores
+    //         // console.log({ comedores })
+    //         const comedoresPromises = comedores.map(async (comedor) => {
+    //             // Paso 2: Obtener el sector como string a partir del ID numérico
+    //             const sectorResponse = await this.httpService.axiosRef.get(`http://34.176.220.122/api/sectores/${comedor.sector}`);
+    //             const sectorData = sectorResponse.data;
+
+    //             // Convertir cada campo en UTF-8
+    //             return this.entregasService.createNewComedor({
+    //                 id: comedor.id,
+    //                 nombre: Buffer.from(comedor.nombre, 'utf-8').toString(),
+    //                 direccion: Buffer.from(comedor.direccion, 'utf-8').toString(),
+    //                 latitud: comedor.latitud,
+    //                 longitud: comedor.longitud,
+    //                 sector: Buffer.from(sectorData.nombre, 'utf-8').toString()
+    //             } as CreateComedorDto);
+    //         });
+
+    //         // Ejecutar todas las promesas
+    //         await Promise.all(comedoresPromises);
+    //     } catch (error) {
+    //         // console.log({ error });
+    //         throw error;
+    //     }
+    // }
+
+    // private async insertNewComedores() {
+    //     try {
+    //         // Paso 1: Obtener la lista de comedores desde el otro backend
+    //         const response = await this.httpService.axiosRef.get('http://34.176.220.122/api/comedores');
+    //         const comedores = response.data;
+
+    //         const comedoresPromises = comedores.map(async (comedor) => {
+    //             // Paso 2: Obtener el sector como string a partir del ID numérico
+    //             const sectorResponse = await this.httpService.axiosRef.get(`http://34.176.220.122/api/sectores/${comedor.sector}`);
+    //             const sectorData = sectorResponse.data;
+
+    //             // Asegúrate de que todos los campos sean UTF-8 usando iconv-lite
+    //             const utf8Nombre = iconv.encode(comedor.nombre, 'utf8').toString();
+    //             const utf8Direccion = iconv.encode(comedor.direccion, 'utf8').toString();
+    //             const utf8Sector = iconv.encode(sectorData.nombre, 'utf8').toString();
+
+    //             // Crear el nuevo comedor con todos los campos en UTF-8
+    //             return this.entregasService.createNewComedor({
+    //                 id: comedor.id,
+    //                 nombre: utf8Nombre,
+    //                 direccion: utf8Direccion,
+    //                 latitud: comedor.latitud,
+    //                 longitud: comedor.longitud,
+    //                 sector: utf8Sector,
+    //             } as CreateComedorDto);
+    //         });
+
+    //         // Ejecutar todas las promesas
+    //         await Promise.all(comedoresPromises);
+    //     } catch (error) {
+    //         console.log({ error });
+    //         throw error;
+    //     }
+    // }
     private async insertNewComedores() {
-        const seedComedores = initialData.comedores;
-        const comedoresPromises = [];
-        seedComedores.map((comedor) => {
-            comedoresPromises.push(this.entregasService.createNewComedor({
-                ...comedor
-            }))
-        })
-        await Promise.all(comedoresPromises);
+        try {
+            function sanitizeText(text: string): string {
+                return text.normalize('NFD').replace(/[\u0300-\u036f]/g, ''); // Quita acentos y caracteres especiales
+            }
+            let responseComedores;
+            // Paso 1: Obtener la lista de comedores desde el otro backend
+            try {
+                responseComedores = await this.httpService.axiosRef.get('http://34.176.220.122/api/comedores', {
+                    transformResponse: [(data) => {
+                        return JSON.parse(Buffer.from(data, 'latin1').toString('utf-8'));
+                    }],
+                    responseEncoding: 'utf-8'
+                });
+            } catch (error) {
+                console.log('Error comedores')
+                throw error;
+            }
+            const comedores = responseComedores.data;
+            // console.log({ comedores })
+            const comedoresPromises = comedores.map(async (comedor) => {
+                let sectorResponse;
+                try {
+                    sectorResponse = await this.httpService.axiosRef.get(`http://34.176.220.122/api/sectores/${comedor.sector}`, {
+                        transformResponse: [(data) => {
+                            return JSON.parse(Buffer.from(data, 'latin1').toString('utf-8'));
+                        }],
+                        responseEncoding: 'utf-8'
+                    });
+                } catch (error) {
+                    console.log('Error sector')
+                    throw error;
+                }
+                const sectorData = sectorResponse.data;
+
+                return this.entregasService.createNewComedor({
+                    id: comedor.id,
+                    nombre: sanitizeText(comedor.nombre),
+                    direccion: sanitizeText(comedor.direccion),
+                    latitud: comedor.latitud,
+                    longitud: comedor.longitud,
+                    sector: sanitizeText(sectorData.nombre)
+                } as CreateComedorDto);
+            });
+
+            // Ejecutar todas las promesas
+            await Promise.all(comedoresPromises);
+        } catch (error) {
+            console.log({ error });
+            throw error;
+        }
     }
     private async insertNewPlanificaciones() {
         try {
@@ -227,7 +336,6 @@ export class SeedService {
     // }
     private async insertNewProductos() {
         const seedProductos = initialData.productos;
-
         // Obtener todas las categorías creadas
         // const categorias = await this.categoriaService.findAll();
 

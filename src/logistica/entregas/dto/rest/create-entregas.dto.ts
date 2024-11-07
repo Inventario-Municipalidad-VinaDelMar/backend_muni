@@ -18,8 +18,10 @@ export class CreateEntregaDto {
     @IsUUID()
     idEnvio: string;
 
-    @IsUUID()
-    idComedor: string;
+    @IsInt()
+    idComedor: number;
+    // @IsUUID()
+    // idComedor: string;
 
     @IsArray()
     @ValidateNested({ each: true })

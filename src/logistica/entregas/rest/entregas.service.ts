@@ -123,7 +123,8 @@ export class EntregasService {
       throw error;
     }
   }
-  instanceComedorSolidario(idComedor: string) {
+  instanceComedorSolidario(idComedor: number) {
+    // instanceComedorSolidario(idComedor: string) {
     return this.comedorSolidarioRepository.create({
       id: idComedor,
     })
@@ -133,6 +134,7 @@ export class EntregasService {
     try {
       const comedorData = this.comedorSolidarioRepository.create({
         ...createComedorDto,
+
       });
       const comedor = await this.comedorSolidarioRepository.save(comedorData)
       return comedor;

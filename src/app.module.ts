@@ -9,6 +9,7 @@ import { LogisticaModule } from './logistica/logistica.module';
 import { PlanificacionModule } from './planificacion/planificacion.module';
 import { AuthModule } from './auth/auth.module';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
+import { HttpModule } from '@nestjs/axios';
 
 
 @Module({
@@ -17,6 +18,7 @@ import { CloudinaryModule } from './cloudinary/cloudinary.module';
 
   ],
   imports: [
+    HttpModule,
     CloudinaryModule,
     ScheduleModule.forRoot(),
     ConfigModule.forRoot({ isGlobal: true }),
@@ -29,6 +31,8 @@ import { CloudinaryModule } from './cloudinary/cloudinary.module';
       password: process.env.POSTGRES_PASSWORD,
       synchronize: !(process.env.STAGE === 'prod'), // in prod should in false
       autoLoadEntities: true,
+
+
     }),
     InventarioModule,
     SeedModule,
