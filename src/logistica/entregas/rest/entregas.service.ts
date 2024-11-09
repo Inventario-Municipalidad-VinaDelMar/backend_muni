@@ -230,12 +230,28 @@ export class EntregasService {
     const query1 = this.entregaRepository.createQueryBuilder('entregas');
     const query2 = this.entregaDetalleRepository.createQueryBuilder('entregasDetalles');
     const query3 = this.comedorSolidarioRepository.createQueryBuilder('comedores');
+
     try {
       await query2.delete().where({}).execute();
-      await query1.delete().where({}).execute();
-      await query3.delete().where({}).execute();
-      return;
+      // return;
     } catch (error) {
+      console.log('Error entrega detalles')
+      throw error;
+    }
+
+    try {
+      await query1.delete().where({}).execute();
+      // return;
+    } catch (error) {
+      console.log('Error entrega')
+      throw error;
+    }
+    try {
+      await query3.delete().where({}).execute();
+      // return;
+    } catch (error) {
+
+      console.log('Error comedores')
       throw error;
     }
   }

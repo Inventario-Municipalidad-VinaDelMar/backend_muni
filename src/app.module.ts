@@ -31,7 +31,7 @@ import { HttpModule } from '@nestjs/axios';
       password: process.env.POSTGRES_PASSWORD,
       synchronize: !(process.env.STAGE === 'prod'), // in prod should in false
       autoLoadEntities: true,
-
+      cache: false,
 
     }),
     InventarioModule,

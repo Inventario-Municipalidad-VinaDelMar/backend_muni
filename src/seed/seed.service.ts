@@ -196,30 +196,124 @@ export class SeedService {
     //     }
     // }
 
+    private async insertNewComedores() {
+        try {
+            const response = await this.httpService.axiosRef.get('http://34.176.220.122/api/comedores', {
+                responseType: 'json',
+                responseEncoding: 'utf8',
+                headers: { 'Cache-Control': 'no-cache' },
+            });
+            const comedores = response.data;
+
+            const comedoresPromises = comedores.map(async (comedor) => {
+                const sectorResponse = await this.httpService.axiosRef.get(`http://34.176.220.122/api/sectores/${comedor.sector}`, {
+                    responseType: 'json',
+                    responseEncoding: 'utf8',
+                    headers: { 'Cache-Control': 'no-cache' },
+                });
+                const sectorData = sectorResponse.data;
+                // const comedorData = {
+                //     id: comedor.id,
+                //     nombre: Buffer.from(comedor.nombre, 'binary').toString('utf8'),
+                //     direccion: Buffer.from(comedor.direccion, 'binary').toString('utf8'),
+                //     latitud: comedor.latitud,
+                //     longitud: comedor.longitud,
+                //     sector: Buffer.from(sectorData.nombre, 'binary').toString('utf8'),
+                // } as CreateComedorDto;
+
+
+                // const comedorData = {
+                //     id: comedor.id,
+                //     nombre: iconv.decode(Buffer.from(comedor.nombre, 'binary'), 'latin1'),
+                //     direccion: iconv.decode(Buffer.from(comedor.direccion, 'binary'), 'latin1'),
+                //     latitud: comedor.latitud,
+                //     longitud: comedor.longitud,
+                //     sector: iconv.decode(Buffer.from(sectorData.nombre, 'binary'), 'latin1'),
+                // } as CreateComedorDto;
+
+                function removeDiacritics(text: string): string {
+                    return text.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+                }
+
+                const comedorData = {
+                    id: comedor.id,
+                    nombre: removeDiacritics(comedor.nombre),
+                    direccion: removeDiacritics(comedor.direccion),
+                    latitud: comedor.latitud,
+                    longitud: comedor.longitud,
+                    sector: removeDiacritics(sectorData.nombre),
+                } as CreateComedorDto;
+                // const comedorData = {
+                //     id: comedor.id,
+                //     nombre: comedor.nombre,
+                //     direccion: comedor.direccion,
+                //     latitud: comedor.latitud,
+                //     longitud: comedor.longitud,
+                //     sector: sectorData.nombre,
+                // } as CreateComedorDto;
+                // const comedorData = {
+                //     id: comedor.id,
+                //     nombre: Buffer.from(comedor.nombre, 'utf8').toString(),
+                //     direccion: Buffer.from(comedor.direccion, 'utf8').toString(),
+                //     latitud: Buffer.from(comedor.latitud, 'utf8').toString(),
+                //     longitud: Buffer.from(comedor.longitud, 'utf8').toString(),
+                //     sector: Buffer.from(sectorData.nombre, 'utf8').toString(),
+                // } as CreateComedorDto;
+                try {
+                    await this.entregasService.createNewComedor(comedorData);
+                } catch (error) {
+                    console.log({ comedorData })
+                    // console.log({ error })
+                }
+
+            });
+
+        } catch (error) {
+            throw error;
+        }
+    }
     // private async insertNewComedores() {
     //     try {
+    //         function sanitizeText(text: string): string {
+    //             return text.normalize('NFD').replace(/[\u0300-\u036f]/g, ''); // Quita acentos y caracteres especiales
+    //         }
+    //         let responseComedores;
     //         // Paso 1: Obtener la lista de comedores desde el otro backend
-    //         const response = await this.httpService.axiosRef.get('http://34.176.220.122/api/comedores');
-    //         const comedores = response.data;
-
+    //         try {
+    //             responseComedores = await this.httpService.axiosRef.get('http://34.176.220.122/api/comedores', {
+    //                 transformResponse: [(data) => {
+    //                     return JSON.parse(Buffer.from(data, 'latin1').toString('utf-8'));
+    //                 }],
+    //                 responseEncoding: 'utf-8'
+    //             });
+    //         } catch (error) {
+    //             console.log('Error comedores')
+    //             throw error;
+    //         }
+    //         const comedores = responseComedores.data;
+    //         // console.log({ comedores })
     //         const comedoresPromises = comedores.map(async (comedor) => {
-    //             // Paso 2: Obtener el sector como string a partir del ID numérico
-    //             const sectorResponse = await this.httpService.axiosRef.get(`http://34.176.220.122/api/sectores/${comedor.sector}`);
+    //             let sectorResponse;
+    //             try {
+    //                 sectorResponse = await this.httpService.axiosRef.get(`http://34.176.220.122/api/sectores/${comedor.sector}`, {
+    //                     transformResponse: [(data) => {
+    //                         return JSON.parse(Buffer.from(data, 'latin1').toString('utf-8'));
+    //                     }],
+    //                     responseEncoding: 'utf-8'
+    //                 });
+    //             } catch (error) {
+    //                 console.log('Error sector')
+    //                 throw error;
+    //             }
     //             const sectorData = sectorResponse.data;
 
-    //             // Asegúrate de que todos los campos sean UTF-8 usando iconv-lite
-    //             const utf8Nombre = iconv.encode(comedor.nombre, 'utf8').toString();
-    //             const utf8Direccion = iconv.encode(comedor.direccion, 'utf8').toString();
-    //             const utf8Sector = iconv.encode(sectorData.nombre, 'utf8').toString();
-
-    //             // Crear el nuevo comedor con todos los campos en UTF-8
     //             return this.entregasService.createNewComedor({
     //                 id: comedor.id,
-    //                 nombre: utf8Nombre,
-    //                 direccion: utf8Direccion,
+    //                 nombre: sanitizeText(comedor.nombre),
+    //                 direccion: sanitizeText(comedor.direccion),
     //                 latitud: comedor.latitud,
     //                 longitud: comedor.longitud,
-    //                 sector: utf8Sector,
+    //                 sector: sanitizeText(sectorData.nombre)
     //             } as CreateComedorDto);
     //         });
 
@@ -230,58 +324,6 @@ export class SeedService {
     //         throw error;
     //     }
     // }
-    private async insertNewComedores() {
-        try {
-            function sanitizeText(text: string): string {
-                return text.normalize('NFD').replace(/[\u0300-\u036f]/g, ''); // Quita acentos y caracteres especiales
-            }
-            let responseComedores;
-            // Paso 1: Obtener la lista de comedores desde el otro backend
-            try {
-                responseComedores = await this.httpService.axiosRef.get('http://34.176.220.122/api/comedores', {
-                    transformResponse: [(data) => {
-                        return JSON.parse(Buffer.from(data, 'latin1').toString('utf-8'));
-                    }],
-                    responseEncoding: 'utf-8'
-                });
-            } catch (error) {
-                console.log('Error comedores')
-                throw error;
-            }
-            const comedores = responseComedores.data;
-            // console.log({ comedores })
-            const comedoresPromises = comedores.map(async (comedor) => {
-                let sectorResponse;
-                try {
-                    sectorResponse = await this.httpService.axiosRef.get(`http://34.176.220.122/api/sectores/${comedor.sector}`, {
-                        transformResponse: [(data) => {
-                            return JSON.parse(Buffer.from(data, 'latin1').toString('utf-8'));
-                        }],
-                        responseEncoding: 'utf-8'
-                    });
-                } catch (error) {
-                    console.log('Error sector')
-                    throw error;
-                }
-                const sectorData = sectorResponse.data;
-
-                return this.entregasService.createNewComedor({
-                    id: comedor.id,
-                    nombre: sanitizeText(comedor.nombre),
-                    direccion: sanitizeText(comedor.direccion),
-                    latitud: comedor.latitud,
-                    longitud: comedor.longitud,
-                    sector: sanitizeText(sectorData.nombre)
-                } as CreateComedorDto);
-            });
-
-            // Ejecutar todas las promesas
-            await Promise.all(comedoresPromises);
-        } catch (error) {
-            console.log({ error });
-            throw error;
-        }
-    }
     private async insertNewPlanificaciones() {
         try {
             const datesSemana = weekDates.getCurrentWeekDates();
