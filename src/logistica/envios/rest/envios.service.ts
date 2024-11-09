@@ -44,7 +44,48 @@ export class EnviosService {
     private readonly planificacionSocketService: PlanificacionSocketService,
     private readonly cloudinaryService: CloudinaryService,
   ) { }
-
+  async selectEnvioByNeorute(idEnvio: string) {
+    try {
+      const envio = await this.envioRepository.findOneBy({ id: idEnvio });
+      if (envio.status !== EnvioStatus.CARGA_COMPLETA) {
+        throw new BadRequestException(`Este envio no seleccionable, porque su status es: '${envio.status.toString()}' `);
+      }
+      envio.status = EnvioStatus.EN_ENVIO;
+      const envioUpdated = await this.envioRepository.save(envio);
+      delete envioUpdated.entregas;
+      delete envioUpdated.incidentes;
+      delete envioUpdated.productosPlanificados;
+      delete envioUpdated.isDeleted;
+      //*Notificar cambio en un envio de la lista de envios del administrador
+      await this.enviosSocketService.notifyListEnviosUpdate();
+      //*Notificar por sockcet que un envio ha cambiado
+      await this.enviosSocketService.notifyEnvioUpdate(idEnvio);
+      return envioUpdated;
+    } catch (error) {
+      throw error;
+    }
+  }
+  async finishEnvioByNeorute(idEnvio: string) {
+    try {
+      const envio = await this.envioRepository.findOneBy({ id: idEnvio });
+      if (envio.status !== EnvioStatus.EN_ENVIO) {
+        throw new BadRequestException(`Este envio no finalizable, porque su status es: '${envio.status.toString()}' `);
+      }
+      envio.status = EnvioStatus.FINALIZADO;
+      const envioUpdated = await this.envioRepository.save(envio);
+      delete envioUpdated.entregas;
+      delete envioUpdated.incidentes;
+      delete envioUpdated.productosPlanificados;
+      delete envioUpdated.isDeleted;
+      //*Notificar cambio en un envio de la lista de envios del administrador
+      await this.enviosSocketService.notifyListEnviosUpdate();
+      //*Notificar por sockcet que un envio ha cambiado
+      await this.enviosSocketService.notifyEnvioUpdate(idEnvio);
+      return envioUpdated;
+    } catch (error) {
+      throw error;
+    }
+  }
   async createNewIncidente(file: Express.Multer.File | null, createIncidenteDto: CreateIncidenteDto, user: User) {
 
     try {
@@ -63,7 +104,9 @@ export class EnviosService {
       }
       const incidenteData = this.incidenteEnvioRepository.create({
         ...rest,
-        envio: this.envioRepository.create({ id: idEnvio }),
+        envio: envio,
+
+        causeCloseEnvio: closeEnvio,//default false si es null
 
 
       })
@@ -420,8 +463,9 @@ export class EnviosService {
       if (!completeAllProducto) {
         throw new BadRequestException('Aun no se han cargado todos los productos planificados');
       }
-
-      envioEnCurso.status = EnvioStatus.EN_ENVIO;
+      //?Todabia no hay sido tomada para salir a repartir
+      envioEnCurso.status = EnvioStatus.CARGA_COMPLETA;
+      // envioEnCurso.status = EnvioStatus.EN_ENVIO;
       delete envioEnCurso.productosPlanificados;
       const envioUpdated = await this.envioRepository.save(envioEnCurso);
 
@@ -495,7 +539,8 @@ export class EnviosService {
       let envioEnProceso = null;
 
       envios.map(envio => {
-        if ([EnvioStatus.EN_ENVIO, EnvioStatus.FINALIZADO].includes(envio.status)) {
+
+        if ([EnvioStatus.CARGA_COMPLETA, EnvioStatus.EN_ENVIO, EnvioStatus.FINALIZADO].includes(envio.status)) {
           return;
         }
         envioEnProceso = envio;
@@ -513,7 +558,7 @@ export class EnviosService {
           return newDetalle;
         });
       });
-
+      console.log({ envioEnProceso })
       return envioEnProceso;
     } catch (error) {
       return null;

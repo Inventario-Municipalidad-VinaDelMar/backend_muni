@@ -79,6 +79,7 @@ export class EntregasService {
         copiloto: user,
       });
 
+      //TODO: Obtener el envio para validar que no haya carga negativa
       const entrega = await this.entregaRepository.save(entregaData);
       const productosEntregadosData = detalles.map(d => {
         const producto = this.entregaDetalleRepository.create({

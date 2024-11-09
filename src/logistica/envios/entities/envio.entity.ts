@@ -6,8 +6,9 @@ import { normalizeDates } from "src/utils";
 import { IncidenteEnvio } from "./incidente-envio.entity";
 
 export enum EnvioStatus {
-    SIN_CARGAR = 'Sin Cargar',
+    SIN_CARGAR = 'Sin cargar',
     CARGANDO = 'Cargando',
+    CARGA_COMPLETA = 'Carga completa',
     EN_ENVIO = 'En envio',
     FINALIZADO = 'Finalizado',
 }
@@ -21,17 +22,19 @@ export class Envio {
     @Column({ type: 'date', default: () => 'CURRENT_DATE' })
     fecha: Date;
 
-    @Column({ type: 'time', default: () => 'CURRENT_TIME' })
-    horaCreacion: string;
+    @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+    // @Column({ type: 'time', default: () => 'CURRENT_TIME' })
+    horaCreacion: Date;
 
-    @Column({ type: 'time', nullable: true })
-    horaInicioEnvio?: string;
+    @Column({ type: 'timestamp', nullable: true })
+    horaInicioEnvio?: Date;
 
-    @Column({ type: 'time', default: () => 'CURRENT_TIME' })
-    ultimaActualizacion: string;
+    @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+    // @Column({ type: 'time', default: () => 'CURRENT_TIME' })
+    ultimaActualizacion: Date;
 
-    @Column({ type: 'time', nullable: true })
-    horaFinalizacion?: string;
+    @Column({ type: 'timestamp', nullable: true })
+    horaFinalizacion?: Date;
 
     @Column({ type: 'enum', enum: EnvioStatus, default: EnvioStatus.SIN_CARGAR, })
     status: EnvioStatus;
@@ -57,11 +60,18 @@ export class Envio {
     @BeforeUpdate()
     setHoraInicioEnvio() {
         if (this.status === EnvioStatus.EN_ENVIO && !this.horaInicioEnvio) {
-            this.horaInicioEnvio = normalizeDates.getCurrentTime();  // Asignar hora actual
+            this.horaInicioEnvio = normalizeDates.getCurrentTimestamp();  // Asignar hora actual
+            // this.horaInicioEnvio = normalizeDates.getCurrentTime();  // Asignar hora actual
+        }
+    }
+    @BeforeUpdate()
+    setHoraFinalizacionEnvio() {
+        if (this.status === EnvioStatus.FINALIZADO && !this.horaFinalizacion) {
+            this.horaFinalizacion = normalizeDates.getCurrentTimestamp();  // Asignar hora actual
         }
     }
     @BeforeUpdate()
     setUltimaActualizacion() {
-        this.ultimaActualizacion = normalizeDates.getCurrentTime();  // Asignar hora actual
+        this.ultimaActualizacion = normalizeDates.getCurrentTimestamp();  // Asignar hora actual
     }
 }

@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, FileTypeValidator, Get, MaxFileSizeValidator, ParseFilePipe, Post, UploadedFile, UseInterceptors, UsePipes, ValidationPipe, } from '@nestjs/common';
+import { BadRequestException, Body, Controller, FileTypeValidator, Get, MaxFileSizeValidator, Param, ParseFilePipe, ParseUUIDPipe, Post, UploadedFile, UseInterceptors, UsePipes, ValidationPipe, } from '@nestjs/common';
 import { EnviosService } from './envios.service';
 import { Auth, GetUser } from 'src/auth/decorators';
 import { ValidRoles } from 'src/auth/interfaces';
@@ -66,6 +66,14 @@ export class EnviosController {
   @Auth(ValidRoles.admin, ValidRoles.bodeguero, ValidRoles.cargador)
   completeNewEnvio() {
     return this.enviosService.completeNewEnvio();
+  }
+  @Post(':id/select')
+  selectEnvioByNeorute(@Param('id', ParseUUIDPipe) idEnvio: string) {
+    return this.enviosService.selectEnvioByNeorute(idEnvio);
+  }
+  @Post(':id/finish')
+  finishEnvioByNeorute(@Param('id', ParseUUIDPipe) idEnvio: string) {
+    return this.enviosService.finishEnvioByNeorute(idEnvio);
   }
 
   @Get('')

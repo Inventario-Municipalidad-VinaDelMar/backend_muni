@@ -138,7 +138,8 @@ export class SeedService {
                 await this.envioProductoRepository.save(producto);
 
             });
-            envio.status = EnvioStatus.EN_ENVIO;
+            envio.status = EnvioStatus.CARGA_COMPLETA;
+            // envio.status = EnvioStatus.EN_ENVIO;
             await this.envioRepository.save(envio);
         });
 

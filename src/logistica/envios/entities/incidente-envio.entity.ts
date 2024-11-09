@@ -24,6 +24,9 @@ export class IncidenteEnvio {
     @Column()
     descripcion: string;
 
+    @Column({ type: 'bool', default: false })
+    causeCloseEnvio: boolean;
+
     @Column({ type: 'enum', enum: IncidenteType })
     type: IncidenteType;
 
