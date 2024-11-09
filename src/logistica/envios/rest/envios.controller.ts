@@ -80,7 +80,8 @@ export class EnviosController {
   // @Auth(ValidRoles.admin, ValidRoles.bodeguero, ValidRoles.cargador)
   getEnvios(@Body() getEnviosDto: GetEnviosDto) {
     const { fecha } = getEnviosDto;
-    return this.enviosService.getEnviosByFecha(fecha);
+    return this.enviosService.getEnviosToNeorute(fecha);
+    // return this.enviosService.getEnviosByFecha(fecha);
   }
 
 }

@@ -17,6 +17,7 @@ import { IncidenteEnvio } from '../entities/incidente-envio.entity';
 import { IncidenteProducto } from '../entities/incidente-producto.entity';
 import { CreateIncidenteDto } from '../dto/create-incidente.dto';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
+import { Entrega } from 'src/logistica/entregas/entities/entrega.entity';
 
 @Injectable()
 export class EnviosService {
@@ -189,6 +190,17 @@ export class EnviosService {
       throw error;
     }
   }
+
+  async getEnviosToNeorute(fecha: string): Promise<EnvioResponseList[]> {
+    return this.fetchEnvios(fecha, [EnvioStatus.CARGA_COMPLETA], 'DESC', [
+      'solicitud',
+      'entregas',
+      'entregas.detallesEntrega',
+      'incidentes',
+      'incidentes.productosAfectados',
+    ]);
+  }
+
 
   async getEnviosByFecha(fecha: string, adminView: boolean = false) {
     try {
@@ -630,6 +642,116 @@ export class EnviosService {
       throw error;
     }
   }
+
+  //Test: funciones reutilizables
+  private async fetchEnvios(
+    fecha: string,
+    statusFilter: EnvioStatus[],
+    orderDirection: 'ASC' | 'DESC',
+    relations: string[],
+  ): Promise<EnvioResponseList[]> {
+    const fechaFormatted = normalizeDates.normalize(fecha);
+    const enviosData = await this.envioRepository.find({
+      where: {
+        isDeleted: false,
+        fecha: fechaFormatted,
+        status: statusFilter.length ? Not(In(statusFilter)) : undefined,
+      },
+      order: { horaCreacion: orderDirection },
+      relations,
+    });
+
+    enviosData.forEach(envio => this.orderEntregasByTime(envio.entregas));
+
+    return enviosData.map(envio => this.mapEnvioToResponse(envio));
+  }
+
+  private orderEntregasByTime(entregas: Entrega[]) {
+    entregas.sort((a, b) => {
+      const [hoursA, minutesA, secondsA] = a.hora.split(':').map(Number);
+      const [hoursB, minutesB, secondsB] = b.hora.split(':').map(Number);
+      const timeA = new Date(1970, 0, 1, hoursA, minutesA, secondsA).getTime();
+      const timeB = new Date(1970, 0, 1, hoursB, minutesB, secondsB).getTime();
+      return timeA - timeB;
+    });
+  }
+
+  private mapEnvioToResponse(envio: Envio): EnvioResponseList {
+    const productos = envio.productosPlanificados
+      .filter(pp => pp.movimiento)
+      .map(this.calculateProductoCarga.bind(this, envio))
+      .sort((a: ProductoOnEnvio, b: ProductoOnEnvio) => b.cantidad - a.cantidad) as ProductoOnEnvio[];
+
+    const entregas = envio.entregas.map(entrega => ({
+      comedorSolidario: entrega.comedorSolidario.nombre,
+      comedorDireccion: entrega.comedorSolidario.direccion,
+      realizador: `${entrega.copiloto.nombre} ${entrega.copiloto.apellidoPaterno} ${entrega.copiloto.apellidoMaterno}`,
+      realizadorId: entrega.copiloto.id,
+      productosEntregados: entrega.detallesEntrega.length,
+    }));
+
+    const incidentes: IncidenteResponse[] = envio.incidentes.map(incidente => ({
+      id: incidente.id,
+      descripcion: incidente.descripcion,
+      type: incidente.type,
+      evidenciaFotograficaUrl: incidente.evidenciaFotograficaUrl,
+      fecha: incidente.fecha as unknown as string,
+      hora: incidente.hora,
+      causeCloseEnvio: incidente.causeCloseEnvio,
+      productosAfectados: incidente.productosAfectados.map(p => ({
+        cantidad: p.cantidadAfectada,
+        producto: p.producto.nombre,
+        productoId: p.producto.id,
+        urlImagen: p.producto.urlImagen,
+      })),
+    }));
+    const solicitud = envio.solicitud;
+    delete envio.solicitud;
+    delete envio.isDeleted;
+    delete envio.productosPlanificados;
+    return {
+      ...envio,
+      autorizante: `${solicitud.administrador.nombre} ${solicitud.administrador.apellidoPaterno} ${solicitud.administrador.apellidoMaterno}`,
+      solicitante: `${solicitud.solicitante.nombre} ${solicitud.solicitante.apellidoPaterno} ${solicitud.solicitante.apellidoMaterno}`,
+      productos,
+      entregas,
+      incidentes,
+    };
+  }
+
+  private calculateProductoCarga(envio: Envio, productoPlanificado: EnvioProducto): ProductoOnEnvio {
+    const carga: ProductoOnEnvio = {
+      cantidad: productoPlanificado.movimiento.cantidadRetirada,
+      producto: productoPlanificado.producto.nombre,
+      productoId: productoPlanificado.producto.id,
+      urlImagen: productoPlanificado.producto.urlImagen,
+    };
+
+    envio.entregas.forEach(entrega => {
+      entrega.detallesEntrega.forEach(detalle => {
+        if (detalle.producto.id === carga.productoId) {
+          carga.cantidad -= detalle.cantidadEntregada;
+          if (carga.cantidad < 0) {
+            throw new BadRequestException(`El producto ${carga.producto} ha quedado con carga negativa: ${carga.cantidad}`);
+          }
+        }
+      });
+    });
+
+    envio.incidentes.forEach(incidente => {
+      incidente.productosAfectados.forEach(productoAfectado => {
+        if (productoAfectado.producto.id === carga.productoId) {
+          carga.cantidad -= productoAfectado.cantidadAfectada;
+          if (carga.cantidad < 0) {
+            throw new BadRequestException(`El producto ${carga.producto} ha quedado con carga negativa: ${carga.cantidad}`);
+          }
+        }
+      });
+    });
+
+    return carga;
+  }
+
 
 
 
