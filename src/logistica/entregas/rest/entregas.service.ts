@@ -4,7 +4,7 @@ import { User } from 'src/auth/entities/user.entity';
 import { CreateEntregaDto } from '../dto/rest/create-entregas.dto';
 import { Entrega } from '../entities/entrega.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Between, Repository } from 'typeorm';
 import { EntregaDetalle } from '../entities/entrega-detalle.entity';
 import { ComedorSolidario } from '../entities/comedor-solidario.entity';
 import { EnviosSocketService } from 'src/logistica/envios/socket/envios.socket.service';
@@ -14,6 +14,7 @@ import { CreateComedorDto } from '../dto/rest/create-comedor.dto';
 import e from 'express';
 import { UpdateEntregaDto } from '../dto/rest/update-entrega.dto';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
+import { normalizeDates } from 'src/utils';
 
 
 @Injectable()
@@ -38,6 +39,23 @@ export class EntregasService {
     @InjectRepository(ComedorSolidario)
     private readonly comedorSolidarioRepository: Repository<ComedorSolidario>,
   ) { }
+
+  async getEntregasInfoCharts(fechaInicio: string, fechaFin?: string) {
+    try {
+      const entregasData = await this.entregaRepository.find({
+        where: {
+          isDeleted: false,
+          fecha: fechaFin
+            ? Between(normalizeDates.normalize(fechaInicio), normalizeDates.normalize(fechaFin))
+            : normalizeDates.normalize(fechaInicio),
+        },
+      })
+
+      return entregasData;
+    } catch (error) {
+      throw error;
+    }
+  }
 
   async updateEntregaFile(file: Express.Multer.File, updateEntregaDto: UpdateEntregaDto) {
     try {

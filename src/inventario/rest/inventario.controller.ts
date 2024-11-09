@@ -1,14 +1,15 @@
-import { Controller, Post, Body } from '@nestjs/common';
+import { Controller, Post, Body, Get } from '@nestjs/common';
 import { InventarioService } from './inventario.service';
 import { CreateBodegaDto, CreateProductoDto, CreateTandaDto, CreateUbicacionDto } from '../dto/rest-dto';
 import { Auth, GetUser } from 'src/auth/decorators';
 import { ValidRoles } from 'src/auth/interfaces';
 import { User } from 'src/auth/entities/user.entity';
+import { GetInfoCharts } from '../dto/socket-dto/inventario/get-info-charts.dto';
 
 
 
 @Controller('inventario')
-@Auth()
+// @Auth()
 export class InventarioController {
   constructor(private readonly inventarioService: InventarioService) { }
 
@@ -30,4 +31,8 @@ export class InventarioController {
     return this.inventarioService.createTanda(createTandaDto, user);
   }
 
+  @Get('infoCharts')
+  getInfoCharts(@Body() getInfoCharts: GetInfoCharts,) {
+    return this.inventarioService.getInfoCharts(getInfoCharts);
+  }
 }

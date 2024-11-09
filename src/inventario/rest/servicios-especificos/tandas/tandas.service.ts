@@ -1,10 +1,11 @@
 import { BadRequestException, Injectable, } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { QueryRunner, Repository } from 'typeorm';
+import { Between, QueryRunner, Repository } from 'typeorm';
 import { BaseService } from '../base.service';
 import { TandaCreateSchema } from 'src/inventario/interfaces/tanda-create.interface';
 import { TandaResponse } from 'src/inventario/interfaces/tanda-response.interface';
 import { Tanda } from 'src/inventario/entities';
+import { normalizeDates } from 'src/utils';
 
 @Injectable()
 export class TandasService extends BaseService<Tanda> {
@@ -44,6 +45,39 @@ export class TandasService extends BaseService<Tanda> {
             };
         } catch (error) {
             this.handleDbExceptions(error);
+        }
+    }
+
+    async findAllByFechas(fechaInicio: string, fechaFin?: string) {
+        try {
+            const tandasData = await this.tandaRepository.find({
+                where: {
+                    isDeleted: false,
+                    fechaLlegada: fechaFin
+                        ? Between(normalizeDates.normalize(fechaInicio), normalizeDates.normalize(fechaFin))
+                        : normalizeDates.normalize(fechaInicio),
+                },
+
+            })
+            const tandas = tandasData.map(tanda => {
+                delete tanda.isDeleted;
+                const bodega = tanda.bodega;
+                const producto = tanda.producto;
+                const ubicacion = tanda.ubicacion;
+                delete tanda.bodega;
+                delete tanda.producto;
+                delete tanda.ubicacion;
+                return {
+                    ...tanda,
+                    producto: producto.nombre,
+                    productoId: producto.id,
+                    bodega: bodega.nombre,
+                    ubicacion: ubicacion.descripcion,
+                }
+            });
+            return tandas;
+        } catch (error) {
+            throw error;
         }
     }
 

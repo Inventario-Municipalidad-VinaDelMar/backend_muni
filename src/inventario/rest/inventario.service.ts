@@ -4,6 +4,8 @@ import { CreateBodegaDto, CreateProductoDto, CreateTandaDto, CreateUbicacionDto 
 import { BodegasService, ProductosService, TandasService, UbicacionesService } from './servicios-especificos';
 import { MovimientosService } from 'src/movimientos/rest/movimientos.service';
 import { User } from 'src/auth/entities/user.entity';
+import { GetInfoCharts } from '../dto/socket-dto/inventario/get-info-charts.dto';
+import { EntregasService } from '../../logistica/entregas/rest/entregas.service';
 
 
 
@@ -11,6 +13,7 @@ import { User } from 'src/auth/entities/user.entity';
 export class InventarioService {
 
   constructor(
+    private readonly entregasService: EntregasService,
     private readonly productoService: ProductosService,
     // private readonly categoriaService: CategoriasService,
     private readonly bodegasService: BodegasService,
@@ -113,6 +116,20 @@ export class InventarioService {
         stock,
       }
 
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async getInfoCharts(getInfoCharts: GetInfoCharts) {
+    try {
+      const { fechaInicio, fechaFin } = getInfoCharts;
+      const entregas = await this.entregasService.getEntregasInfoCharts(fechaInicio, fechaFin);
+      const tandas = await this.tandasService.findAllByFechas(fechaInicio, fechaFin);
+      return {
+        entregas,
+        tandas,
+      }
     } catch (error) {
       throw error;
     }
