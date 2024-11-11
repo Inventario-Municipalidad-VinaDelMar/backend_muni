@@ -46,7 +46,7 @@ export class Movimiento {
 
     //! MERMA --> Como es merma, no se envia producto vencido, envio = null
     //! INGRESO --> Si es ingreso, significa que no hay relacion con un envio = null
-    //* RETIRO --> Si hay retiro, se debe registrar a que envio pertenece ya esta planificado 
+    //* RETIRO --> Si hay retiro, se debe registrar a que envio pertenece ya QUE esta planificado 
     @OneToOne(() => EnvioProducto, (envio) => envio.movimiento, { nullable: true, onDelete: 'CASCADE' })
     // @OneToOne(() => EnvioProducto, (envio) => envio.movimiento, { nullable: false, onDelete: 'CASCADE' })
     @JoinColumn()
