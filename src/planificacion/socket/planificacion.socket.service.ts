@@ -31,6 +31,19 @@ export class PlanificacionSocketService {
         }
     }
 
+    async notifyPlanificacionActualUpdate() {
+        if (this.wss) {
+            const fechaActual = normalizeDates.currentFecha();
+            const planificacion = await this.planificacionService.findByFecha({ fecha: fechaActual })
+            const room = `planificacion-${fechaActual}`;
+            console.log(`Planificacion actual refresh:"${room}"`)
+            this.wss.to(room).emit('loadPlanificacion', planificacion)
+        } else {
+            console.error('WebSocket server not initialized - To emit planificacion actual update ');
+            throw new BadRequestException();
+        }
+    }
+
     async notifySolicitudEnvio(solicitud: SolicitudEnvio) {
         if (this.wss) {
             this.wss.emit('loadSolicitud', solicitud);

@@ -280,6 +280,7 @@ export class PlanificacionService {
 
       // Notificar la actualización
       await this.planificacionSocketService.notifyPlanificacionSemanalUpdate(planificacionesActualizadas);
+      await this.planificacionSocketService.notifyPlanificacionActualUpdate();
       await queryRunner.commitTransaction();
 
       return planificacionesActualizadas;
