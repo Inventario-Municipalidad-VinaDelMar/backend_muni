@@ -1,7 +1,8 @@
+import { PartialType } from "@nestjs/mapped-types";
 import { IsOptional, IsString, IsUUID } from "class-validator";
 
-export class CreateProductoDto {
 
+export class BaseProductoDto {
     @IsString()
     nombre: string;
 
@@ -13,11 +14,15 @@ export class CreateProductoDto {
     @IsOptional()
     descripcion?: string;
 
+}
+
+
+
+export class CreateProductoDto extends PartialType(BaseProductoDto) {
+
     @IsString()
     @IsOptional()
     urlImagen?: string;
 
-    // @IsUUID()
-    // idCategoria: string;
 
 }

@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { BaseService } from '../base.service';
 import { Bodega } from 'src/inventario/entities';
 import { CreateBodegaDto } from 'src/inventario/dto/rest-dto';
+import { UpdateBodegaDto } from '../../../dto/rest-dto/bodega-dto/update-bodega.dto';
 
 @Injectable()
 export class BodegasService extends BaseService<Bodega> {
@@ -22,6 +23,32 @@ export class BodegasService extends BaseService<Bodega> {
             });
             const bodega = await this.bodegaRepository.save(bodegaCreated);
             return bodega;
+        } catch (error) {
+            this.handleDbExceptions(error);
+        }
+    }
+    async updateBodega(idBodega: string, updateBodegaDto: UpdateBodegaDto) {
+        try {
+            const bodegaData = await this.findOneById(idBodega);
+            for (const [key, value] of Object.entries(updateBodegaDto)) {
+                if (value !== undefined) {
+
+                    bodegaData[key] = value;
+
+                }
+            }
+            const bodega = await this.bodegaRepository.save(bodegaData);
+            return bodega;
+        } catch (error) {
+            this.handleDbExceptions(error);
+        }
+    }
+    async deleteBodega(idBodega: string,) {
+        try {
+            const bodega = await this.findOneById(idBodega);
+            bodega.isDeleted = true;
+            return await this.bodegaRepository.save(bodega);
+            // return bodega;
         } catch (error) {
             this.handleDbExceptions(error);
         }

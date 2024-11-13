@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { BaseService } from '../base.service';
 import { Ubicacion } from 'src/inventario/entities';
-import { CreateUbicacionDto } from 'src/inventario/dto/rest-dto';
+import { CreateUbicacionDto, UpdateUbicacionDto } from 'src/inventario/dto/rest-dto';
 import { BodegasService } from '../bodegas/bodegas.service';
 
 @Injectable()
@@ -28,6 +28,27 @@ export class UbicacionesService extends BaseService<Ubicacion> {
                 bodega: this.bodegasService.generateClass(idBodega),
             });
             const ubicacion = await this.ubicacionRepository.save(ubicacionCreated);
+            return ubicacion;
+        } catch (error) {
+            this.handleDbExceptions(error);
+        }
+    }
+    async updateUbicacion(idUbicacion: string, updateUbicacionDto: UpdateUbicacionDto) {
+        try {
+            const { descripcion } = updateUbicacionDto;
+            const ubicacionData = await this.findOneById(idUbicacion);
+            ubicacionData.descripcion = descripcion;
+            const ubicacion = await this.ubicacionRepository.save(ubicacionData);
+            return ubicacion;
+        } catch (error) {
+            this.handleDbExceptions(error);
+        }
+    }
+    async deleteUbicacion(idUbicacion: string) {
+        try {
+            const ubicacionData = await this.findOneById(idUbicacion);
+            ubicacionData.isDeleted = true;
+            const ubicacion = await this.ubicacionRepository.save(ubicacionData);
             return ubicacion;
         } catch (error) {
             this.handleDbExceptions(error);

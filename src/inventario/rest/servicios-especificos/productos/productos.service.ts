@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { BaseService } from '../base.service';
 import { Producto } from 'src/inventario/entities';
-import { CreateProductoDto } from 'src/inventario/dto/rest-dto';
+import { CreateProductoDto, UpdateProductoDto } from 'src/inventario/dto/rest-dto';
 
 @Injectable()
 export class ProductosService extends BaseService<Producto> {
@@ -22,6 +22,34 @@ export class ProductosService extends BaseService<Producto> {
             return producto;
         } catch (error) {
             console.log({ createProductoDto })
+            this.handleDbExceptions(error);
+        }
+    }
+    async updateProducto(idProducto: string, updateProductoDto: UpdateProductoDto) {
+        try {
+            const productoData = await this.findOneById(idProducto)
+            for (const [key, value] of Object.entries(updateProductoDto)) {
+                if (value !== undefined) {
+
+                    productoData[key] = value;
+
+
+                }
+            }
+            const producto = await this.productoRepository.save(productoData);
+            return producto;
+        } catch (error) {
+            // console.log({ createProductoDto })
+            this.handleDbExceptions(error);
+        }
+    }
+    async deleteProducto(idProducto: string) {
+        try {
+            const productoData = await this.findOneById(idProducto);
+            productoData.isDeleted = true;
+            const producto = await this.productoRepository.save(productoData);
+            return producto;
+        } catch (error) {
             this.handleDbExceptions(error);
         }
     }

@@ -11,10 +11,12 @@ import { Bodega, Producto, Tanda, Ubicacion } from "./entities";
 import { BodegasService, ProductosService, TandasService, UbicacionesService } from "./rest/servicios-especificos";
 import { LogisticaModule } from "src/logistica/logistica.module";
 import { AuthModule } from "src/auth/auth.module";
+import { CloudinaryModule } from "src/cloudinary/cloudinary.module";
 
 
 @Module({
     imports: [
+        CloudinaryModule,
         AuthModule,
         LogisticaModule,
 

@@ -15,6 +15,34 @@ export class InventarioSocketService {
         private readonly inventarioService: InventarioService,
     ) { }
 
+    async notifyProductoUpdate() {
+        if (this.wss) {
+            const productos = await this.inventarioService.findAllProductos();
+            this.wss.emit('loadAllProductos', productos);
+        } else {
+            console.error('WebSocket server not initialized - To notify productos list has been updated');
+            throw new BadRequestException();
+        }
+    }
+    async notifyBodegasUpdate() {
+        if (this.wss) {
+            const bodegas = await this.inventarioService.findAllBodegas();
+            this.wss.emit('loadAllBodegas', bodegas);
+        } else {
+            console.error('WebSocket server not initialized - To notify bodegas list has been updated');
+            throw new BadRequestException();
+        }
+    }
+    async notifyUbicacionUpdate(idBodega: string) {
+        if (this.wss) {
+            const ubicaciones = await this.inventarioService.findUbicacionesByBodega(idBodega);
+            this.wss.emit(`${idBodega}-ubicaciones`, ubicaciones);
+        } else {
+            console.error('WebSocket server not initialized - To notify ubicaciones list has been updated');
+            throw new BadRequestException();
+        }
+    }
+
     async notifyTandaCreated(tanda: TandaResponse) {
         if (this.wss) {
             const producto = await this.inventarioService.findOneProducto(tanda.productoId);

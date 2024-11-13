@@ -1,21 +1,73 @@
-import { BadRequestException, Injectable, } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException, } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Between, QueryRunner, Repository } from 'typeorm';
 import { BaseService } from '../base.service';
 import { TandaCreateSchema } from 'src/inventario/interfaces/tanda-create.interface';
 import { TandaResponse } from 'src/inventario/interfaces/tanda-response.interface';
-import { Tanda } from 'src/inventario/entities';
+import { Bodega, Producto, Tanda, Ubicacion } from 'src/inventario/entities';
 import { normalizeDates } from 'src/utils';
+import { UpdateTandaDto } from '../../../dto/rest-dto/tanda-dto/update-tanda.dto';
 
 @Injectable()
 export class TandasService extends BaseService<Tanda> {
     constructor(
         @InjectRepository(Tanda)
         private readonly tandaRepository: Repository<Tanda>,
+        @InjectRepository(Bodega)
+        private readonly bodegaRepository: Repository<Bodega>,
+        @InjectRepository(Producto)
+        private readonly productoRepository: Repository<Producto>,
+        @InjectRepository(Ubicacion)
+        private readonly ubicacionRepository: Repository<Ubicacion>,
 
     ) {
 
         super(tandaRepository, 'TandasService');
+    }
+
+    async updateTanda(idTanda: string, updateTandaDto: UpdateTandaDto) {
+        try {
+            const tandaData = await this.tandaRepository.findOne({
+                where: {
+                    id: idTanda
+                },
+                relations: ['movimientos'],
+            });
+            if (!tandaData) {
+                throw new NotFoundException(`La tanda con id ${idTanda} no existe.`);
+            }
+            if (tandaData.cantidadActual !== tandaData.cantidadIngresada) {
+                throw new BadRequestException(`Esta tanda no se puede actualizar, porque tiene ${tandaData.movimientos.length} movimientos.`);
+            }
+            for (const [key, value] of Object.entries(updateTandaDto)) {
+                if (value !== undefined) {
+                    if (key === 'idProducto') {
+                        tandaData.producto = this.productoRepository.create({
+                            id: value,
+                        })
+                    } else if (key === 'idBodega') {
+                        tandaData.bodega = this.bodegaRepository.create({
+                            id: value,
+                        })
+                    } else if (key === 'idUbicacion') {
+                        tandaData.ubicacion = this.ubicacionRepository.create({
+                            id: value,
+                        })
+                    } else if (key === 'cantidadIngresada') {
+                        tandaData.cantidadActual = value;
+                        tandaData.cantidadIngresada = value;
+                    } else {
+                        tandaData[key] = value;
+                    }
+
+                }
+            }
+
+            const tanda = await this.tandaRepository.save(tandaData);
+            return tanda;
+        } catch (error) {
+            throw error;
+        }
     }
 
     async createTanda(tandaCreateSchema: TandaCreateSchema): Promise<TandaResponse> {

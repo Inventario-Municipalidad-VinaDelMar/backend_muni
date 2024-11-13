@@ -39,10 +39,12 @@ export class InventarioSocketGateway {
 
   @SubscribeMessage('getUbicacionesByBodega',)
   async findUbicacionesByBodega(client: Socket, payload: GetUbicacionByBodegaDto) {
+    const { idBodega } = payload;
     const data =
       await this.inventarioSocketService.getInventarioUbicacionByBodega(payload);
 
-    client.emit('loadUbicacionesByBodega', data);
+    client.emit(`${idBodega}-ubicaciones`, data);
+    // client.emit('loadUbicacionesByBodega', data);
   }
 
   @SubscribeMessage('getAllBodegas',)

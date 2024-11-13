@@ -1,11 +1,13 @@
 import { BadRequestException, forwardRef, Inject, Injectable, } from '@nestjs/common';
 import { InventarioSocketService } from '../socket/inventario.socket.service';
-import { CreateBodegaDto, CreateProductoDto, CreateTandaDto, CreateUbicacionDto } from '../dto/rest-dto';
+import { CreateBodegaDto, CreateTandaDto, CreateUbicacionDto, UpdateBodegaDto, UpdateTandaDto, UpdateUbicacionDto } from '../dto/rest-dto';
 import { BodegasService, ProductosService, TandasService, UbicacionesService } from './servicios-especificos';
 import { MovimientosService } from 'src/movimientos/rest/movimientos.service';
 import { User } from 'src/auth/entities/user.entity';
 import { GetInfoCharts } from '../dto/socket-dto/inventario/get-info-charts.dto';
 import { EntregasService } from '../../logistica/entregas/rest/entregas.service';
+import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
+import { BaseProductoDto } from '../dto/rest-dto/producto-dto/create-producto.dto';
 
 
 
@@ -13,6 +15,7 @@ import { EntregasService } from '../../logistica/entregas/rest/entregas.service'
 export class InventarioService {
 
   constructor(
+    private readonly cloudinaryService: CloudinaryService,
     private readonly entregasService: EntregasService,
     private readonly productoService: ProductosService,
     // private readonly categoriaService: CategoriasService,
@@ -25,22 +28,130 @@ export class InventarioService {
     @Inject(forwardRef(() => InventarioSocketService))
     private readonly inventarioSocketService: InventarioSocketService,
   ) { }
+  //?CRUD DE PRODUCTOS
 
-  async createProducto(createProductoDto: CreateProductoDto) {
-    const producto = await this.productoService.createProducto(createProductoDto);
-    //TODO: notificar por sockets
-    return producto;
+  async deleteProducto(idProducto: string) {
+    try {
+      const producto = await this.productoService.deleteProducto(idProducto);
+      await this.inventarioSocketService.notifyProductoUpdate()
+      return producto;
+    } catch (error) {
+      throw error;
+    }
   }
+  async createProducto(productImage: Express.Multer.File, baseProductoDto: BaseProductoDto) {
+    let imageUrl: string | undefined;
 
+    try {
+      // Sube la imagen y obtiene la URL segura
+      imageUrl = await this.cloudinaryService.uploadFile(productImage, 'productos').then(data => data.secure_url);
+
+      // Crea el producto con la URL de imagen obtenida
+      const producto = await this.productoService.createProducto({
+        urlImagen: imageUrl,
+        ...baseProductoDto,
+      });
+      await this.inventarioSocketService.notifyProductoUpdate()
+      return producto;
+
+    } catch (error) {
+      // Si hubo un error después de subir la imagen, la elimina
+      if (imageUrl) {
+        const imageId = imageUrl.split('/').pop()?.split('.')[0];
+        await this.cloudinaryService.deleteFile(imageId, 'productos');
+      }
+      throw error;
+    }
+  }
+  async updateProducto(idProducto: string, baseProductoDto: BaseProductoDto, newProductImage?: Express.Multer.File,) {
+    // Subir la imagen solo si `newProductImage` está presente
+    let imageUrl: string | undefined;
+    try {
+      imageUrl = newProductImage
+        ? await this.cloudinaryService.uploadFile(newProductImage, 'productos').then((data) => data.secure_url)
+        : undefined;
+      const updateData = {
+        ...baseProductoDto,
+        ...(imageUrl && { urlImagen: imageUrl }), // Solo añade `urlImagen` si `imageUrl` está definido
+      };
+      const previousImageUrl = (await this.productoService.findOneById(idProducto)).urlImagen;
+      if (previousImageUrl && newProductImage) {
+        const imageId = previousImageUrl.split('/').pop()?.split('.')[0];
+        if (imageId) {
+          await this.cloudinaryService.deleteFile(imageId, 'productos');
+        }
+      }
+      const producto = await this.productoService.updateProducto(idProducto, updateData);
+      await this.inventarioSocketService.notifyProductoUpdate()
+      return producto;
+
+    } catch (error) {
+      if (imageUrl) {
+        const imageId = imageUrl.split('/').pop()?.split('.')[0];
+        await this.cloudinaryService.deleteFile(imageId, 'productos');
+      }
+      throw error;
+    }
+  }
+  //?CRUD DE BODEGAS
   async createBodega(createBodegaDto: CreateBodegaDto) {
     const bodega = await this.bodegasService.createBodega(createBodegaDto);
-    //TODO: notificar por sockets
+    //*Notificar por socket que hay una nueva bodega en la lista
+    await this.inventarioSocketService.notifyBodegasUpdate()
     return bodega;
   }
+  async updateBodega(idBodega: string, updateBodegaDto: UpdateBodegaDto) {
+    const bodega = await this.bodegasService.updateBodega(idBodega, updateBodegaDto);
+    //*Notificar por socket que hay una actualizacion de una bodega de la lista
+    await this.inventarioSocketService.notifyBodegasUpdate()
+    return bodega;
+  }
+  async deleteBodega(idBodega: string) {
+    const bodega = await this.bodegasService.deleteBodega(idBodega);
+    //*Notificar por socket que se elimino una bodega de la lista
+    await this.inventarioSocketService.notifyBodegasUpdate()
+    return bodega;
+  }
+
+  //?CRUD DE UBICACIONES
   async createUbicacion(createUbicacionDto: CreateUbicacionDto) {
+    const { idBodega } = createUbicacionDto;
     const ubicacion = await this.ubicacionesService.createUbicacion(createUbicacionDto);
-    //TODO: notificar por sockets
+    await this.inventarioSocketService.notifyUbicacionUpdate(idBodega)
     return ubicacion;
+  }
+  async updateUbicacion(idUbicacion: string, updateUbicacionDto: UpdateUbicacionDto) {
+    const ubicacion = await this.ubicacionesService.updateUbicacion(idUbicacion, updateUbicacionDto);
+    await this.inventarioSocketService.notifyUbicacionUpdate(ubicacion.bodega.id)
+    return ubicacion;
+  }
+  async deleteUbicacion(idUbicacion: string) {
+    const ubicacion = await this.ubicacionesService.deleteUbicacion(idUbicacion);
+    await this.inventarioSocketService.notifyUbicacionUpdate(ubicacion.bodega.id)
+    return ubicacion;
+  }
+
+  //?CRUD DE TANDAS
+  async updateTanda(idTanda: string, updateTandaDto: UpdateTandaDto) {
+    try {
+      const tanda = await this.tandasService.updateTanda(idTanda, updateTandaDto);
+      //*Se notifica a los clientes una tanda actualizada
+      await this.inventarioSocketService.notifyTandaCreated({
+        id: tanda.id,
+        cantidadActual: tanda.cantidadActual,
+        cantidadIngresada: tanda.cantidadActual,
+        bodega: tanda.bodega.nombre,
+        ubicacion: tanda.ubicacion.descripcion,
+        fechaLlegada: tanda.fechaLlegada,
+        fechaVencimiento: tanda.fechaVencimiento,
+        producto: tanda.producto.nombre,
+        productoId: tanda.producto.id,
+      });
+      return tanda;
+    } catch (error) {
+      throw error;
+    }
+    // await this.inventarioSocketService.notifyUbicacionUpdate(ubicacion.bodega.id)
   }
 
   //!Proceso que requiere mucha carga, será lento.

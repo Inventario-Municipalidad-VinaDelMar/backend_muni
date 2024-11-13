@@ -137,6 +137,8 @@ export class MovimientosService {
             await this.planificacionSocketService.notifyEnvioUpdate(fechaEnvio,)
             //* Notificar por socket que el envio ha tenido un cambio
             await this.enviosSocketService.notifyEnvioUpdate(idEnvio)
+            //* Notificar por socket que el envio de la lista ha tenido un cambio
+            await this.enviosSocketService.notifyListEnviosUpdate()
             //Error de prueba
             return movimiento;
         } catch (error) {

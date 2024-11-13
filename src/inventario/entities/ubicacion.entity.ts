@@ -14,7 +14,7 @@ export class Ubicacion {
     @Column({ default: false })
     isDeleted: boolean;
 
-    @ManyToOne(() => Bodega, (bodega) => bodega.ubicaciones)
+    @ManyToOne(() => Bodega, (bodega) => bodega.ubicaciones, { eager: true })
     bodega: Bodega;
 
     @OneToMany(() => Tanda, (tanda) => tanda.ubicacion)

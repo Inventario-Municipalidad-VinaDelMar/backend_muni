@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
@@ -8,6 +8,7 @@ import { JwtPayload } from './interfaces';
 import { LoginUserDto } from './dto/login-user.dto';
 
 import * as bcrypt from 'bcrypt';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class AuthService {
@@ -16,6 +17,55 @@ export class AuthService {
     private readonly userRepository: Repository<User>,
     private readonly jwtService: JwtService,
   ) {
+  }
+  async findAllUsers(showAll: boolean = false) {
+    try {
+
+      const usuarios = await this.userRepository.find({
+        where: {
+          isActive: !showAll,
+        }
+      });
+      return usuarios;
+    } catch (error) {
+      this.handleDbErrors(error);
+    }
+  }
+  async deleteUser(idUser: string) {
+    try {
+      const userData = await this.userRepository.findOneBy({ id: idUser });
+      if (!userData) {
+        throw new NotFoundException(`El usuario con id ${idUser} no existe.`)
+      }
+      userData.isActive = false;
+      const user = await this.userRepository.save(userData);
+      return user;
+    } catch (error) {
+      this.handleDbErrors(error);
+    }
+  }
+  async updateUser(idUser: string, updateUserDto: UpdateUserDto) {
+    try {
+      const userData = await this.userRepository.findOneBy({ id: idUser });
+      if (!userData) {
+        throw new NotFoundException(`El usuario con id ${idUser} no existe.`)
+      }
+      // Itera sobre las propiedades de updateUserDto y actualiza solo si están definidas.
+      for (const [key, value] of Object.entries(updateUserDto)) {
+        if (value !== undefined) {
+          if (key === 'password') {
+            userData.password = bcrypt.hashSync(value, 10); // Hashear solo si es la contraseña
+          } else {
+            userData[key] = value;
+          }
+        }
+      }
+
+      const user = await this.userRepository.save(userData);
+      return user;
+    } catch (error) {
+      this.handleDbErrors(error);
+    }
   }
   async create(createUserDto: CreateUserDto) {
     try {
@@ -68,6 +118,9 @@ export class AuthService {
       if (!bcrypt.compareSync(password, user.password)) {
         throw new UnauthorizedException('Credenciales no validas');
       }
+      if (!user.isActive) {
+        throw new UnauthorizedException('Usuario inactivo');
+      }
       delete user.password
       delete user.isActive
       return {
@@ -96,7 +149,9 @@ export class AuthService {
       if (!user) {
         throw new UnauthorizedException('Usuario no encontrado');
       }
-
+      if (!user.isActive) {
+        throw new UnauthorizedException('Usuario inactivo');
+      }
       // Generar un nuevo token JWT
       const newToken = this.getjwtToken({ id: user.id });
 
