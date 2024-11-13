@@ -40,9 +40,8 @@ export class BaseService<T> {
                 }
             });
 
-            // Verifica si la entidad tiene la columna 'isDelete'
-            if (metadata.findColumnWithPropertyName('isDelete')) {
-                queryBuilder.where('entity.isDelete = :isDelete', { isDelete: false });
+            if (metadata.findColumnWithPropertyName('isDeleted')) {
+                queryBuilder.where('entity.isDeleted = :isDeleted', { isDeleted: false });
             }
 
             const entities = await queryBuilder.getMany();
