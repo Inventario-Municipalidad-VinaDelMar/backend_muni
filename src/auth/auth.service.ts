@@ -101,6 +101,7 @@ export class AuthService {
           email,
         },
         select: {
+          isActive: true,
           email: true,
           password: true,
           id: true,
