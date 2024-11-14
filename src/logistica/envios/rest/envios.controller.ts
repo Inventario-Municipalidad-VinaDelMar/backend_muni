@@ -9,6 +9,7 @@ import { User } from 'src/auth/entities/user.entity';
 import { IncidenteType } from '../entities/incidente-envio.entity';
 import { plainToInstance } from 'class-transformer';
 import { validate } from 'class-validator';
+import { DevolucionEnvioDto } from '../dto/devolucion-envio.dto';
 
 // @Auth()
 @Controller('envios')
@@ -67,6 +68,12 @@ export class EnviosController {
   completeNewEnvio() {
     return this.enviosService.completeNewEnvio();
   }
+  @Post(':id/devolucion')
+  @Auth(ValidRoles.admin, ValidRoles.bodeguero, ValidRoles.cargador)
+  devolucionProductos(@Param('id', ParseUUIDPipe) idEnvio: string, @Body() devolucionEnvioDto: DevolucionEnvioDto, @GetUser() user: User) {
+    return this.enviosService.processDevolucionEnvio(idEnvio, devolucionEnvioDto, user);
+  }
+
   @Post(':id/select')
   selectEnvioByNeorute(@Param('id', ParseUUIDPipe) idEnvio: string) {
     return this.enviosService.selectEnvioByNeorute(idEnvio);

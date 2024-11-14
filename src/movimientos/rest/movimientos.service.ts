@@ -14,14 +14,17 @@ import { CreateMovimientoIngresoDto } from '../dto/create_movimiento_ingreso';
 import { EnviosSocketService } from 'src/logistica/envios/socket/envios.socket.service';
 import { CreateMovimientoMermaDto } from '../dto/create_movimiento_merma.dto';
 import { normalizeDates } from 'src/utils';
+import { CreateMovimientoDevolucionDto } from '../dto/create_movimiento_devolucion';
 
 @Injectable()
 export class MovimientosService {
-    processingMerma: boolean = false;
-    processingIngreso: boolean = false;
-    processingRetiro: boolean = false;
+    // processingMerma: boolean = false;
+    // processingIngreso: boolean = false;
+    // processingRetiro: boolean = false;
+    // processingDevolucion: boolean = false;
 
     constructor(
+        @Inject(forwardRef(() => EnviosService))
         private readonly enviosService: EnviosService,
         private readonly enviosSocketService: EnviosSocketService,
         private readonly tandasService: TandasService,
@@ -77,16 +80,17 @@ export class MovimientosService {
         }
     }
 
+
     async createMovimientoAsMerma(createMovimientoMermaDto: CreateMovimientoMermaDto, user: User) {
         const { idTanda, cantidadMerma, comentario } = createMovimientoMermaDto;
-        if (this.processingMerma) {
-            throw new BadRequestException('Se esta procesando una merma ahora mismo, por favor espere');
-        }
+        // if (this.processingMerma) {
+        //     throw new BadRequestException('Se esta procesando una merma ahora mismo, por favor espere');
+        // }
         // Iniciar la transacción
         const queryRunner: QueryRunner = this.dataSource.createQueryRunner();
         await queryRunner.connect();
         await queryRunner.startTransaction();
-        this.processingMerma = true;
+        // this.processingMerma = true;
         try {
             // Crear el movimiento
             const tandaInstance = this.tandasService.generateClass(idTanda);
@@ -116,22 +120,22 @@ export class MovimientosService {
         } catch (error) {
             // Revertir todos los cambios si ocurre un error
             await queryRunner.rollbackTransaction();
-            this.processingMerma = false;
+            // this.processingMerma = false;
             throw error;
         } finally {
             // Liberar el queryRunner
             await queryRunner.release();
-            this.processingMerma = false;
+            // this.processingMerma = false;
         }
     }
 
     async createMovimientoAsRetiro(createMovimientoRetiroDto: CreateMovimientoRetiroDto, user: User) {
         const { idEnvioProducto, idTanda, cantidadRetirada } = createMovimientoRetiroDto;
 
-        if (this.processingRetiro) {
-            throw new BadRequestException('Se esta procesando un ingreso ahora mismo, por favor espere');
-        }
-        this.processingRetiro = true;
+        // if (this.processingRetiro) {
+        //     throw new BadRequestException('Se esta procesando un ingreso ahora mismo, por favor espere');
+        // }
+        // this.processingRetiro = true;
         //Verificar si el movimiento tiene vinculo con un envio actual
         const { fechaEnvio, idEnvio } = await this.enviosService.verifyEnvioByEnvioProducto(idEnvioProducto);
 
@@ -189,26 +193,88 @@ export class MovimientosService {
             return movimiento;
         } catch (error) {
             // Revertir todos los cambios si ocurre un error
-            this.processingRetiro = false;
+            // this.processingRetiro = false;
             await queryRunner.rollbackTransaction();
             throw error;
         } finally {
             // Liberar el queryRunner
-            this.processingRetiro = false;
+            // this.processingRetiro = false;
+            await queryRunner.release();
+        }
+    }
+    async createMovimientoAsDevolucion(createMovimientoDevolucionDto: CreateMovimientoDevolucionDto, user: User) {
+        const { comentario, idTanda, cantidadDevuelta, idEnvio } = createMovimientoDevolucionDto;
+
+        // if (this.processingDevolucion) {
+        //     throw new BadRequestException('Se esta procesando un ingreso ahora mismo, por favor espere');
+        // }
+        // this.processingDevolucion = true;
+
+        // Iniciar la transacción
+        const queryRunner: QueryRunner = this.dataSource.createQueryRunner();
+        await queryRunner.connect();
+        await queryRunner.startTransaction();
+
+
+        try {
+            // Crear el movimiento
+            const tandaInstance = this.tandasService.generateClass(idTanda);
+            const movimientoCreated = this.movimientoRepository.create({
+                cantidadRetirada: cantidadDevuelta,
+                tanda: tandaInstance,
+                comentario,
+                devolucionFromEnvio: this.enviosService.instanceEnvio(idEnvio),
+                realizador: user,
+                type: MovimientoType.DEVOLUCION,
+            });
+
+            // Guardar el movimiento dentro de la transacción
+            const movimiento = await queryRunner.manager.save(movimientoCreated);
+
+            // Descontar la cantidad del movimiento a la tanda
+            const tanda: TandaResponse = await this.tandasService.addAmountToTanda(queryRunner, idTanda, cantidadDevuelta);
+
+            delete movimiento.tanda
+            delete movimiento.isDeleted;
+
+
+
+            // Confirmar la transacción
+            await queryRunner.commitTransaction();
+
+            //* Notificar por socket actualización de la tanda
+            await this.movimientosSocketService.notifyTandaDiscount(tanda)
+
+            //* Notificar por socket que el envio ha tenido un cambio
+            await this.enviosSocketService.notifyEnvioUpdate(idEnvio)
+
+            //* Notificar por socket que el envio de la lista ha tenido un cambio
+            await this.enviosSocketService.notifyListEnviosUpdate()
+
+            return movimiento;
+        } catch (error) {
+            // Revertir todos los cambios si ocurre un error
+            // this.processingDevolucion = false;
+            console.log({ error })
+            await queryRunner.rollbackTransaction();
+            throw error;
+        } finally {
+            // Liberar el queryRunner
+            // this.processingDevolucion = false;
             await queryRunner.release();
         }
     }
 
     async createMovimientoAsIngreso(createMovimientoIngresoDto: CreateMovimientoIngresoDto, user: User) {
         const { idTanda, cantidadRetirada } = createMovimientoIngresoDto;
-        if (this.processingIngreso) {
-            throw new BadRequestException('Se esta procesando una merma ahora mismo, por favor espere');
-        }
+        // if (this.processingIngreso) {
+        //     throw new BadRequestException('Se esta procesando una merma ahora mismo, por favor espere');
+        // }
         // Iniciar la transacción
         const queryRunner: QueryRunner = this.dataSource.createQueryRunner();
         await queryRunner.connect();
         await queryRunner.startTransaction();
-        this.processingIngreso = true;
+        // this.processingIngreso = true;
 
         try {
             // Crear el movimiento
@@ -236,12 +302,12 @@ export class MovimientosService {
         } catch (error) {
             // Revertir todos los cambios si ocurre un error
             await queryRunner.rollbackTransaction();
-            this.processingIngreso = false;
+            // this.processingIngreso = false;
             throw error;
         } finally {
             // Liberar el queryRunner
             await queryRunner.release();
-            this.processingIngreso = false;
+            // this.processingIngreso = false;
         }
     }
 

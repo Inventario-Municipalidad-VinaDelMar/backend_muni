@@ -185,6 +185,26 @@ export class TandasService extends BaseService<Tanda> {
             this.handleDbExceptions(error);
         }
     }
+    //?@Update
+    async addAmountToTanda(queryRunner: QueryRunner, idTanda: string, amount: number): Promise<TandaResponse> {
+        try {
+            const tandaToUpdate = await this.findOne(idTanda);
+
+            tandaToUpdate.cantidadActual += amount;//Sumar cantidad
+            const tanda = await queryRunner.manager.save(tandaToUpdate);
+            delete tanda.isDeleted;
+            return {
+                ...tanda,
+                bodega: tanda.bodega.nombre,
+                producto: tanda.producto.nombre,
+                ubicacion: tanda.ubicacion.descripcion,
+                productoId: tanda.producto.id,
+            };
+
+        } catch (error) {
+            this.handleDbExceptions(error);
+        }
+    }
 
 
 }

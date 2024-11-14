@@ -25,9 +25,11 @@ export class EnviosSocketService {
             const roomAdmin = `envios-${fecha}-all`;
             const enviosAdmin = await this.enviosService.getEnviosByFecha(fecha, true);
             this.wss.to(roomAdmin).emit('loadEnviosByFecha', enviosAdmin);
+            console.log('Admin nofificado')
             if (onlyAdmin) {
                 return;
             }
+            console.log('Normal nofificado')
             const roomCommom = `envios-${fecha}-partial`;
             const enviosCommom = await this.enviosService.getEnviosByFecha(fecha, false);
             this.wss.to(roomCommom).emit('loadEnviosByFecha', enviosCommom);

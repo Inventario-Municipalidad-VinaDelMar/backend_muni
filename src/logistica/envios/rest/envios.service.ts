@@ -1,7 +1,7 @@
 import { BadRequestException, forwardRef, Inject, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { Envio, EnvioStatus } from '../entities/envio.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, QueryRunner, Not, In } from 'typeorm';
+import { Repository, QueryRunner, Not, In, FindOptions, FindOptionsWhere } from 'typeorm';
 import { normalizeDates } from 'src/utils';
 // import { CategoriasService } from 'src/inventario/rest/servicios-especificos';
 import { EnvioProducto } from '../entities/envio-producto.entity';
@@ -18,6 +18,8 @@ import { IncidenteProducto } from '../entities/incidente-producto.entity';
 import { CreateIncidenteDto } from '../dto/create-incidente.dto';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { Entrega } from 'src/logistica/entregas/entities/entrega.entity';
+import { DevolucionEnvioDto } from '../dto/devolucion-envio.dto';
+import { MovimientosService } from 'src/movimientos/rest/movimientos.service';
 
 @Injectable()
 export class EnviosService {
@@ -40,11 +42,57 @@ export class EnviosService {
 
     @Inject(forwardRef(() => EnviosSocketService))
     private readonly enviosSocketService: EnviosSocketService,
+    @Inject(forwardRef(() => MovimientosService))
+    private readonly movimientosService: MovimientosService,
 
     private readonly productosService: ProductosService,
     private readonly planificacionSocketService: PlanificacionSocketService,
     private readonly cloudinaryService: CloudinaryService,
   ) { }
+
+  async processDevolucionEnvio(idEnvio: string, devolucionEnvioDto: DevolucionEnvioDto, user: User) {
+    try {
+      const { comentario, } = devolucionEnvioDto;
+      const envio = await this.envioRepository.findOne({
+        where: {
+          isDeleted: false,
+          id: idEnvio,
+        },
+        relations: ['devoluciones.tanda.producto', 'devoluciones', 'entregas', 'entregas.detallesEntrega', 'incidentes', 'incidentes.productosAfectados']
+      });
+
+      if (!envio) {
+        throw new NotFoundException(`El envio con id ${idEnvio} no existe.`);
+      }
+      //Solo envio finalziados, pueden procesar devolciones
+      if (envio.status !== EnvioStatus.FINALIZADO) {
+        throw new BadRequestException(`El envio ${idEnvio} aun no esta finalizado.`)
+      }
+
+      const productosData = this.calculateCargaActual(envio, envio.productosPlanificados);
+      const productos = productosData.map(productoCalculado => {
+        const productoOriginal = envio.productosPlanificados.find(p => p.producto.id === productoCalculado.productoId);
+        return {
+          ...productoCalculado,
+          tandaId: productoOriginal.movimiento.tanda.id,
+        };
+      });
+
+      const movimientosPromises = productos.map(p => {
+        return () => this.movimientosService.createMovimientoAsDevolucion({
+          cantidadDevuelta: p.cantidad,
+          comentario,
+          idEnvio,
+          idTanda: p.tandaId,
+        }, user);
+      });
+      const movimientos = await Promise.all(movimientosPromises.map(fn => fn()));
+      return movimientos;
+    } catch (error) {
+      throw error;
+    }
+  }
+
   async selectEnvioByNeorute(idEnvio: string) {
     try {
       const envio = await this.envioRepository.findOneBy({ id: idEnvio });
@@ -147,7 +195,6 @@ export class EnviosService {
     }
   }
 
-
   async createNewEnvio(solicitud: SolicitudEnvio, user: User) {
     try {
       const fechaActual = normalizeDates.currentFecha();
@@ -190,256 +237,38 @@ export class EnviosService {
       throw error;
     }
   }
-
-  async getEnviosToNeorute(fecha: string): Promise<EnvioResponseList[]> {
-    return this.fetchEnvios(fecha, [EnvioStatus.CARGA_COMPLETA], 'DESC', [
-      'solicitud',
-      'entregas',
-      'entregas.detallesEntrega',
-      'incidentes',
-      'incidentes.productosAfectados',
-    ]);
-  }
-
-
   async getEnviosByFecha(fecha: string, adminView: boolean = false) {
     try {
-      const fechaFormatted = normalizeDates.normalize(fecha);
-      const statusAvailables = [EnvioStatus.SIN_CARGAR, EnvioStatus.CARGANDO];
-
-      //El administrador puede ver todos los envios sin importar el status
-      if (adminView) {
-        //Se espera que la lista quede vacia
-        statusAvailables.splice(0, statusAvailables.length);
-      }
-      const enviosData = await this.envioRepository.find({
-        where: {
-          isDeleted: false,
-          fecha: fechaFormatted,
-          status: Not(In(statusAvailables)),
-
-        },
-        order: {
-          horaCreacion: 'DESC',
-        },
-        relations: ['solicitud', 'entregas', 'entregas.detallesEntrega', 'incidentes', 'incidentes.productosAfectados'],
-        //?Activar si es necesaria
-      });
-      enviosData.forEach(envio => {
-        envio.entregas = envio.entregas.sort((a, b) => {
-          // Extrae horas, minutos y segundos como números
-          const [hoursA, minutesA, secondsA] = a.hora.split(':').map(Number);
-          const [hoursB, minutesB, secondsB] = b.hora.split(':').map(Number);
-
-          // Crea un timestamp solo con horas, minutos y segundos
-          const timeA = new Date(1970, 0, 1, hoursA, minutesA, secondsA).getTime();
-          const timeB = new Date(1970, 0, 1, hoursB, minutesB, secondsB).getTime();
-          return timeA - timeB;
-        });
-      });
-
-
-
-      const envios = enviosData.map(e => {
-        delete e.isDeleted;
-        const productosData = e.productosPlanificados;
-        const productos = productosData
-          .filter(pp => pp.movimiento)
-          .map(p => {
-            const carga: ProductoOnEnvio = {
-              cantidad: p.movimiento.cantidadRetirada,
-              producto: p.producto.nombre,
-              productoId: p.producto.id,
-              urlImagen: p.producto.urlImagen,
-            }
-            //Restar carga inicial con productos entregados
-            e.entregas.map(e => {
-              e.detallesEntrega.map(detalle => {
-                if (detalle.producto.id === carga.productoId) {
-                  carga.cantidad -= detalle.cantidadEntregada;
-                  if (carga.cantidad < 0) {
-                    throw new BadRequestException(`El producto ${carga.producto} a quedado con carga negativa: ${carga.cantidad}`);
-                  }
-                }
-              })
-            });
-            //Restar carga inicial con productos afectados en incidente
-            e.incidentes.map(i => {
-              i.productosAfectados.map(pi => {
-                if (pi.producto.id === carga.productoId) {
-                  carga.cantidad -= pi.cantidadAfectada;
-                  if (carga.cantidad < 0) {
-                    throw new BadRequestException(`El producto ${carga.producto} a quedado con carga negativa: ${carga.cantidad}`);
-                  }
-                }
-              })
-            });
-            return {
-              ...carga,
-            }
-          }).sort((a, b) => b.cantidad - a.cantidad);
-
-        delete e.productosPlanificados;
-        const solicitud = e.solicitud;
-        delete e.solicitud;
-        //Modifica la respuesta de entregas
-        const entregas = e.entregas.map(e => {
-          const copiloto = e.copiloto;
-          const comedor = e.comedorSolidario;
-          const numProductos = e.detallesEntrega.length;
-          delete e.copiloto;
-          delete e.comedorSolidario;
-          delete e.isDeleted;
-          delete e.detallesEntrega;
-          delete e.envio;
-          // delete e.id;
-          return {
-            ...e,
-            comedorSolidario: comedor.nombre,
-            comedorDireccion: comedor.direccion,
-            realizador: `${copiloto.nombre} ${copiloto.apellidoPaterno} ${copiloto.apellidoMaterno}`,
-            realizadorId: copiloto.id,
-            productosEntregados: numProductos,
-          };
-        });
-        delete e.entregas;
-        const incidentes = e.incidentes.map(i => {
-          const productos = i.productosAfectados;
-          delete i.isDeleted;
-          delete i.envio;
-          return {
-            ...i,
-            productosAfectados: productos.map(p => {
-              delete p.incidente;
-              return {
-                cantidad: p.cantidadAfectada,
-                producto: p.producto.nombre,
-                productoId: p.producto.id,
-                urlImagen: p.producto.urlImagen,
-              }
-            })
-          };
-        });
-        delete e.incidentes;
-
-        //TODO: Modificar la respuesta para incidentes
-        return {
-          ...e,
-          autorizante: `${solicitud.administrador.nombre} ${solicitud.administrador.apellidoPaterno} ${solicitud.administrador.apellidoMaterno}`,
-          solicitante: `${solicitud.solicitante.nombre} ${solicitud.solicitante.apellidoPaterno} ${solicitud.solicitante.apellidoMaterno}`,
-          productos,
-          entregas,
-          incidentes,
-        };
-      });
-      return envios;
-
+      const enviosData = await this.loadEnvioRelations(undefined, fecha, adminView);
+      return enviosData.map(envio => this.buildEnvioResponse(envio));
     } catch (error) {
       throw error;
     }
   }
+
   async getEnvioById(idEnvio: string): Promise<EnvioResponseUnique> {
     try {
-
-      const envioData = await this.envioRepository.findOne({
-        where: {
-          isDeleted: false,
-          id: idEnvio,
-        },
-        relations: ['entregas', 'entregas.detallesEntrega', 'solicitud']
-      })
-      if (!envioData) {
-        throw new BadRequestException(`El envio con id ${idEnvio} no existe`)
+      const enviosData = await this.loadEnvioRelations(idEnvio);
+      if (!enviosData.length) {
+        throw new BadRequestException(`El envio con id ${idEnvio} no existe`);
       }
-      const envio: EnvioResponseUnique = {
-        id: envioData.id,
-        fecha: envioData.fecha,
-        horaCreacion: envioData.horaInicioEnvio,
-        horaInicioEnvio: envioData.horaInicioEnvio,
-        horaFinalizacion: envioData.horaFinalizacion,
-        status: envioData.status,
-        administrador: envioData.solicitud.administrador,
-        solicitante: envioData.solicitud.solicitante,
-        movimientos: [],
-        entregas: [],
-        cargaInicial: [],
-        cargaActual: [],
-      };
-
-      envio.movimientos = envioData.productosPlanificados
-        .filter(pp => pp.movimiento) // Filtrar los que tienen movimiento
-        .map(pp => ({
-          id: pp.movimiento.id,
-          cantidadRetirada: pp.movimiento.cantidadRetirada,
-          producto: pp.producto.nombre,
-          productoId: pp.producto.id,
-          fecha: pp.movimiento.fecha,
-          hora: pp.movimiento.hora,
-        }));
-
-      envio.entregas = envioData.entregas.map(e => ({
-        id: e.id,
-        comedorSolidario: e.comedorSolidario.nombre,
-        comedorSolidarioId: e.comedorSolidario.id,
-        copiloto: e.copiloto,
-        fecha: e.fecha as unknown as string,
-        // fecha: normalizeDates.normalize(e.fecha as unknown as string),
-        hora: e.hora,
-        urlActaLegal: e.url_acta_legal,
-        productosEntregados: e.detallesEntrega.map(ed => ({
-          producto: ed.producto.nombre,
-          productoId: ed.producto.id,
-          cantidad: ed.cantidadEntregada,
-          urlImagen: ed.producto.urlImagen,
-        })),
-      }));
-
-      if (![EnvioStatus.EN_ENVIO, EnvioStatus.FINALIZADO].includes(envioData.status)) {
-        return envio;
-      }
-
-      envio.cargaInicial = envioData.productosPlanificados
-        .filter(pp => pp.movimiento).map(p => ({
-          cantidad: p.movimiento.cantidadRetirada,
-
-          producto: p.producto.nombre,
-          productoId: p.producto.id,
-          urlImagen: p.producto.urlImagen,
-        }));
-
-      envio.cargaActual = envioData.productosPlanificados
-        .filter(pp => pp.movimiento)
-        .map(p => {
-          const carga: ProductoOnEnvio = {
-            cantidad: p.movimiento.cantidadRetirada,
-            producto: p.producto.nombre,
-            productoId: p.producto.id,
-            urlImagen: p.producto.urlImagen,
-          }
-          //Restar carga inicial con productos entregados
-          envioData.entregas.map(e => {
-            e.detallesEntrega.map(detalle => {
-              if (detalle.producto.id === carga.productoId) {
-                carga.cantidad -= detalle.cantidadEntregada;
-                if (carga.cantidad < 0) {
-                  throw new BadRequestException(`El producto ${carga.producto} a quedado con carga negativa: ${carga.cantidad}`);
-                }
-              }
-            })
-          });
-          //TODO: añadir la resta de incidente envio
-          return {
-            ...carga,
-          }
-        });
-
-
-      return envio;
-
+      return this.buildEnvioResponse(enviosData[0], true);
     } catch (error) {
       throw error;
     }
   }
+
+  async getEnviosToNeorute(fecha: string): Promise<EnvioResponseList[]> {
+    try {
+      const enviosData = await this.loadEnvioRelations(undefined, fecha, false, true);
+      return enviosData.map(envio => this.buildEnvioResponse(envio));
+    } catch (error) {
+      throw error;
+    }
+  }
+
+
+
 
   async completeNewEnvio() {
     try {
@@ -643,115 +472,187 @@ export class EnviosService {
     }
   }
 
-  //Test: funciones reutilizables
-  private async fetchEnvios(
-    fecha: string,
-    statusFilter: EnvioStatus[],
-    orderDirection: 'ASC' | 'DESC',
-    relations: string[],
-  ): Promise<EnvioResponseList[]> {
-    const fechaFormatted = normalizeDates.normalize(fecha);
-    const enviosData = await this.envioRepository.find({
-      where: {
-        isDeleted: false,
-        fecha: fechaFormatted,
-        status: statusFilter.length ? Not(In(statusFilter)) : undefined,
-      },
-      order: { horaCreacion: orderDirection },
-      relations,
-    });
+  private calculateCargaActual(envio: Envio, productos: EnvioProducto[]) {
+    if (!envio.entregas) {
+      throw new InternalServerErrorException('El envio no tiene las entregas');
+    }
+    if (!envio.incidentes) {
+      throw new InternalServerErrorException('El envio no tiene los incidentes');
+    }
+    if (!envio.devoluciones) {
+      throw new InternalServerErrorException('El envio no tiene las devoluciones');
+    }
+    return productos
+      .filter(pp => pp.movimiento)
+      .map(p => {
+        const carga: ProductoOnEnvio = {
+          cantidad: p.movimiento.cantidadRetirada,
+          producto: p.producto.nombre,
+          productoId: p.producto.id,
+          urlImagen: p.producto.urlImagen,
+        }
+        //Restar carga inicial con productos entregados
+        envio.entregas.map(e => {
+          e.detallesEntrega.map(detalle => {
+            if (detalle.producto.id === carga.productoId) {
+              carga.cantidad -= detalle.cantidadEntregada;
+              if (carga.cantidad < 0) {
+                throw new BadRequestException(`El producto ${carga.producto} a quedado con carga negativa: ${carga.cantidad}`);
+              }
+            }
+          })
+        });
+        //Restar carga inicial con productos afectados en incidente
+        envio.incidentes.map(i => {
+          i.productosAfectados.map(pi => {
+            if (pi.producto.id === carga.productoId) {
+              carga.cantidad -= pi.cantidadAfectada;
+              if (carga.cantidad < 0) {
+                throw new BadRequestException(`El producto ${carga.producto} a quedado con carga negativa: ${carga.cantidad}`);
+              }
+            }
+          })
+        });
+        //Restar carga inicial con devoluciones asociadas
+        envio.devoluciones.map(dm => {
+          if (dm.tanda.producto.id === carga.productoId) {
+            carga.cantidad -= dm.cantidadRetirada;
+            if (carga.cantidad < 0) {
+              throw new BadRequestException(`El producto ${carga.producto} a quedado con carga negativa: ${carga.cantidad}`);
+            }
+          }
+        });
+        return {
+          ...carga,
+        }
+      }).sort((a, b) => b.cantidad - a.cantidad);
 
-    enviosData.forEach(envio => this.orderEntregasByTime(envio.entregas));
-
-    return enviosData.map(envio => this.mapEnvioToResponse(envio));
   }
 
-  private orderEntregasByTime(entregas: Entrega[]) {
-    entregas.sort((a, b) => {
-      const [hoursA, minutesA, secondsA] = a.hora.split(':').map(Number);
-      const [hoursB, minutesB, secondsB] = b.hora.split(':').map(Number);
-      const timeA = new Date(1970, 0, 1, hoursA, minutesA, secondsA).getTime();
-      const timeB = new Date(1970, 0, 1, hoursB, minutesB, secondsB).getTime();
+  private async loadEnvioRelations(
+    idEnvio?: string,
+    fecha?: string,
+    adminView: boolean = false,
+    neorute: boolean = false,
+  ): Promise<Envio[]> {
+    const statusAvailables = [EnvioStatus.SIN_CARGAR, EnvioStatus.CARGANDO];
+
+    if (adminView) {
+      statusAvailables.length = 0; // Limpiar restricciones si es admin
+    }
+    if (neorute) {
+      statusAvailables.length = 0;
+      statusAvailables.push(EnvioStatus.SIN_CARGAR)
+      statusAvailables.push(EnvioStatus.CARGANDO)
+      statusAvailables.push(EnvioStatus.FINALIZADO)
+      statusAvailables.push(EnvioStatus.EN_ENVIO)
+    }
+    const condiciones: FindOptionsWhere<Envio> = idEnvio
+      ? { id: idEnvio, isDeleted: false, status: Not(In(statusAvailables)), }
+      : { fecha: normalizeDates.normalize(fecha), isDeleted: false, status: Not(In(statusAvailables)) };
+    return await this.envioRepository.find({
+      where: condiciones,
+      relations: [
+        'devoluciones.tanda.producto',
+        'solicitud',
+        'entregas',
+        'entregas.detallesEntrega',
+        'incidentes',
+        'incidentes.productosAfectados',
+      ],
+      order: idEnvio ? undefined : { horaCreacion: 'DESC' },
+    });
+  }
+
+  private sortEnvioData(envio: Envio): void {
+    envio.entregas.sort((a, b) => {
+      const timeA = new Date(`1970-01-01T${a.hora}`).getTime();
+      const timeB = new Date(`1970-01-01T${b.hora}`).getTime();
       return timeA - timeB;
     });
+    envio.incidentes.sort((a, b) => {
+      const timeA = new Date(`1970-01-01T${a.hora}`).getTime();
+      const timeB = new Date(`1970-01-01T${b.hora}`).getTime();
+      return timeB - timeA;
+    });
   }
 
-  private mapEnvioToResponse(envio: Envio): EnvioResponseList {
-    const productos = envio.productosPlanificados
-      .filter(pp => pp.movimiento)
-      .map(this.calculateProductoCarga.bind(this, envio))
-      .sort((a: ProductoOnEnvio, b: ProductoOnEnvio) => b.cantidad - a.cantidad) as ProductoOnEnvio[];
+  private buildEnvioResponse(envio: Envio, listDetail: boolean = false): any {
+    this.sortEnvioData(envio);
 
-    const entregas = envio.entregas.map(entrega => ({
-      comedorSolidario: entrega.comedorSolidario.nombre,
-      comedorDireccion: entrega.comedorSolidario.direccion,
-      realizador: `${entrega.copiloto.nombre} ${entrega.copiloto.apellidoPaterno} ${entrega.copiloto.apellidoMaterno}`,
-      realizadorId: entrega.copiloto.id,
-      productosEntregados: entrega.detallesEntrega.length,
-    }));
+    const cargaActual = this.calculateCargaActual(envio, envio.productosPlanificados);
+    const cargaInicial = envio.productosPlanificados
+      .filter(pp => pp.movimiento).map(p => ({
+        cantidad: p.movimiento.cantidadRetirada,
 
-    const incidentes: IncidenteResponse[] = envio.incidentes.map(incidente => ({
-      id: incidente.id,
-      descripcion: incidente.descripcion,
-      type: incidente.type,
-      evidenciaFotograficaUrl: incidente.evidenciaFotograficaUrl,
-      fecha: incidente.fecha as unknown as string,
-      hora: incidente.hora,
-      causeCloseEnvio: incidente.causeCloseEnvio,
-      productosAfectados: incidente.productosAfectados.map(p => ({
-        cantidad: p.cantidadAfectada,
         producto: p.producto.nombre,
         productoId: p.producto.id,
         urlImagen: p.producto.urlImagen,
-      })),
-    }));
+      }));
+    const movimientos = envio.productosPlanificados
+      .filter(pp => pp.movimiento) // Filtrar los que tienen movimiento
+      .map(pp => ({
+        id: pp.movimiento.id,
+        cantidadRetirada: pp.movimiento.cantidadRetirada,
+        producto: pp.producto.nombre,
+        productoId: pp.producto.id,
+        fecha: pp.movimiento.fecha,
+        hora: pp.movimiento.hora,
+      }));
     const solicitud = envio.solicitud;
-    delete envio.solicitud;
+
+    const entregas = envio.entregas.map(e => {
+      const copiloto = e.copiloto;
+      const comedor = e.comedorSolidario;
+      const numProductos = e.detallesEntrega.length;
+      delete e.copiloto;
+      delete e.comedorSolidario;
+      delete e.isDeleted;
+      delete e.detallesEntrega;
+      delete e.envio;
+      // delete e.id;
+      return {
+        ...e,
+        comedorSolidario: comedor.nombre,
+        comedorDireccion: comedor.direccion,
+        realizador: `${copiloto.nombre} ${copiloto.apellidoPaterno} ${copiloto.apellidoMaterno}`,
+        realizadorId: copiloto.id,
+        productosEntregados: numProductos,
+      };
+    });
+
+    const incidentes = envio.incidentes.map(i => {
+      const productos = i.productosAfectados;
+      delete i.isDeleted;
+      delete i.envio;
+      return {
+        ...i,
+        productosAfectados: productos.map(p => {
+          delete p.incidente;
+          return {
+            cantidad: p.cantidadAfectada,
+            producto: p.producto.nombre,
+            productoId: p.producto.id,
+            urlImagen: p.producto.urlImagen,
+          }
+        })
+      };
+    });
     delete envio.isDeleted;
+    delete envio.entregas;
+    delete envio.incidentes;
     delete envio.productosPlanificados;
+    delete envio.solicitud;
+    delete envio.devoluciones;
     return {
       ...envio,
       autorizante: `${solicitud.administrador.nombre} ${solicitud.administrador.apellidoPaterno} ${solicitud.administrador.apellidoMaterno}`,
       solicitante: `${solicitud.solicitante.nombre} ${solicitud.solicitante.apellidoPaterno} ${solicitud.solicitante.apellidoMaterno}`,
-      productos,
       entregas,
       incidentes,
+      ...(listDetail ? { cargaInicial, cargaActual, movimientos } : { productos: cargaActual }),
     };
   }
-
-  private calculateProductoCarga(envio: Envio, productoPlanificado: EnvioProducto): ProductoOnEnvio {
-    const carga: ProductoOnEnvio = {
-      cantidad: productoPlanificado.movimiento.cantidadRetirada,
-      producto: productoPlanificado.producto.nombre,
-      productoId: productoPlanificado.producto.id,
-      urlImagen: productoPlanificado.producto.urlImagen,
-    };
-
-    envio.entregas.forEach(entrega => {
-      entrega.detallesEntrega.forEach(detalle => {
-        if (detalle.producto.id === carga.productoId) {
-          carga.cantidad -= detalle.cantidadEntregada;
-          if (carga.cantidad < 0) {
-            throw new BadRequestException(`El producto ${carga.producto} ha quedado con carga negativa: ${carga.cantidad}`);
-          }
-        }
-      });
-    });
-
-    envio.incidentes.forEach(incidente => {
-      incidente.productosAfectados.forEach(productoAfectado => {
-        if (productoAfectado.producto.id === carga.productoId) {
-          carga.cantidad -= productoAfectado.cantidadAfectada;
-          if (carga.cantidad < 0) {
-            throw new BadRequestException(`El producto ${carga.producto} ha quedado con carga negativa: ${carga.cantidad}`);
-          }
-        }
-      });
-    });
-
-    return carga;
-  }
-
 
 
 

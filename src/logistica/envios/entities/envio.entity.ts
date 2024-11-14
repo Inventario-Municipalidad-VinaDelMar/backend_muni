@@ -4,6 +4,7 @@ import { SolicitudEnvio } from "src/planificacion/entities/solicitud-envio.entit
 import { Entrega } from "src/logistica/entregas/entities/entrega.entity";
 import { normalizeDates } from "src/utils";
 import { IncidenteEnvio } from "./incidente-envio.entity";
+import { Movimiento } from "src/movimientos/entities/movimiento.entity";
 
 export enum EnvioStatus {
     SIN_CARGAR = 'Sin cargar',
@@ -50,6 +51,9 @@ export class Envio {
 
     @OneToMany(() => IncidenteEnvio, (incidenteEnvio) => incidenteEnvio.envio, { cascade: ['remove'] })
     incidentes: IncidenteEnvio[];
+
+    @OneToMany(() => Movimiento, (movimiento) => movimiento.devolucionFromEnvio, { cascade: ['remove'] })
+    devoluciones: Movimiento[];
 
     @OneToOne(() => SolicitudEnvio, (solicitud) => solicitud.envioAsociado, { cascade: ['remove'] })
     @JoinColumn()
