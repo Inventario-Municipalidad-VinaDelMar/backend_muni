@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, Patch, Delete, Param, ParseUUIDPipe, UseInterceptors, UploadedFile, ParseFilePipe, MaxFileSizeValidator, FileTypeValidator } from '@nestjs/common';
+import { Controller, Post, Body, Get, Patch, Delete, Param, ParseUUIDPipe, UseInterceptors, UploadedFile, ParseFilePipe, MaxFileSizeValidator, FileTypeValidator, Query } from '@nestjs/common';
 import { InventarioService } from './inventario.service';
 import { CreateBodegaDto, CreateProductoDto, CreateTandaDto, CreateUbicacionDto, UpdateBodegaDto, UpdateTandaDto, UpdateUbicacionDto } from '../dto/rest-dto';
 import { Auth, GetUser } from 'src/auth/decorators';
@@ -89,7 +89,7 @@ export class InventarioController {
 
   //?Informacion para graficos
   @Get('infoCharts')
-  getInfoCharts(@Body() getInfoCharts: GetInfoCharts,) {
+  getInfoCharts(@Query() getInfoCharts: GetInfoCharts,) {
     return this.inventarioService.getInfoCharts(getInfoCharts);
   }
 }
