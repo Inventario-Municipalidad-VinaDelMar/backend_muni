@@ -48,9 +48,10 @@ export class EnviosSocketGateway {
         if (!idEnvio) {
             throw new BadRequestException('El id del envio es inexistente.')
         }
+        const isAdmin = user.roles.includes('administrador')
         try {
             const data =
-                await this.enviosSocketService.getEnvioById(idEnvio);
+                await this.enviosSocketService.getEnvioById(idEnvio, isAdmin);
             client.emit(`${idEnvio}-loadEnvioById`, data);
         } catch (error) {
             client.emit(`${idEnvio}-loadEnvioById`, error.response);

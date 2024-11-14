@@ -40,7 +40,7 @@ export class EnviosSocketService {
     }
     async notifyEnvioUpdate(idEnvio: string) {
         if (this.wss) {
-            const envio = await this.enviosService.getEnvioById(idEnvio);
+            const envio = await this.enviosService.getEnvioById(idEnvio, true);
             this.wss.emit(`${idEnvio}-loadEnvioById`, envio);
         } else {
             console.error('WebSocket server not initialized - To emit envio by id updated');
@@ -56,10 +56,10 @@ export class EnviosSocketService {
             throw new BadRequestException();
         }
     }
-    async getEnvioById(idEnvio: string) {
+    async getEnvioById(idEnvio: string, isAdmin: boolean) {
         if (this.wss) {
             try {
-                const envio = await this.enviosService.getEnvioById(idEnvio);
+                const envio = await this.enviosService.getEnvioById(idEnvio, isAdmin);
                 return envio;
             } catch (error) {
                 throw error;

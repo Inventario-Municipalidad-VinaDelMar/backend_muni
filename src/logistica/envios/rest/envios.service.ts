@@ -246,9 +246,9 @@ export class EnviosService {
     }
   }
 
-  async getEnvioById(idEnvio: string): Promise<EnvioResponseUnique> {
+  async getEnvioById(idEnvio: string, isAdmin: boolean = false): Promise<EnvioResponseUnique> {
     try {
-      const enviosData = await this.loadEnvioRelations(idEnvio);
+      const enviosData = await this.loadEnvioRelations(idEnvio, null, isAdmin);
       if (!enviosData.length) {
         throw new BadRequestException(`El envio con id ${idEnvio} no existe`);
       }
@@ -439,13 +439,16 @@ export class EnviosService {
   async updateEnvioProducto(queryRunner: QueryRunner, movimiento: Movimiento) {
     try {
       const envioProducto = await this.findOneEnvioProducto(movimiento.envioProducto.id);
+      const envio = await this.envioRepository.findOneBy({ id: envioProducto.envio.id });
       delete movimiento.envioProducto;
       envioProducto.movimiento = movimiento;
 
       await queryRunner.manager.save(envioProducto);
 
       //Actualizar el estado del envio
-      const envio = envioProducto.envio;
+      if (!envio) {
+        throw new NotFoundException(`El envio ${envioProducto.id} no existe para realizar el movimiento`)
+      }
       if (envio.status !== EnvioStatus.SIN_CARGAR) return;
 
       envio.status = EnvioStatus.CARGANDO;
