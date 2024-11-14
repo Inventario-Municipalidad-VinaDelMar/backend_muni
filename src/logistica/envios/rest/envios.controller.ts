@@ -78,9 +78,11 @@ export class EnviosController {
 
   @Get('')
   // @Auth(ValidRoles.admin, ValidRoles.bodeguero, ValidRoles.cargador)
-  getEnvios(@Body() getEnviosDto: GetEnviosDto) {
-    const { fecha } = getEnviosDto;
-    return this.enviosService.getEnviosToNeorute(fecha);
+  getEnvios(@Body() getEnviosDto: any) {
+    console.log(getEnviosDto)
+    // getEnvios(@Body() getEnviosDto: GetEnviosDto) {
+    // const { fecha } = getEnviosDto;
+    // return this.enviosService.getEnviosToNeorute(fecha);
     // return this.enviosService.getEnviosByFecha(fecha);
   }
 

@@ -33,7 +33,7 @@ export class InventarioSocketGateway {
   async findAllProductos(client: Socket,) {
     const data =
       await this.inventarioSocketService.getInventarioProductos();
-
+    console.log({ data });
     client.emit('loadAllProductos', data);
   }
 

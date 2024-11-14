@@ -235,11 +235,13 @@ export class InventarioService {
   async getInfoCharts(getInfoCharts: GetInfoCharts) {
     try {
       const { fechaInicio, fechaFin } = getInfoCharts;
-      const entregas = await this.entregasService.getEntregasInfoCharts(fechaInicio, fechaFin);
+      const entregas = await this.entregasService.provideInfoToCharts(fechaInicio, fechaFin);
       const tandas = await this.tandasService.findAllByFechas(fechaInicio, fechaFin);
+      const mermas = await this.movimientosService.providerInfoToCharts(fechaInicio, fechaFin);
       return {
         entregas,
         tandas,
+        mermas,
       }
     } catch (error) {
       throw error;

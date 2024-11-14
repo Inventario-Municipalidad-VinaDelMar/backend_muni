@@ -1,7 +1,7 @@
 import { BadRequestException, forwardRef, Inject, Injectable, } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Movimiento, MovimientoType } from '../entities/movimiento.entity';
-import { DataSource, QueryRunner, Repository } from 'typeorm';
+import { Between, DataSource, QueryRunner, Repository } from 'typeorm';
 import { CreateMovimientoRetiroDto } from '../dto/create_movimiento_retiro.dto';
 import { TandasService } from 'src/inventario/rest/servicios-especificos';
 import { MovimientosSocketService } from '../socket/movimientos.socket.service';
@@ -13,6 +13,7 @@ import { User } from 'src/auth/entities/user.entity';
 import { CreateMovimientoIngresoDto } from '../dto/create_movimiento_ingreso';
 import { EnviosSocketService } from 'src/logistica/envios/socket/envios.socket.service';
 import { CreateMovimientoMermaDto } from '../dto/create_movimiento_merma.dto';
+import { normalizeDates } from 'src/utils';
 
 @Injectable()
 export class MovimientosService {
@@ -34,8 +35,50 @@ export class MovimientosService {
         private readonly movimientosSocketService: MovimientosSocketService,
     ) {
     }
+
+    async providerInfoToCharts(fechaInicio: string, fechaFin?: string) {
+        try {
+            const mermasData = await this.movimientoRepository.find({
+                where: {
+                    isDeleted: false,
+                    type: MovimientoType.MERMA,
+                    fecha: fechaFin
+                        ? Between(normalizeDates.normalize(fechaInicio), normalizeDates.normalize(fechaFin))
+                        : normalizeDates.normalize(fechaInicio),
+                },
+                // select: {
+                //     cantidadRetirada: true,
+                //     envioProducto: {
+                //         producto: {
+                //             nombre: true,
+                //             id: true,
+                //         }
+                //     }
+                // },
+            });
+            const mermas = mermasData.map(m => {
+                const tanda = m.tanda;
+                delete m.comentario;
+                delete m.envioProducto;
+                delete m.id;
+                delete m.hora;
+                delete m.isDeleted;
+                delete m.realizador;
+                delete m.tanda;
+                delete m.type;
+                return {
+                    ...m,
+                    producto: tanda.producto.nombre,
+                };
+            });
+            return mermas;
+        } catch (error) {
+            throw error;
+        }
+    }
+
     async createMovimientoAsMerma(createMovimientoMermaDto: CreateMovimientoMermaDto, user: User) {
-        const { idTanda, cantidadMerma, } = createMovimientoMermaDto;
+        const { idTanda, cantidadMerma, comentario } = createMovimientoMermaDto;
         if (this.processingMerma) {
             throw new BadRequestException('Se esta procesando una merma ahora mismo, por favor espere');
         }
@@ -51,12 +94,14 @@ export class MovimientosService {
                 cantidadRetirada: cantidadMerma,
                 tanda: tandaInstance,
                 realizador: user,
+                comentario,
                 type: MovimientoType.MERMA,
             });
 
             // Guardar el movimiento dentro de la transacción
             const movimiento = await queryRunner.manager.save(movimientoCreated);
-
+            // Descontar la cantidad de merma del movimiento a la tanda
+            const tanda: TandaResponse = await this.tandasService.substractAmountToTanda(queryRunner, idTanda, cantidadMerma);
             // const producto = tanda.producto;
             // const productoId = tanda.productoId;
             delete movimiento.tanda
@@ -64,7 +109,8 @@ export class MovimientosService {
 
 
             await queryRunner.commitTransaction();
-
+            //* Notificar por socket actualización de la tanda
+            await this.movimientosSocketService.notifyTandaDiscount(tanda)
             //Error de prueba
             return movimiento;
         } catch (error) {
@@ -115,13 +161,13 @@ export class MovimientosService {
             // Asignar el nuevo movimiento al EnvioProducto;
             await this.enviosService.updateEnvioProducto(queryRunner, movimiento)
             // throw new InternalServerErrorException();
-            // Confirmar la transacción
             const producto = tanda.producto;
             const productoId = tanda.productoId;
             delete movimiento.tanda
             delete movimiento.isDeleted;
 
 
+            // Confirmar la transacción
             await queryRunner.commitTransaction();
             //* Notificar por socket que hay movimiento nuevo en un ENVIO
             await this.movimientosSocketService.notifyMovimientoCreated({

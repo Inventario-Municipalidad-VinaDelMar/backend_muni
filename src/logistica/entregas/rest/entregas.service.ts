@@ -40,7 +40,7 @@ export class EntregasService {
     private readonly comedorSolidarioRepository: Repository<ComedorSolidario>,
   ) { }
 
-  async getEntregasInfoCharts(fechaInicio: string, fechaFin?: string) {
+  async provideInfoToCharts(fechaInicio: string, fechaFin?: string) {
     try {
       const entregasData = await this.entregaRepository.find({
         where: {
@@ -49,9 +49,52 @@ export class EntregasService {
             ? Between(normalizeDates.normalize(fechaInicio), normalizeDates.normalize(fechaFin))
             : normalizeDates.normalize(fechaInicio),
         },
+        relations: ['detallesEntrega'],
+        // select: {
+        //   comedorSolidario: {
+        //     nombre: true,
+        //   },
+        //   fecha: true,
+        //   detallesEntrega: {
+        //     cantidadEntregada: true,
+        //     producto: {
+        //       nombre: true,
+        //     },
+        //   },
+        // },
       })
+      const entregas = entregasData.map(e => {
+        const comedor = e.comedorSolidario;
+        const productos = e.detallesEntrega;
+        delete e.comedorSolidario;
+        delete e.detallesEntrega;
+        delete e.copiloto;
+        delete e.envio;
+        delete e.hora;
+        delete e.id;
+        delete e.isDeleted;
+        delete e.url_acta_legal;
 
-      return entregasData;
+        return {
+          ...e,
+          comedor: comedor.nombre,
+          productos: productos.map(p => {
+            const nombre = p.producto.nombre;
+            const id = p.producto.id;
+            delete p.producto;
+            delete p.isDeleted;
+            delete p.entrega;
+            delete p.id;
+            return {
+              id,
+              nombre,
+              ...p,
+            }
+          })
+        }
+
+      });
+      return entregas;;
     } catch (error) {
       throw error;
     }
