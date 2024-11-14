@@ -76,7 +76,7 @@ export class EnviosController {
     return this.enviosService.finishEnvioByNeorute(idEnvio);
   }
 
-  @Get('')
+  @Post('')
   // @Auth(ValidRoles.admin, ValidRoles.bodeguero, ValidRoles.cargador)
   getEnvios(@Body() getEnviosDto: any) {
     console.log(getEnviosDto)
