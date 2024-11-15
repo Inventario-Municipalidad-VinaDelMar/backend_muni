@@ -601,6 +601,7 @@ export class EnviosService {
         productoId: pp.producto.id,
         fecha: pp.movimiento.fecha,
         hora: pp.movimiento.hora,
+        user: `${pp.movimiento.realizador.nombre} ${pp.movimiento.realizador.apellidoPaterno} ${pp.movimiento.realizador.apellidoMaterno}`
       }));
     const solicitud = envio.solicitud;
 
