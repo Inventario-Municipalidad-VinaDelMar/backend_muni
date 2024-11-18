@@ -278,11 +278,16 @@ export class PlanificacionService {
         });
       }
 
-      // Notificar la actualización
-      await this.planificacionSocketService.notifyPlanificacionSemanalUpdate(planificacionesActualizadas);
-      await this.planificacionSocketService.notifyPlanificacionActualUpdate();
-      await queryRunner.commitTransaction();
 
+      await queryRunner.commitTransaction();
+      try {
+        // Notificar la actualización
+        await this.planificacionSocketService.notifyPlanificacionSemanalUpdate(planificacionesActualizadas);
+        await this.planificacionSocketService.notifyPlanificacionActualUpdate();
+      } catch (error) {
+        console.log('ERROR AL EMITIR CAMBIOS EN PLANIFICACION')
+        console.log(error)
+      }
       return planificacionesActualizadas;
 
     } catch (error) {
