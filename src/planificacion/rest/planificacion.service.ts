@@ -273,6 +273,7 @@ export class PlanificacionService {
               cantidadPlanificada: d.cantidadPlanificada,
               producto: d.producto.nombre,
               productoId: d.producto.id,
+              urlImagen: d.producto.urlImagen,
             };
           }),
         });
