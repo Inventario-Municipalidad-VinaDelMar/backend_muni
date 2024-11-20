@@ -69,6 +69,24 @@ export const initialData: SeedData = {
         { email: 'mangini@gmail.com', password: 'Abc12345', nombre: 'Franco', apellidoPaterno: 'Mangini', apellidoMaterno: 'Tapia', rut: '20175289-2', roles: ['administrador'] },
         { email: 'diego@gmail.com', password: 'Abc12345', nombre: 'Diego', apellidoPaterno: 'Hidalgo', apellidoMaterno: 'Carvajal', rut: '21069070-0', roles: ['administrador'] },
         { email: 'renato@gmail.com', password: 'Abc12345', nombre: 'Renato', apellidoPaterno: 'Plaza', apellidoMaterno: 'Diaz', rut: '20482871-7', roles: ['administrador'] },
+        //Reunion 20 de novimiembre, participantes
+        { email: 'cesar.roman.russell@gmail.com', password: 'Abc12345', nombre: 'Cesar', apellidoPaterno: 'Roman', apellidoMaterno: 'Russel', rut: '1234567897', roles: ['administrador'] },
+        { email: 'sebastian.cabrera@alumnos.uv.cl', password: 'Abc12345', nombre: 'Sebastian', apellidoPaterno: 'Cabrera', apellidoMaterno: 'Russel', rut: '1234567897', roles: ['administrador'] },
+        { email: 'basticontrewasil@gmail.com', password: 'Abc12345', nombre: 'Bastian', apellidoPaterno: 'Contreras', apellidoMaterno: 'Wasil', rut: '1234567897', roles: ['administrador'] },
+        { email: 'ashlymazuela@gmail.com', password: 'Abc12345', nombre: 'Ashly', apellidoPaterno: 'Mazuela', apellidoMaterno: '', rut: '1234567897', roles: ['administrador'] },
+        { email: 'flga.belensepulvedal@gmail.com', password: 'Abc12345', nombre: 'Flga', apellidoPaterno: 'Belen', apellidoMaterno: 'Sepulveda', rut: '1234567897', roles: ['administrador'] },
+        { email: 'franco.villegas190@gmail.com', password: 'Abc12345', nombre: 'Franco', apellidoPaterno: 'Villegas', apellidoMaterno: '', rut: '1234567897', roles: ['administrador'] },
+        { email: 'conniedcp@gmail.coml', password: 'Abc12345', nombre: 'Connie', apellidoPaterno: 'Dcp', apellidoMaterno: '', rut: '1234567897', roles: ['administrador'] },
+        { email: 'jorgecl@gmail.com', password: 'Abc12345', nombre: 'Jorge', apellidoPaterno: 'Cl', apellidoMaterno: '', rut: '1234567897', roles: ['administrador'] },
+        { email: 'juan.vargasgo@usach.cl', password: 'Abc12345', nombre: 'Juan', apellidoPaterno: 'Vargas', apellidoMaterno: '', rut: '1234567897', roles: ['administrador'] },
+        { email: 'constanza.delcanto@alumni.uc.cl', password: 'Abc12345', nombre: 'Constanza', apellidoPaterno: 'del Canto', apellidoMaterno: '', rut: '1234567897', roles: ['administrador'] },
+        { email: 'paulaestercruz@gmail.com', password: 'Abc12345', nombre: 'Paula', apellidoPaterno: 'Ester', apellidoMaterno: 'Cruz', rut: '1234567897', roles: ['administrador'] },
+        { email: 'ambar.arriagada719@gmail.com', password: 'Abc12345', nombre: 'Ambar', apellidoPaterno: 'Arriagada', apellidoMaterno: '', rut: '1234567897', roles: ['administrador'] },
+        { email: 'alejandro.ramirez.mendoza@gmail.com', password: 'Abc12345', nombre: 'Alejandro', apellidoPaterno: 'Ramirez', apellidoMaterno: 'Mendoza', rut: '1234567897', roles: ['administrador'] },
+        //Usuario de testeos
+        { email: 'test.inv.admin1@gmail.com', password: 'Abc12345', nombre: 'Administrador', apellidoPaterno: 'Testing', apellidoMaterno: '1', rut: '1234567897', roles: ['administrador'] },
+        { email: 'test.inv.admin2@gmail.com', password: 'Abc12345', nombre: 'Administrador', apellidoPaterno: 'Testing', apellidoMaterno: '2', rut: '1234567897', roles: ['administrador'] },
+        { email: 'test.inv.admin3@gmail.com', password: 'Abc12345', nombre: 'Administrador', apellidoPaterno: 'Testing', apellidoMaterno: '3', rut: '1234567897', roles: ['administrador'] },
     ],
     comedores: [
         //Comedor 1

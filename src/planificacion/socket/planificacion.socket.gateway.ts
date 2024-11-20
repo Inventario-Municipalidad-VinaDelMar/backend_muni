@@ -72,6 +72,7 @@ export class PlanificacionSocketGateway {
     client.emit('loadSolicitud', solicitud);
     console.log({ room })
     client.emit('loadPlanificacion', data);
+    client.emit('loadDetallesTaken', this.detallesTaken);
   }
 
   @SubscribeMessage('adminPlanificacionManage')

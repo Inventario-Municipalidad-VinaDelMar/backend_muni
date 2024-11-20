@@ -61,7 +61,7 @@ export class SeedService {
             await this.insertNewUbicaciones(bodega.id);
             await this.insertNewTandas();
             const planificaciones = await this.insertNewPlanificaciones();
-            await this.insertNewEnvios(user1, user2, planificaciones);
+            // await this.insertNewEnvios(user1, user2, planificaciones);
             await this.insertNewComedores();
             return 'Seed Executed';
         } catch (error) {
